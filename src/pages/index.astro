@@ -19,8 +19,6 @@ interface ProductoAgrupado {
 
 let productosAgrupados: ProductoAgrupado[] = [];
 let errorCarga = '';
-
-// IMAGEN POR DEFECTO (CUANDO NO HAY FOTO EN EXCEL)
 const IMAGEN_SIN_FOTO = 'https://placehold.co/500x500/f0f0f0/d60000?text=SIN+FOTO';
 
 try {
@@ -43,12 +41,10 @@ try {
 
     if (!nombreFamilia || !precioTexto) return;
 
-    // 🚨 LIMPIEZA DE RUTA (/public)
     if (imagenRaw.startsWith('/public')) {
         imagenRaw = imagenRaw.replace('/public', '');
     }
 
-    // 🔥 CORRECCIÓN: Si está vacía, se queda vacía (usará el placeholder después)
     const imagenFinal = imagenRaw !== '' ? imagenRaw : IMAGEN_SIN_FOTO;
 
     if (!grupos[nombreFamilia]) {
@@ -59,8 +55,6 @@ try {
         referencias: []
       };
     }
-
-    // Si es una variante y no tiene foto específica, usamos la del grupo principal
     const imagenVariante = imagenRaw !== '' ? imagenRaw : grupos[nombreFamilia].imagenDefault;
 
     grupos[nombreFamilia].referencias.push({
@@ -79,9 +73,7 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    
     <meta name="robots" content="noindex, nofollow" />
-    
     <title>Catálogo Premium Racing</title>
     <style>
         .casilla-resaltada {
@@ -89,47 +81,65 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
             color: #000000 !important;
             font-weight: 900 !important;
             border-left: 5px solid #D60000;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
+            transition: all 0.2s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .header-layout {
+                flex-direction: row !important;
+                align-items: center;
+                gap: 10px;
+            }
+            .header-logo-container {
+                width: 50px; 
+                padding: 0 !important;
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                transform: none !important;
+            }
+            .header-logo-img { height: 40px !important; }
+            .header-title-text { display: none; }
+            .header-search-container { flex: 1; }
         }
     </style>
 </head>
 <body class="bg-grid-pattern text-gray-800 antialiased">
 
-    <header class="bg-carbon sticky top-0 z-50 shadow-2xl border-b-4 border-brand-red">
+    <header class="bg-carbon sticky top-0 z-50 shadow-md border-b-4 border-brand-red transition-all duration-300 h-[72px] flex items-center">
         <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-red via-red-500 to-brand-red z-20"></div>
-        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col gap-4 relative z-10">
-            <div class="flex items-center justify-center md:justify-between w-full">
-                <div class="relative transform -skew-x-12 bg-black px-6 py-1 border-l-4 md:border-l-8 border-brand-red shadow-lg transition-all">
-                    <div class="transform skew-x-12 flex items-center justify-center">
-                        <img src="/logo.png" alt="Logo" class="h-14 md:h-20 w-auto object-contain" onerror="this.style.display='none'; document.getElementById('alt-logo').style.display='block'"/>
-                        <div id="alt-logo" class="hidden">
+        <div class="max-w-7xl mx-auto px-4 w-full relative z-10">
+            <div class="header-layout flex flex-col md:flex-row gap-4 items-center justify-between">
+                <div class="header-logo-container relative transform md:-skew-x-12 bg-black px-0 md:px-6 py-1 md:border-l-8 border-brand-red md:shadow-lg transition-all flex-shrink-0">
+                    <div class="transform md:skew-x-12 flex items-center justify-center">
+                        <img src="/logo.png" alt="Logo" class="header-logo-img h-14 md:h-20 w-auto object-contain"/>
+                        <div class="header-title-text hidden md:block ml-4">
                             <h1 class="text-xl md:text-3xl font-racing font-black italic tracking-tighter text-white uppercase">PREMIUM <span class="text-brand-red">RACING</span></h1>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="w-full">
-                <div class="relative group">
-                    <div class="absolute -inset-0.5 bg-brand-red rounded opacity-30 group-hover:opacity-100 transition duration-200 blur"></div>
-                    <input type="search" id="search-input" placeholder="BUSCAR..." class="relative w-full py-3 px-5 pl-12 bg-gray-900 border border-gray-700 rounded text-white font-bold placeholder-gray-500 focus:outline-none focus:bg-black uppercase italic tracking-wide shadow-inner text-sm md:text-base"/>
-                    <span class="absolute left-4 top-3 text-brand-red text-lg z-10">🔍</span>
+                <div class="header-search-container w-full">
+                    <div class="relative group">
+                        <div class="absolute -inset-0.5 bg-brand-red rounded opacity-30 group-hover:opacity-100 transition duration-200 blur"></div>
+                        <input type="search" id="search-input" placeholder="BUSCAR..." class="relative w-full py-2 md:py-3 px-5 pl-10 md:pl-12 bg-gray-900 border border-gray-700 rounded text-white font-bold placeholder-gray-500 focus:outline-none focus:bg-black uppercase italic tracking-wide shadow-inner text-sm md:text-base"/>
+                        <span class="absolute left-3 md:left-4 top-2 md:top-3 text-brand-red text-lg z-10">🔍</span>
+                    </div>
                 </div>
             </div>
         </div>
     </header>
 
-    <div class="bg-brand-red h-8 w-full flex items-center overflow-hidden relative shadow-md border-b border-white/20">
+    <div class="bg-brand-red h-8 w-full flex items-center overflow-hidden relative shadow-md border-b border-white/20 sticky top-[72px] z-40">
         <div class="absolute inset-0 w-full h-full opacity-20" style="background-image: repeating-linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), repeating-linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000); background-position: 0 0, 10px 10px; background-size: 20px 20px;"></div>
         <div class="max-w-7xl mx-auto w-full px-4 flex justify-between text-white text-[10px] md:text-xs font-black uppercase tracking-[0.2em] italic relative z-10">
             <span>CALIDAD GARANTIZADA</span><span>2026</span>
         </div>
     </div>
 
-    <main class="max-w-7xl mx-auto px-4 py-6 md:py-10 min-h-screen pb-32">
+    <main class="max-w-7xl mx-auto px-2 md:px-4 py-4 md:py-10 min-h-screen pb-32 relative z-0">
         {errorCarga && <div class="bg-red-600 text-white p-4 font-bold text-center mb-6 shadow-lg border-2 border-white rounded">{errorCarga}</div>}
 
-        <div class="flex items-center gap-3 mb-6">
+        <div class="flex items-center gap-3 mb-6 px-2 mt-4">
             <div class="w-2 md:w-3 h-8 md:h-10 bg-brand-red -skew-x-12 shadow-lg shadow-red-500/50"></div>
             <h2 class="text-2xl md:text-4xl font-racing font-black uppercase italic text-gray-900 tracking-tight">Catálogo <span class="text-brand-red">Oficial</span></h2>
         </div>
@@ -137,23 +147,16 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
         <div id="product-grid" class="columns-1 xl:columns-2 gap-6 space-y-6">
             {productosAgrupados.map((item) => (
                 <article 
-                    class="producto-card break-inside-avoid bg-white rounded-lg shadow-md border-t-4 border-brand-red overflow-hidden flex flex-col md:flex-row hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+                    class="producto-card break-inside-avoid bg-white rounded-lg shadow-md border-t-4 border-brand-red overflow-hidden flex flex-col md:flex-row hover:shadow-2xl transition-all duration-300"
                     data-nombre={item.nombre.toLowerCase()} 
                     data-referencias={JSON.stringify(item.referencias).toLowerCase()}
+                    data-all-images={JSON.stringify(item.referencias.map(r => r.imagenEspecifica))} 
                 >
-                    <div class="w-full md:w-5/12 bg-white p-4 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-gray-100 relative group">
-                        <div class="w-full h-64 md:h-full min-h-[250px] flex items-center justify-center p-2">
-                            <img 
-                                id={`img-${item.id}`}
-                                src={item.imagenDefault} 
-                                alt={item.nombre} 
-                                class="main-image max-w-full max-h-full object-contain transition-transform duration-500 group-hover:scale-110"
-                                onerror="this.src='https://placehold.co/500x500/f0f0f0/d60000?text=SIN+FOTO'"
-                            />
-                        </div>
-                        <div class="mt-4 text-center pb-4 md:pb-0 px-2 w-full">
-                            <div class="texto-buscable rounded px-2 transition-colors">
-                                <h3 class="font-racing font-black text-2xl leading-none text-gray-900 uppercase italic">
+                    <div class="w-full md:w-5/12 bg-white border-b md:border-b-0 md:border-r border-gray-100 relative group md:static sticky top-[104px] z-30 md:z-0 shadow-lg md:shadow-none">
+                        
+                        <div class="text-center w-full bg-gray-50 border-b border-gray-200 py-3 shadow-sm">
+                            <div class="texto-buscable px-2">
+                                <h3 class="font-racing font-black text-lg md:text-2xl leading-none text-gray-900 uppercase italic">
                                     {item.nombre}
                                 </h3>
                             </div>
@@ -161,10 +164,20 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
                                 {item.referencias.length} Referencias
                             </p>
                         </div>
+
+                        <div class="w-full h-32 md:h-full min-h-[130px] flex items-center justify-center p-2 bg-white">
+                            <img 
+                                id={`img-${item.id}`}
+                                src={item.imagenDefault} 
+                                alt={item.nombre} 
+                                class="main-image max-w-full max-h-32 md:max-h-full object-contain transition-opacity duration-200"
+                                onerror="this.src='https://placehold.co/500x500/f0f0f0/d60000?text=SIN+FOTO'"
+                            />
+                        </div>
                     </div>
 
-                    <div class="w-full md:w-7/12 flex flex-col bg-white">
-                        <div class="bg-gray-900 text-white text-[10px] md:text-xs uppercase font-bold px-4 py-2 flex justify-between items-center shadow-md z-10">
+                    <div class="w-full md:w-7/12 flex flex-col bg-white relative z-10 pt-2">
+                        <div class="bg-gray-900 text-white text-[10px] md:text-xs uppercase font-bold px-4 py-2 flex justify-between items-center shadow-md sticky top-0 md:static z-10">
                             <span>Referencia</span>
                             <span>Precio</span>
                         </div>
@@ -173,11 +186,12 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
                                 <tbody class="divide-y divide-gray-100">
                                     {item.referencias.map((ref) => (
                                         <tr 
-                                            class="hover:bg-red-50 transition-colors cursor-pointer ref-row group/row"
+                                            class="hover:bg-red-50 transition-colors cursor-pointer ref-row active:bg-red-100"
                                             data-img={ref.imagenEspecifica}
                                             data-target={`img-${item.id}`}
+                                            onclick="" 
                                         >
-                                            <td class="texto-buscable px-4 py-3 font-medium text-gray-700 uppercase group-hover/row:text-brand-red transition-colors">
+                                            <td class="texto-buscable px-4 py-3 font-medium text-gray-700 uppercase transition-colors">
                                                 {ref.modelo}
                                             </td>
                                             <td class="px-4 py-3 text-right whitespace-nowrap">
@@ -225,21 +239,34 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
             const noResults = document.getElementById('no-results');
             const elementosBuscables = document.querySelectorAll('.texto-buscable');
 
-            // Preparar el resaltado
+            setTimeout(() => {
+                const uniqueImages = new Set();
+                cards.forEach(card => {
+                    try {
+                        const images = JSON.parse(card.dataset.allImages || '[]');
+                        images.forEach(img => {
+                            if(img && img !== '' && !img.includes('placehold.co')) uniqueImages.add(img);
+                        });
+                    } catch(e){}
+                });
+                uniqueImages.forEach(src => {
+                    const img = new Image();
+                    img.src = src; 
+                });
+            }, 1000);
+
             elementosBuscables.forEach(el => {
                 el.dataset.textoOriginal = el.innerText.toLowerCase();
             });
 
             if(input) {
-                // 1. EVENTO PARA CERRAR TECLADO AL DAR ENTER
                 input.addEventListener('keydown', (event) => {
                     if (event.key === 'Enter') {
-                        event.preventDefault(); // Evita comportamientos raros
-                        input.blur(); // 💥 ESTO CIERRA EL TECLADO
+                        event.preventDefault(); 
+                        input.blur(); 
                     }
                 });
 
-                // 2. Lógica de búsqueda normal
                 input.addEventListener('input', (e) => {
                     const term = e.target.value.toLowerCase().trim();
                     let visibleCount = 0;
@@ -275,12 +302,11 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
                     const imgUrl = row.dataset.img;
                     const targetId = row.dataset.target;
                     const mainImg = document.getElementById(targetId);
+                    
+                    if (mainImg.src.endsWith(imgUrl)) return;
+
                     if (imgUrl && mainImg && imgUrl !== '') {
-                        mainImg.style.opacity = '0.7'; 
-                        setTimeout(() => {
-                            mainImg.src = imgUrl;
-                            mainImg.style.opacity = '1';
-                        }, 150);
+                        mainImg.src = imgUrl;
                     }
                 };
                 row.addEventListener('mouseenter', changeImage);
