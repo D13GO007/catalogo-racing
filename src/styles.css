@@ -1,0 +1,25 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,600;0,800;1,600;1,800&family=Roboto:wght@400;500;700&display=swap');
+
+@theme {
+  --font-sans: 'Roboto', sans-serif;
+  --color-brand-red: #D60000;
+  --color-brand-dark: #0f0f0f;
+}
+
+.bg-carbon {
+  background-color: #111;
+  background-image: 
+    linear-gradient(45deg, #1a1a1a 25%, transparent 25%, transparent 75%, #1a1a1a 75%, #1a1a1a),
+    linear-gradient(45deg, #1a1a1a 25%, transparent 25%, transparent 75%, #1a1a1a 75%, #1a1a1a);
+  background-size: 10px 10px;
+  background-position: 0 0, 5px 5px;
+}
+
+.bg-grid-pattern {
+  background-color: #f4f4f4;
+  background-image: radial-gradient(#d1d1d1 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.font-racing { font-family: 'Kanit', sans-serif; }

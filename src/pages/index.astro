@@ -1,16 +1,274 @@
 ---
+import '../styles.css';
 
+// 🔗 TU ENLACE
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSIQG65879ah7LwHRW8AOiOsah5dO8aJaRhqab75I_5cxhv5slN_YEjmZCaqLOVx6m1R-5Ak2j35C7c/pub?output=csv';
+
+interface Referencia {
+  modelo: string;
+  precio: number;
+  imagenEspecifica: string;
+}
+
+interface ProductoAgrupado {
+  id: string;
+  nombre: string;
+  imagenDefault: string;
+  referencias: Referencia[];
+}
+
+let productosAgrupados: ProductoAgrupado[] = [];
+let errorCarga = '';
+
+try {
+  const response = await fetch(SHEET_URL);
+  if (!response.ok) throw new Error('Error al conectar con Google Sheets');
+  const data = await response.text();
+  const filas = data.split('\n');
+  const grupos: Record<string, ProductoAgrupado> = {};
+  let ultimaImagen = '';
+
+  filas.slice(1).forEach((fila, index) => {
+    if (!fila.trim()) return;
+    const col = fila.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+    if (col.length < 3) return; 
+
+    const nombreFamilia = col[0]?.replace(/^"|"$/g, '').trim(); 
+    const modeloReferencia = col[1]?.replace(/^"|"$/g, '').trim();
+    const precioTexto = col[2]?.replace(/[^0-9]/g, '');
+    let imagenRaw = col[3]?.replace(/^"|"$/g, '').trim() || '';
+    const id = `prod-${index}`;
+
+    if (!nombreFamilia || !precioTexto) return;
+
+    if (imagenRaw === '') {
+        imagenRaw = ultimaImagen;
+    } else {
+        ultimaImagen = imagenRaw;
+    }
+
+    if (!grupos[nombreFamilia]) {
+      grupos[nombreFamilia] = {
+        id,
+        nombre: nombreFamilia,
+        imagenDefault: imagenRaw || '/logo.png',
+        referencias: []
+      };
+    }
+    grupos[nombreFamilia].referencias.push({
+      modelo: modeloReferencia || 'Estándar',
+      precio: Number(precioTexto),
+      imagenEspecifica: imagenRaw || ''
+    });
+  });
+  productosAgrupados = Object.values(grupos);
+} catch (e) { errorCarga = "No pudimos cargar la lista."; }
+
+const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(v);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    
+    <meta name="robots" content="noindex, nofollow" />
+    
+    <title>Catálogo Premium Racing</title>
+    <style>
+        .casilla-resaltada {
+            background-color: #ffd700 !important;
+            color: #000000 !important;
+            font-weight: 900 !important;
+            border-left: 5px solid #D60000;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-grid-pattern text-gray-800 antialiased">
+
+    <header class="bg-carbon sticky top-0 z-50 shadow-2xl border-b-4 border-brand-red">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-red via-red-500 to-brand-red z-20"></div>
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col gap-4 relative z-10">
+            <div class="flex items-center justify-center md:justify-between w-full">
+                <div class="relative transform -skew-x-12 bg-black px-6 py-1 border-l-4 md:border-l-8 border-brand-red shadow-lg transition-all">
+                    <div class="transform skew-x-12 flex items-center justify-center">
+                        <img src="/logo.png" alt="Logo" class="h-14 md:h-20 w-auto object-contain" onerror="this.style.display='none'; document.getElementById('alt-logo').style.display='block'"/>
+                        <div id="alt-logo" class="hidden">
+                            <h1 class="text-xl md:text-3xl font-racing font-black italic tracking-tighter text-white uppercase">PREMIUM <span class="text-brand-red">RACING</span></h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full">
+                <div class="relative group">
+                    <div class="absolute -inset-0.5 bg-brand-red rounded opacity-30 group-hover:opacity-100 transition duration-200 blur"></div>
+                    <input type="text" id="search-input" placeholder="BUSCAR..." class="relative w-full py-3 px-5 pl-12 bg-gray-900 border border-gray-700 rounded text-white font-bold placeholder-gray-500 focus:outline-none focus:bg-black uppercase italic tracking-wide shadow-inner text-sm md:text-base"/>
+                    <span class="absolute left-4 top-3 text-brand-red text-lg z-10">🔍</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="bg-brand-red h-8 w-full flex items-center overflow-hidden relative shadow-md border-b border-white/20">
+        <div class="absolute inset-0 w-full h-full opacity-20" style="background-image: repeating-linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), repeating-linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000); background-position: 0 0, 10px 10px; background-size: 20px 20px;"></div>
+        <div class="max-w-7xl mx-auto w-full px-4 flex justify-between text-white text-[10px] md:text-xs font-black uppercase tracking-[0.2em] italic relative z-10">
+            <span>CALIDAD GARANTIZADA</span><span>2026</span>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 py-6 md:py-10 min-h-screen pb-32">
+        {errorCarga && <div class="bg-red-600 text-white p-4 font-bold text-center mb-6 shadow-lg border-2 border-white rounded">{errorCarga}</div>}
+
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-2 md:w-3 h-8 md:h-10 bg-brand-red -skew-x-12 shadow-lg shadow-red-500/50"></div>
+            <h2 class="text-2xl md:text-4xl font-racing font-black uppercase italic text-gray-900 tracking-tight">Catálogo <span class="text-brand-red">Oficial</span></h2>
+        </div>
+
+        <div id="product-grid" class="columns-1 xl:columns-2 gap-6 space-y-6">
+            {productosAgrupados.map((item) => (
+                <article 
+                    class="producto-card break-inside-avoid bg-white rounded-lg shadow-md border-t-4 border-brand-red overflow-hidden flex flex-col md:flex-row hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+                    data-nombre={item.nombre.toLowerCase()} 
+                    data-referencias={JSON.stringify(item.referencias).toLowerCase()}
+                >
+                    <div class="w-full md:w-5/12 bg-white p-4 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-gray-100 relative group">
+                        <div class="w-full h-64 md:h-full min-h-[250px] flex items-center justify-center p-2">
+                            <img 
+                                id={`img-${item.id}`}
+                                src={item.imagenDefault} 
+                                alt={item.nombre} 
+                                class="main-image max-w-full max-h-full object-contain transition-transform duration-500 group-hover:scale-110"
+                                onerror="this.src='https://placehold.co/500x500/f0f0f0/d60000?text=SIN+FOTO'"
+                            />
+                        </div>
+                        <div class="mt-4 text-center pb-4 md:pb-0 px-2 w-full">
+                            <div class="texto-buscable rounded px-2 transition-colors">
+                                <h3 class="font-racing font-black text-2xl leading-none text-gray-900 uppercase italic">
+                                    {item.nombre}
+                                </h3>
+                            </div>
+                            <p class="text-[10px] text-gray-400 font-bold uppercase mt-1">
+                                {item.referencias.length} Referencias
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="w-full md:w-7/12 flex flex-col bg-white">
+                        <div class="bg-gray-900 text-white text-[10px] md:text-xs uppercase font-bold px-4 py-2 flex justify-between items-center shadow-md z-10">
+                            <span>Referencia</span>
+                            <span>Precio</span>
+                        </div>
+                        <div class="flex-1 w-full">
+                            <table class="w-full text-xs md:text-sm text-left">
+                                <tbody class="divide-y divide-gray-100">
+                                    {item.referencias.map((ref) => (
+                                        <tr 
+                                            class="hover:bg-red-50 transition-colors cursor-pointer ref-row group/row"
+                                            data-img={ref.imagenEspecifica}
+                                            data-target={`img-${item.id}`}
+                                        >
+                                            <td class="texto-buscable px-4 py-3 font-medium text-gray-700 uppercase group-hover/row:text-brand-red transition-colors">
+                                                {ref.modelo}
+                                            </td>
+                                            <td class="px-4 py-3 text-right whitespace-nowrap">
+                                                <span class="font-racing font-bold text-base md:text-lg text-brand-red">
+                                                    {formatoPeso(ref.precio)}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="p-4 bg-gray-50 mt-auto border-t border-gray-100">
+                            <a 
+                                href={`https://wa.me/573132240559?text=Hola,%20me%20interesa%20el%20producto:%20${item.nombre}`}
+                                target="_blank"
+                                class="w-full flex items-center justify-center gap-2 bg-black hover:bg-brand-red text-white py-3 rounded uppercase font-racing font-bold italic tracking-widest active:scale-95 transition-all text-sm group shadow-lg"
+                            >
+                                <span>SOLICITAR</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            ))}
+        </div>
+
+        <div id="no-results" class="hidden py-24 text-center opacity-40">
+            <h3 class="text-2xl font-racing font-black italic uppercase text-gray-400">Sin resultados</h3>
+        </div>
+    </main>
+
+    <footer class="bg-carbon text-white py-8 md:py-12 mt-8 border-t-8 border-brand-red relative overflow-hidden">
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-6xl md:text-9xl font-racing font-black opacity-[0.03] italic whitespace-nowrap pointer-events-none select-none">PREMIUM RACING</div>
+        <div class="max-w-7xl mx-auto px-4 text-center relative z-10">
+            <h2 class="font-racing font-black text-2xl md:text-3xl italic uppercase text-brand-red mb-2">Premium Racing</h2>
+            <p class="text-gray-400 text-xs md:text-sm uppercase tracking-widest">Catálogo Oficial • Colombia</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const input = document.getElementById('search-input');
+            const cards = document.querySelectorAll('.producto-card');
+            const noResults = document.getElementById('no-results');
+            const elementosBuscables = document.querySelectorAll('.texto-buscable');
+
+            elementosBuscables.forEach(el => {
+                el.dataset.textoOriginal = el.innerText.toLowerCase();
+            });
+
+            if(input) {
+                input.addEventListener('input', (e) => {
+                    const term = e.target.value.toLowerCase().trim();
+                    let visibleCount = 0;
+
+                    cards.forEach(card => {
+                        const nombre = card.dataset.nombre || '';
+                        const referencias = card.dataset.referencias || '';
+                        
+                        if(nombre.includes(term) || referencias.includes(term)) { 
+                            card.style.display = 'flex'; 
+                            visibleCount++; 
+                        } else { 
+                            card.style.display = 'none'; 
+                        }
+                    });
+
+                    if(noResults) noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+
+                    elementosBuscables.forEach(el => {
+                        const texto = el.dataset.textoOriginal;
+                        if(term && texto.includes(term)) {
+                            el.classList.add('casilla-resaltada');
+                        } else {
+                            el.classList.remove('casilla-resaltada');
+                        }
+                    });
+                });
+            }
+
+            const refRows = document.querySelectorAll('.ref-row');
+            refRows.forEach(row => {
+                const changeImage = () => {
+                    const imgUrl = row.dataset.img;
+                    const targetId = row.dataset.target;
+                    const mainImg = document.getElementById(targetId);
+                    if (imgUrl && mainImg && imgUrl !== '') {
+                        mainImg.style.opacity = '0.7'; 
+                        setTimeout(() => {
+                            mainImg.src = imgUrl;
+                            mainImg.style.opacity = '1';
+                        }, 150);
+                    }
+                };
+                row.addEventListener('mouseenter', changeImage);
+                row.addEventListener('click', changeImage);
+            });
+        });
+    </script>
+</body>
 </html>
