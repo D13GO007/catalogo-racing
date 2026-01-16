@@ -26,6 +26,7 @@ try {
   const data = await response.text();
   const filas = data.split('\n');
   const grupos: Record<string, ProductoAgrupado> = {};
+
   let ultimaImagen = '';
 
   filas.slice(1).forEach((fila, index) => {
@@ -41,11 +42,19 @@ try {
 
     if (!nombreFamilia || !precioTexto) return;
 
+    // --- LÓGICA DE IMÁGENES ---
     if (imagenRaw === '') {
         imagenRaw = ultimaImagen;
     } else {
         ultimaImagen = imagenRaw;
     }
+
+    // 🚨 CORRECCIÓN DE RUTA AUTOMÁTICA 🚨
+    // Si en el Excel pusiste "/public/productos/...", el código lo limpia a "/productos/..."
+    if (imagenRaw.startsWith('/public')) {
+        imagenRaw = imagenRaw.replace('/public', '');
+    }
+    // -------------------------------------
 
     if (!grupos[nombreFamilia]) {
       grupos[nombreFamilia] = {
@@ -71,7 +80,6 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    
     <meta name="robots" content="noindex, nofollow" />
     
     <title>Catálogo Premium Racing</title>
