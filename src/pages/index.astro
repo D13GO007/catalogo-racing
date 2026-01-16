@@ -84,7 +84,7 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
             transition: all 0.2s ease;
         }
         
-        /* ESTILOS PARA EL ENCABEZADO COMPACTO */
+        /* HEADER COMPACTO EN MÓVIL */
         @media (max-width: 768px) {
             .header-layout {
                 flex-direction: row !important;
@@ -100,7 +100,7 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
                 transform: none !important;
             }
             .header-logo-img { height: 40px !important; }
-            .header-title-text { display: none; }
+            .header-title-text { display: none; } /* Ocultar texto en móvil */
             .header-search-container { flex: 1; }
         }
     </style>
@@ -130,14 +130,14 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
         </div>
     </header>
 
-    <div class="bg-brand-red h-8 w-full flex items-center overflow-hidden relative shadow-md border-b border-white/20 sticky top-[72px] z-40">
+    <div class="bg-brand-red h-8 w-full flex items-center overflow-hidden relative shadow-md border-b border-white/20">
         <div class="absolute inset-0 w-full h-full opacity-20" style="background-image: repeating-linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), repeating-linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000); background-position: 0 0, 10px 10px; background-size: 20px 20px;"></div>
         <div class="max-w-7xl mx-auto w-full px-4 flex justify-between text-white text-[10px] md:text-xs font-black uppercase tracking-[0.2em] italic relative z-10">
             <span>CALIDAD GARANTIZADA</span><span>2026</span>
         </div>
     </div>
 
-    <main class="max-w-7xl mx-auto px-2 md:px-4 py-4 md:py-10 min-h-screen pb-32 relative z-0">
+    <main class="max-w-7xl mx-auto px-2 md:px-4 py-4 md:py-10 min-h-screen pb-32">
         {errorCarga && <div class="bg-red-600 text-white p-4 font-bold text-center mb-6 shadow-lg border-2 border-white rounded">{errorCarga}</div>}
 
         <div class="flex items-center gap-3 mb-6 px-2 mt-4">
@@ -148,26 +148,26 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
         <div id="product-grid" class="columns-1 xl:columns-2 gap-6 space-y-6">
             {productosAgrupados.map((item) => (
                 <article 
-                    class="producto-card break-inside-avoid bg-white rounded-lg shadow-md border-t-4 border-brand-red overflow-hidden flex flex-col md:flex-row hover:shadow-2xl transition-all duration-300"
+                    class="producto-card break-inside-avoid bg-white rounded-lg shadow-md border-t-4 border-brand-red overflow-hidden flex flex-col md:flex-row hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
                     data-nombre={item.nombre.toLowerCase()} 
                     data-referencias={JSON.stringify(item.referencias).toLowerCase()}
                     data-all-images={JSON.stringify(item.referencias.map(r => r.imagenEspecifica))} 
                 >
-                    <div class="w-full md:w-5/12 bg-white border-b md:border-b-0 md:border-r border-gray-100 relative group md:static sticky top-[104px] z-30 md:z-0 shadow-lg md:shadow-none">
+                    <div class="w-full md:w-5/12 bg-white border-b md:border-b-0 md:border-r border-gray-100 relative group">
                         
-                        <div class="w-full h-40 md:h-full min-h-[160px] flex items-center justify-center p-2 bg-white">
+                        <div class="w-full h-48 md:h-full min-h-[200px] flex items-center justify-center p-2 bg-white">
                             <img 
                                 id={`img-${item.id}`}
                                 src={item.imagenDefault} 
                                 alt={item.nombre} 
-                                class="main-image max-w-full max-h-40 md:max-h-full object-contain transition-opacity duration-200"
+                                class="main-image max-w-full max-h-48 md:max-h-full object-contain transition-transform duration-500 group-hover:scale-110"
                                 onerror="this.src='https://placehold.co/500x500/f0f0f0/d60000?text=SIN+FOTO'"
                             />
                         </div>
 
-                        <div class="text-center w-full bg-white border-t border-gray-100 py-3">
-                            <div class="texto-buscable px-2">
-                                <h3 class="font-racing font-black text-lg md:text-2xl leading-none text-gray-900 uppercase italic">
+                        <div class="mt-4 text-center pb-4 md:pb-0 px-2 w-full">
+                            <div class="texto-buscable rounded px-2 transition-colors">
+                                <h3 class="font-racing font-black text-2xl leading-none text-gray-900 uppercase italic">
                                     {item.nombre}
                                 </h3>
                             </div>
@@ -177,8 +177,8 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
                         </div>
                     </div>
 
-                    <div class="w-full md:w-7/12 flex flex-col bg-white relative z-10 pt-2">
-                        <div class="bg-gray-900 text-white text-[10px] md:text-xs uppercase font-bold px-4 py-2 flex justify-between items-center shadow-md sticky top-0 md:static z-10">
+                    <div class="w-full md:w-7/12 flex flex-col bg-white">
+                        <div class="bg-gray-900 text-white text-[10px] md:text-xs uppercase font-bold px-4 py-2 flex justify-between items-center shadow-md z-10">
                             <span>Referencia</span>
                             <span>Precio</span>
                         </div>
@@ -187,12 +187,11 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
                                 <tbody class="divide-y divide-gray-100">
                                     {item.referencias.map((ref) => (
                                         <tr 
-                                            class="hover:bg-red-50 transition-colors cursor-pointer ref-row active:bg-red-100"
+                                            class="hover:bg-red-50 transition-colors cursor-pointer ref-row group/row"
                                             data-img={ref.imagenEspecifica}
                                             data-target={`img-${item.id}`}
-                                            onclick="" 
                                         >
-                                            <td class="texto-buscable px-4 py-3 font-medium text-gray-700 uppercase transition-colors">
+                                            <td class="texto-buscable px-4 py-3 font-medium text-gray-700 uppercase group-hover/row:text-brand-red transition-colors">
                                                 {ref.modelo}
                                             </td>
                                             <td class="px-4 py-3 text-right whitespace-nowrap">
@@ -240,7 +239,7 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
             const noResults = document.getElementById('no-results');
             const elementosBuscables = document.querySelectorAll('.texto-buscable');
 
-            // 🚀 PRE-CARGA OPTIMIZADA (Evita LAG)
+            // 🚀 PRE-CARGA DE IMÁGENES
             setTimeout(() => {
                 const uniqueImages = new Set();
                 cards.forEach(card => {
@@ -262,7 +261,6 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
             });
 
             if(input) {
-                // CIERRA TECLADO AL DAR ENTER
                 input.addEventListener('keydown', (event) => {
                     if (event.key === 'Enter') {
                         event.preventDefault(); 
@@ -309,6 +307,7 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
                     if (mainImg.src.endsWith(imgUrl)) return;
 
                     if (imgUrl && mainImg && imgUrl !== '') {
+                        // Cambio simple y directo, sin efectos raros
                         mainImg.src = imgUrl;
                     }
                 };
