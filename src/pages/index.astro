@@ -49,7 +49,6 @@ try {
     }
 
     // 🔥 CORRECCIÓN: Si está vacía, se queda vacía (usará el placeholder después)
-    // Ya no usamos la variable 'ultimaImagen' para evitar que se mezclen productos.
     const imagenFinal = imagenRaw !== '' ? imagenRaw : IMAGEN_SIN_FOTO;
 
     if (!grupos[nombreFamilia]) {
@@ -62,8 +61,6 @@ try {
     }
 
     // Si es una variante y no tiene foto específica, usamos la del grupo principal
-    // O si prefieres que la variante vacía también diga SIN FOTO, usa imagenFinal directo.
-    // Aquí usaremos la del grupo para que se vea bien, pero si el grupo es SIN FOTO, todos son SIN FOTO.
     const imagenVariante = imagenRaw !== '' ? imagenRaw : grupos[nombreFamilia].imagenDefault;
 
     grupos[nombreFamilia].referencias.push({
@@ -115,7 +112,7 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
             <div class="w-full">
                 <div class="relative group">
                     <div class="absolute -inset-0.5 bg-brand-red rounded opacity-30 group-hover:opacity-100 transition duration-200 blur"></div>
-                    <input type="text" id="search-input" placeholder="BUSCAR..." class="relative w-full py-3 px-5 pl-12 bg-gray-900 border border-gray-700 rounded text-white font-bold placeholder-gray-500 focus:outline-none focus:bg-black uppercase italic tracking-wide shadow-inner text-sm md:text-base"/>
+                    <input type="search" id="search-input" placeholder="BUSCAR..." class="relative w-full py-3 px-5 pl-12 bg-gray-900 border border-gray-700 rounded text-white font-bold placeholder-gray-500 focus:outline-none focus:bg-black uppercase italic tracking-wide shadow-inner text-sm md:text-base"/>
                     <span class="absolute left-4 top-3 text-brand-red text-lg z-10">🔍</span>
                 </div>
             </div>
@@ -228,11 +225,21 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
             const noResults = document.getElementById('no-results');
             const elementosBuscables = document.querySelectorAll('.texto-buscable');
 
+            // Preparar el resaltado
             elementosBuscables.forEach(el => {
                 el.dataset.textoOriginal = el.innerText.toLowerCase();
             });
 
             if(input) {
+                // 1. EVENTO PARA CERRAR TECLADO AL DAR ENTER
+                input.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault(); // Evita comportamientos raros
+                        input.blur(); // 💥 ESTO CIERRA EL TECLADO
+                    }
+                });
+
+                // 2. Lógica de búsqueda normal
                 input.addEventListener('input', (e) => {
                     const term = e.target.value.toLowerCase().trim();
                     let visibleCount = 0;
