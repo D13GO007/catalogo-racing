@@ -84,6 +84,7 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
             transition: all 0.2s ease;
         }
         
+        /* ESTILOS PARA EL ENCABEZADO COMPACTO */
         @media (max-width: 768px) {
             .header-layout {
                 flex-direction: row !important;
@@ -154,7 +155,17 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
                 >
                     <div class="w-full md:w-5/12 bg-white border-b md:border-b-0 md:border-r border-gray-100 relative group md:static sticky top-[104px] z-30 md:z-0 shadow-lg md:shadow-none">
                         
-                        <div class="text-center w-full bg-gray-50 border-b border-gray-200 py-3 shadow-sm">
+                        <div class="w-full h-40 md:h-full min-h-[160px] flex items-center justify-center p-2 bg-white">
+                            <img 
+                                id={`img-${item.id}`}
+                                src={item.imagenDefault} 
+                                alt={item.nombre} 
+                                class="main-image max-w-full max-h-40 md:max-h-full object-contain transition-opacity duration-200"
+                                onerror="this.src='https://placehold.co/500x500/f0f0f0/d60000?text=SIN+FOTO'"
+                            />
+                        </div>
+
+                        <div class="text-center w-full bg-white border-t border-gray-100 py-3">
                             <div class="texto-buscable px-2">
                                 <h3 class="font-racing font-black text-lg md:text-2xl leading-none text-gray-900 uppercase italic">
                                     {item.nombre}
@@ -163,16 +174,6 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
                             <p class="text-[10px] text-gray-400 font-bold uppercase mt-1">
                                 {item.referencias.length} Referencias
                             </p>
-                        </div>
-
-                        <div class="w-full h-32 md:h-full min-h-[130px] flex items-center justify-center p-2 bg-white">
-                            <img 
-                                id={`img-${item.id}`}
-                                src={item.imagenDefault} 
-                                alt={item.nombre} 
-                                class="main-image max-w-full max-h-32 md:max-h-full object-contain transition-opacity duration-200"
-                                onerror="this.src='https://placehold.co/500x500/f0f0f0/d60000?text=SIN+FOTO'"
-                            />
                         </div>
                     </div>
 
@@ -239,6 +240,7 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
             const noResults = document.getElementById('no-results');
             const elementosBuscables = document.querySelectorAll('.texto-buscable');
 
+            // 🚀 PRE-CARGA OPTIMIZADA (Evita LAG)
             setTimeout(() => {
                 const uniqueImages = new Set();
                 cards.forEach(card => {
@@ -260,6 +262,7 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
             });
 
             if(input) {
+                // CIERRA TECLADO AL DAR ENTER
                 input.addEventListener('keydown', (event) => {
                     if (event.key === 'Enter') {
                         event.preventDefault(); 
