@@ -83,6 +83,8 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
     <meta name="robots" content="noindex, nofollow" />
     
     <title>Catálogo Premium Racing</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <style>
         .casilla-resaltada {
             background-color: #ffd700 !important;
@@ -112,6 +114,128 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
             .header-title-text { display: none; } /* Ocultar texto en móvil */
             .header-search-container { flex: 1; }
         }
+<<<<<<< Updated upstream
+=======
+
+        /* --- PDF STYLES --- */
+        #printable-area {
+            position: absolute;
+            left: -9999px;
+            top: 0;
+            width: 800px;
+            background: white;
+            color: black;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        .pdf-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 4px solid #D60000;
+            padding-bottom: 5px;
+        }
+
+        .pdf-card {
+            display: grid; 
+            grid-template-columns: 40% 60%;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+            background-color: #fff;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
+        .pdf-col-left {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-right: 1px solid #eee;
+        }
+
+        .pdf-img {
+            width: 100%;
+            max-width: 150px;
+            height: auto;
+            object-fit: contain;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .pdf-title {
+            font-family: 'Arial Black', Arial, sans-serif;
+            font-weight: 900;
+            font-size: 13pt;
+            text-transform: uppercase;
+            color: #000;
+            margin-bottom: 5px;
+            line-height: 1.1;
+        }
+
+        .pdf-count {
+            font-size: 8pt;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .pdf-col-right {
+            display: block;
+            width: 100%;
+        }
+
+        .pdf-list-header {
+            display: flex;
+            justify-content: space-between;
+            background: #000;
+            color: white !important;
+            padding: 5px 15px;
+            font-weight: bold;
+            font-size: 9pt;
+            text-transform: uppercase;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .pdf-list-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .pdf-list-row:last-child { border-bottom: none; }
+
+        .pdf-name {
+            text-align: left;
+            font-size: 9pt;
+            text-transform: uppercase;
+            font-weight: 600;
+            white-space: nowrap; 
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 15px;
+            flex: 1;
+            color: #333;
+        }
+
+        .pdf-price {
+            text-align: right;
+            font-size: 11pt;
+            font-weight: 900;
+            color: #D60000 !important;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .loading-state {
+            opacity: 0.7;
+            pointer-events: none;
+            cursor: wait;
+        }
+>>>>>>> Stashed changes
     </style>
 </head>
 <body class="bg-grid-pattern text-gray-800 antialiased">
@@ -151,9 +275,22 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
     <main class="max-w-7xl mx-auto px-4 py-6 md:py-10 min-h-screen pb-32">
         {errorCarga && <div class="bg-red-600 text-white p-4 font-bold text-center mb-6 shadow-lg border-2 border-white rounded">{errorCarga}</div>}
 
+<<<<<<< Updated upstream
         <div class="flex items-center gap-3 mb-6">
             <div class="w-2 md:w-3 h-8 md:h-10 bg-brand-red -skew-x-12 shadow-lg shadow-red-500/50"></div>
             <h2 class="text-2xl md:text-4xl font-racing font-black uppercase italic text-gray-900 tracking-tight">Catálogo <span class="text-brand-red">Oficial</span></h2>
+=======
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+            <div class="flex items-center gap-3">
+                <div class="w-2 md:w-3 h-8 md:h-10 bg-brand-red -skew-x-12 shadow-lg shadow-red-500/50"></div>
+                <h2 class="text-2xl md:text-4xl font-racing font-black uppercase italic text-gray-900 tracking-tight">Catálogo <span class="text-brand-red">Oficial</span></h2>
+            </div>
+            
+            <button id="btn-download" class="bg-gray-800 hover:bg-black text-white px-6 py-2 rounded font-bold uppercase text-sm flex items-center gap-2 shadow-lg transition-all active:scale-95 border border-gray-600">
+                <span id="btn-text">📥 Descargar PDF</span>
+                <span id="btn-spinner" class="hidden">⏳</span>
+            </button>
+>>>>>>> Stashed changes
         </div>
 
         <div id="product-grid" class="columns-1 xl:columns-2 gap-6 space-y-6">
@@ -229,8 +366,35 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
             ))}
         </div>
 
-        <div id="no-results" class="hidden py-24 text-center opacity-40">
-            <h3 class="text-2xl font-racing font-black italic uppercase text-gray-400">Sin resultados</h3>
+        <div id="printable-area">
+            <div class="pdf-header">
+                <h1 style="font-size: 28px; font-weight: bold; margin: 0; text-transform: uppercase;">PREMIUM RACING</h1>
+                <p style="margin: 5px 0; font-size: 14px;">Catálogo Oficial - {fechaHoy}</p>
+            </div>
+            
+            {productosAgrupados.map(grupo => (
+                <div class="pdf-card">
+                    <div class="pdf-col-left">
+                        <img src={grupo.imagenDefault} class="pdf-img" onerror="this.src='https://placehold.co/300x300/f0f0f0/d60000?text=SIN+FOTO'"/>
+                        <div class="pdf-title">{grupo.nombre}</div>
+                        <div class="pdf-count">{grupo.referencias.length} REFERENCIAS</div>
+                    </div>
+
+                    <div class="pdf-col-right">
+                        <div class="pdf-list-header">
+                            <span>Referencia</span>
+                            <span>Precio</span>
+                        </div>
+
+                        {grupo.referencias.map(ref => (
+                            <div class="pdf-list-row">
+                                <span class="pdf-name">{ref.modelo}</span>
+                                <span class="pdf-price">{formatoPeso(ref.precio)}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ))}
         </div>
     </main>
 
@@ -247,9 +411,16 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
             const input = document.getElementById('search-input');
             const cards = document.querySelectorAll('.producto-card');
             const noResults = document.getElementById('no-results');
+            const btnDownload = document.getElementById('btn-download');
+            const btnText = document.getElementById('btn-text');
+            const btnSpinner = document.getElementById('btn-spinner');
             const elementosBuscables = document.querySelectorAll('.texto-buscable');
 
+<<<<<<< Updated upstream
             // ✅ AGREGADO: SCRIPT DE PRE-CARGA DE IMÁGENES
+=======
+            // --- LÓGICA DE INTERFAZ NORMAL ---
+>>>>>>> Stashed changes
             setTimeout(() => {
                 const uniqueImages = new Set();
                 cards.forEach(card => {
@@ -260,11 +431,25 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
                         });
                     } catch(e){}
                 });
+<<<<<<< Updated upstream
                 uniqueImages.forEach(src => {
                     const img = new Image();
                     img.src = src; 
                 });
             }, 2000);
+=======
+                const imageArray = Array.from(uniqueImages);
+                let imgIndex = 0;
+                const preloadNextImage = () => {
+                    if (imgIndex >= imageArray.length) return; 
+                    const img = new Image();
+                    img.src = imageArray[imgIndex];
+                    img.onload = () => { imgIndex++; preloadNextImage(); };
+                    img.onerror = () => { imgIndex++; preloadNextImage(); };
+                };
+                preloadNextImage();
+            }, 3500); 
+>>>>>>> Stashed changes
 
             // Preparar el resaltado
             elementosBuscables.forEach(el => {
@@ -279,16 +464,17 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
                         input.blur(); // 💥 ESTO CIERRA EL TECLADO
                     }
                 });
+<<<<<<< Updated upstream
 
                 // 2. Lógica de búsqueda normal
+=======
+>>>>>>> Stashed changes
                 input.addEventListener('input', (e) => {
                     const term = e.target.value.toLowerCase().trim();
                     let visibleCount = 0;
-
                     cards.forEach(card => {
                         const nombre = card.dataset.nombre || '';
                         const referencias = card.dataset.referencias || '';
-                        
                         if(nombre.includes(term) || referencias.includes(term)) { 
                             card.style.display = 'flex'; 
                             visibleCount++; 
@@ -296,9 +482,7 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
                             card.style.display = 'none'; 
                         }
                     });
-
                     if(noResults) noResults.style.display = visibleCount === 0 ? 'block' : 'none';
-
                     elementosBuscables.forEach(el => {
                         const texto = el.dataset.textoOriginal;
                         if(term && texto.includes(term)) {
@@ -327,6 +511,77 @@ const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', c
                 row.addEventListener('mouseenter', changeImage);
                 row.addEventListener('click', changeImage);
             });
+
+            // --- LÓGICA BLINDADA DE DESCARGA PDF ---
+            if(btnDownload) {
+                btnDownload.addEventListener('click', async () => {
+                    // 1. Mostrar estado "Procesando"
+                    btnDownload.classList.add('loading-state');
+                    btnText.innerText = "Procesando Imágenes...";
+                    btnSpinner.classList.remove('hidden');
+
+                    const element = document.getElementById('printable-area');
+                    const images = element.querySelectorAll('img');
+
+                    // Función para convertir URL a Base64 USANDO UN PROXY (¡ESTO ARREGLA EL LOCALHOST!)
+                    const toBase64 = (url) => {
+                        // Usamos corsproxy.io para saltar el bloqueo de localhost
+                        const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
+                        
+                        return fetch(proxyUrl)
+                            .then(response => {
+                                if (!response.ok) throw new Error('Network response was not ok');
+                                return response.blob();
+                            })
+                            .then(blob => new Promise((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.onloadend = () => resolve(reader.result);
+                                reader.onerror = reject;
+                                reader.readAsDataURL(blob);
+                            }));
+                    };
+
+                    // 2. Procesar imágenes una por una
+                    for (const img of images) {
+                        try {
+                            // Si ya es base64 o placeholder local, saltar
+                            if (img.src.startsWith('data:') || img.src.includes('placehold.co')) continue;
+                            
+                            // Intentar convertir
+                            const base64 = await toBase64(img.src);
+                            img.src = base64;
+                        } catch (e) {
+                            console.warn('Imagen protegida, usando placeholder:', img.src);
+                            // 🔥 Si falla (incluso con proxy), ponemos una imagen segura
+                            img.src = 'https://placehold.co/300x300/f0f0f0/d60000?text=IMG+ERROR'; 
+                        }
+                    }
+
+                    // 3. Generar PDF
+                    btnText.innerText = "Generando PDF...";
+                    
+                    const opt = {
+                        margin:       10,
+                        filename:     'catalogo-premium-racing.pdf',
+                        image:        { type: 'jpeg', quality: 0.98 },
+                        html2canvas:  { scale: 2, useCORS: true }, 
+                        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    };
+
+                    // @ts-ignore
+                    html2pdf().set(opt).from(element).save().then(() => {
+                        btnDownload.classList.remove('loading-state');
+                        btnText.innerText = "📥 Descargar PDF";
+                        btnSpinner.classList.add('hidden');
+                    }).catch(err => {
+                        console.error("Error final:", err);
+                        alert("Hubo un error inesperado. Revisa tu conexión.");
+                        btnDownload.classList.remove('loading-state');
+                        btnText.innerText = "📥 Descargar PDF";
+                        btnSpinner.classList.add('hidden');
+                    });
+                });
+            }
         });
     </script>
 </body>
