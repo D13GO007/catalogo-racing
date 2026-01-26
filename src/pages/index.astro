@@ -2,7 +2,6 @@
 import '../styles.css';
 
 // 🔗 TU ENLACE
-// 🔗 TU ENLACE
 const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSIQG65879ah7LwHRW8AOiOsah5dO8aJaRhqab75I_5cxhv5slN_YEjmZCaqLOVx6m1R-5Ak2j35C7c/pub?output=csv';
 
 interface Referencia {
@@ -34,7 +33,8 @@ try {
     const col = fila.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
     if (col.length < 3) return; 
 
-    const nombreFamilia = col[0]?.replace(/^"|"$/g, '').trim(); 
+    // 🔥 CORRECCIÓN 1: Convertir a MAYÚSCULAS aquí mismo para asegurar orden correcto
+    const nombreFamilia = col[0]?.replace(/^"|"$/g, '').trim().toUpperCase(); 
     const modeloReferencia = col[1]?.replace(/^"|"$/g, '').trim();
     const precioTexto = col[2]?.replace(/[^0-9]/g, '');
     let imagenRaw = col[3]?.replace(/^"|"$/g, '').trim() || '';
@@ -65,10 +65,12 @@ try {
     });
   });
 
-  // 🔥 AQUÍ ESTÁ EL CAMBIO: ORDENAR ALFABÉTICAMENTE
-  productosAgrupados = Object.values(grupos).sort((a, b) => 
-    a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })
-  );
+  // 🔥 CORRECCIÓN 2: Ordenamiento manual (funciona en Vercel sin depender del idioma)
+  productosAgrupados = Object.values(grupos).sort((a, b) => {
+    if (a.nombre < b.nombre) return -1;
+    if (a.nombre > b.nombre) return 1;
+    return 0;
+  });
 
 } catch (e) { errorCarga = "No pudimos cargar la lista."; }
 
