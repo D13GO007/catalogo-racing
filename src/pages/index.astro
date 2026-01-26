@@ -64,7 +64,12 @@ try {
       imagenEspecifica: imagenVariante
     });
   });
-  productosAgrupados = Object.values(grupos);
+
+  // 🔥 AQUÍ ESTÁ EL CAMBIO: ORDENAR ALFABÉTICAMENTE
+  productosAgrupados = Object.values(grupos).sort((a, b) => 
+    a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })
+  );
+
 } catch (e) { errorCarga = "No pudimos cargar la lista."; }
 
 const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(v);
