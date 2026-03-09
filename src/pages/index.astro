@@ -1,5 +1,6 @@
 ---
 import '../styles.css';
+import BotonDescargaPDF from '../components/CatalogoPDF.jsx';
 
 // 🔗 TU ENLACE
 const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSIQG65879ah7LwHRW8AOiOsah5dO8aJaRhqab75I_5cxhv5slN_YEjmZCaqLOVx6m1R-5Ak2j35C7c/pub?output=csv';
@@ -102,134 +103,102 @@ const fechaHoy = new Date().toLocaleDateString('es-CO', { year: 'numeric', month
             .header-search-container { flex: 1; }
         }
 
-        /* 🖨️ ESTILOS DE IMPRESIÓN FLEXBOX + GRID (PRECIO A LA DERECHA) */
-        @media print {
-            @page { margin: 0.8cm; size: auto; }
-            body * { visibility: hidden; }
-            header, .bg-carbon, .bg-brand-red, footer, #btn-print, #search-input, main { display: none !important; }
-            
-            #printable-area, #printable-area * {
-                visibility: visible;
-                display: block !important;
-            }
-            
-            #printable-area {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                background: white;
-                color: black;
-                font-family: Arial, sans-serif;
-            }
+@media print {
+    @page { margin: 1cm; size: A4; }
+    
+    body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background: white; }
+    body * { visibility: hidden; }
+    header, .bg-carbon, .bg-brand-red, footer, #btn-print, #search-input, main { display: none !important; }
+    
+    #printable-area, #printable-area * { visibility: visible !important; }
+    
+    #printable-area {
+        position: absolute; left: 0; top: 0; width: 100%;
+        font-family: 'Arial Black', Arial, sans-serif; 
+        color: #000;
+    }
 
-            .print-header {
-                text-align: center;
-                margin-bottom: 20px;
-                border-bottom: 4px solid #D60000;
-                padding-bottom: 5px;
-            }
+    /* PORTADA MAYORISTA */
+    .print-cover-page {
+        height: 90vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        page-break-after: always;
+        border: 8px solid #D60000;
+        padding: 2cm;
+        box-sizing: border-box;
+        background-color: #f9f9f9 !important;
+    }
+    .cover-header { text-align: center; margin-bottom: 50px; }
+    .main-logo { max-width: 300px; margin-bottom: 20px; }
+    .cover-header h1 { font-size: 24pt; font-weight: 900; background: #000 !important; color: #fff !important; padding: 10px 20px; text-transform: uppercase; }
+    .cover-header p { font-size: 14pt; font-family: Arial, sans-serif; font-weight: bold; color: #D60000; }
+    
+    .brands-grid { display: flex; gap: 15px; width: 100%; justify-content: center; margin-top: 30px;}
+    .brand-box { border: 2px solid #ccc; padding: 15px 25px; font-size: 10pt; font-weight: bold; color: #666; background: #fff !important; }
 
-            /* TARJETA DEL PRODUCTO */
-            .print-card-vertical {
-                border: 1px solid #999;
-                margin-bottom: 20px;
-                break-inside: avoid;
-                page-break-inside: avoid;
-                background-color: #fff;
-                padding-top: 10px;
-            }
+    /* BLOQUE EDITORIAL (Reemplaza las tarjetas) */
+    .editorial-block {
+        width: 100%;
+        margin-bottom: 20px;
+        border: 2px solid #000;
+        page-break-inside: avoid;
+    }
 
-            /* FOTO ARRIBA */
-            .print-top-section {
-                text-align: center; 
-                padding: 0 10px 5px 10px;
-            }
+    /* TÍTULO DE CATEGORÍA GIGANTE */
+    .editorial-title {
+        background-color: #000 !important;
+        border-bottom: 3px solid #D60000;
+        padding: 8px;
+    }
+    .editorial-title h2 {
+        margin: 0; color: #fff !important; font-size: 14pt; font-weight: 900;
+        text-transform: uppercase; letter-spacing: 1px;
+    }
 
-            .print-main-img {
-                height: 120px; 
-                width: auto;
-                max-width: 100%;
-                object-fit: contain;
-                display: block;
-                margin: 0 auto 5px auto; 
-            }
+    .editorial-grid { display: table; width: 100%; }
 
-            .print-title {
-                font-family: 'Arial Black', Arial, sans-serif;
-                font-weight: 900;
-                font-size: 14pt;
-                text-transform: uppercase;
-                color: #000;
-                margin-bottom: 2px;
-            }
+    /* FOTO CON BORDE */
+    .editorial-img-cell {
+        display: table-cell;
+        width: 25%;
+        vertical-align: middle;
+        text-align: center;
+        border-right: 2px solid #000;
+        padding: 10px;
+        background: #fff !important;
+    }
+    .editorial-img-cell img { max-width: 100%; max-height: 120px; object-fit: contain; }
 
-            .print-refs-count {
-                font-size: 8pt;
-                color: #666;
-                text-transform: uppercase;
-                margin-bottom: 8px;
-            }
-
-            /* LISTA DE PRECIOS CON GRID (70/30) */
-            .price-list-container {
-                border-top: 2px solid #000;
-                width: 100%;
-            }
-
-            /* CLASE COMÚN PARA LA ESTRUCTURA GRID */
-            .grid-structure {
-                display: grid;
-                grid-template-columns: 70% 30%; /* 🔥 70% Referencia | 30% Precio */
-                padding: 4px 10px;
-                align-items: center;
-            }
-
-            /* ENCABEZADO */
-            .list-header {
-                background: #000;
-                color: white !important;
-                font-weight: bold;
-                font-size: 9pt;
-                text-transform: uppercase;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-            
-            /* ALINEAR EL TÍTULO "PRECIO" A LA DERECHA */
-            .list-header span:last-child {
-                text-align: right;
-            }
-
-            /* FILA DE DATOS */
-            .list-data-row {
-                border-bottom: 1px solid #ccc;
-            }
-            .list-data-row:last-child { border-bottom: none; }
-
-            /* NOMBRE REFERENCIA (Columna 1) */
-            .row-name {
-                text-align: left;
-                font-size: 9pt; 
-                text-transform: uppercase;
-                font-weight: 600;
-                white-space: nowrap; 
-                overflow: hidden;
-                text-overflow: ellipsis;
-                padding-right: 10px; 
-            }
-
-            /* PRECIO (Columna 2) */
-            .row-price {
-                text-align: right; /* 🔥 AHORA SÍ, A LA DERECHA */
-                font-size: 10pt;
-                font-weight: 900;
-                color: #D60000 !important;
-                white-space: nowrap; 
-            }
-        }
-
-        #printable-area { display: none; }
+    /* TABLA ESTILO EXCEL/COREL */
+    .editorial-table-cell { display: table-cell; width: 75%; vertical-align: top; }
+    
+    .heavy-table { width: 100%; border-collapse: collapse; }
+    .heavy-table th {
+        background-color: #eaeaea !important;
+        color: #000 !important;
+        font-size: 9pt;
+        padding: 6px;
+        border-bottom: 2px solid #000;
+        text-align: left;
+    }
+    .heavy-table .col-precio { text-align: right; width: 30%; background-color: #D60000 !important; color: #fff !important; }
+    
+    .heavy-table td {
+        padding: 5px 6px;
+        border-bottom: 1px solid #999;
+        font-family: Arial, sans-serif;
+        font-size: 8.5pt;
+    }
+    
+    /* Cebra fuerte */
+    .heavy-table tr:nth-child(even) td { background-color: #f2f2f2 !important; }
+    
+    .celda-texto { font-weight: bold; color: #222; }
+    .celda-numero { text-align: right; font-weight: 900; color: #D60000 !important; }
+}
     </style>
 </head>
 <body class="bg-grid-pattern text-gray-800 antialiased">
@@ -273,9 +242,11 @@ const fechaHoy = new Date().toLocaleDateString('es-CO', { year: 'numeric', month
                 <h2 class="text-2xl md:text-4xl font-racing font-black uppercase italic text-gray-900 tracking-tight">Catálogo <span class="text-brand-red">Oficial</span></h2>
             </div>
             
-            <button onclick="window.print()" id="btn-print" class="bg-gray-800 hover:bg-black text-white px-6 py-2 rounded font-bold uppercase text-sm flex items-center gap-2 shadow-lg transition-all active:scale-95 border border-gray-600">
-                <span>🖨️ Imprimir Catálogo</span>
-            </button>
+            <BotonDescargaPDF 
+    client:only="react" 
+    productos={productosAgrupados} 
+    fechaHoy={fechaHoy} 
+/>
         </div>
 
         <div id="product-grid" class="columns-1 xl:columns-2 gap-6 space-y-6">
@@ -358,36 +329,56 @@ const fechaHoy = new Date().toLocaleDateString('es-CO', { year: 'numeric', month
         </div>
     </main>
 
-    <div id="printable-area">
-        <div class="print-header">
-            <h1 style="font-size: 28px; font-weight: bold; margin: 0; text-transform: uppercase;">PREMIUM RACING</h1>
-            <p style="margin: 5px 0; font-size: 14px;">Catálogo Oficial - {fechaHoy}</p>
+<div id="printable-area">
+    <div class="print-cover-page">
+        <div class="cover-header">
+            <img src="/logo.png" onerror="this.src='https://placehold.co/400x150/000/fff?text=PREMIUM+RACING'" class="main-logo"/>
+            <h1>DISTRIBUIDOR MAYORISTA DE MOTOPARTES</h1>
+            <p>LISTA OFICIAL DE PRECIOS - {fechaHoy}</p>
         </div>
-        
-        {productosAgrupados.map(grupo => (
-            <div class="print-card-vertical">
-                <div class="print-top-section">
-                    <img src={grupo.imagenDefault} class="print-main-img" onerror="this.src='https://placehold.co/300x300/f0f0f0/d60000?text=SIN+FOTO'"/>
-                    <div class="print-title">{grupo.nombre}</div>
-                    <div class="print-refs-count">{grupo.referencias.length} REFERENCIAS</div>
-                </div>
+        <div class="brands-grid">
+            <div class="brand-box">CALIDAD</div>
+            <div class="brand-box">GARANTÍA</div>
+            <div class="brand-box">TECNOLOGÍA</div>
+            <div class="brand-box">JAPONESA</div>
+        </div>
+    </div>
 
-                <div class="price-list-container">
-                    <div class="list-header grid-structure">
-                        <span>Referencia</span>
-                        <span>Precio</span>
+    <div class="print-content-pages">
+        {productosAgrupados.map(grupo => (
+            <div class="editorial-block">
+                <div class="editorial-title">
+                    <h2>{grupo.nombre}</h2>
+                </div>
+                
+                <div class="editorial-grid">
+                    <div class="editorial-img-cell">
+                        <img src={grupo.imagenDefault} onerror="this.src='https://placehold.co/200x200/fff/d60000?text=FOTO'" />
                     </div>
                     
-                    {grupo.referencias.map(ref => (
-                        <div class="list-data-row grid-structure">
-                            <span class="row-name" title={ref.modelo}>{ref.modelo}</span>
-                            <span class="row-price">{formatoPeso(ref.precio)}</span>
-                        </div>
-                    ))}
+                    <div class="editorial-table-cell">
+                        <table class="heavy-table">
+                            <thead>
+                                <tr>
+                                    <th>CÓDIGO / APLICACIÓN / MODELO</th>
+                                    <th class="col-precio">PRECIO MAYOR</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {grupo.referencias.map(ref => (
+                                    <tr>
+                                        <td class="celda-texto">{ref.modelo}</td>
+                                        <td class="celda-numero">{formatoPeso(ref.precio)}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         ))}
     </div>
+</div>
 
     <footer class="bg-carbon text-white py-8 md:py-12 mt-8 border-t-8 border-brand-red relative overflow-hidden">
         <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-6xl md:text-9xl font-racing font-black opacity-[0.03] italic whitespace-nowrap pointer-events-none select-none">PREMIUM RACING</div>
