@@ -8,7 +8,7 @@ const formatoPeso = (valor) => {
 // 🎨 COLOR PRINCIPAL DE LA MARCA
 const COLOR_ZAPOTE = '#FF6600'; // Naranja Zapote Brillante
 
-// 🎨 ESTILOS "RACING PREMIUM" (MÁS AMPLIOS Y CON NUEVO COLOR)
+// 🎨 ESTILOS "RACING PREMIUM" (LÓGICA INTELIGENTE + PRECIOS NEGROS)
 const styles = StyleSheet.create({
   page: {
     paddingTop: 180, // Zona de seguridad para no tapar el diseño del fondo
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
   productBox: {
     width: '95%', 
     alignSelf: 'center', 
-    marginBottom: 15, // Más separación entre cajas
+    marginBottom: 15, 
     backgroundColor: '#FFFFFF',
     border: '2pt solid #000000',
     borderRadius: 4,
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
   // TÍTULO CON EL NUEVO COLOR ZAPOTE
   headerContainer: {
     backgroundColor: COLOR_ZAPOTE, 
-    paddingVertical: 8, // Más altura en el título
+    paddingVertical: 8, 
     paddingHorizontal: 12,
     borderBottom: '2pt solid #000000',
   },
@@ -103,29 +103,31 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap', 
   },
 
-  // FILA: DOBLE COLUMNA (Más espaciosas que antes)
+  // FILA: DOBLE COLUMNA 
   tableItemHalf: {
     width: '50%',
     flexDirection: 'row',
-    paddingVertical: 6, // Más espacio para respirar
+    paddingVertical: 6, 
     paddingHorizontal: 6,
     borderBottom: '1pt solid #EEEEEE',
     alignItems: 'center',
   },
   tdModelHalf: { width: '65%', fontSize: 7.5, color: '#000000', fontWeight: 'bold', paddingRight: 3, textTransform: 'uppercase' },
-  tdPriceHalf: { width: '35%', fontSize: 8.5, fontWeight: 'bold', color: COLOR_ZAPOTE, textAlign: 'right' },
+  // ⚠️ PRECIO EN NEGRO
+  tdPriceHalf: { width: '35%', fontSize: 8.5, fontWeight: 'bold', color: '#000000', textAlign: 'right' },
 
-  // FILA: UNA SOLA COLUMNA (Para listas cortas)
+  // FILA: UNA SOLA COLUMNA 
   tableItemFull: {
     width: '100%',
     flexDirection: 'row',
-    paddingVertical: 8, // Aún más espacio al haber pocas
+    paddingVertical: 8, 
     paddingHorizontal: 10,
     borderBottom: '1pt solid #EEEEEE',
     alignItems: 'center',
   },
   tdModelFull: { width: '70%', fontSize: 9, color: '#000000', fontWeight: 'bold', paddingRight: 10, textTransform: 'uppercase' },
-  tdPriceFull: { width: '30%', fontSize: 11, fontWeight: 'bold', color: COLOR_ZAPOTE, textAlign: 'right' },
+  // ⚠️ PRECIO EN NEGRO
+  tdPriceFull: { width: '30%', fontSize: 11, fontWeight: 'bold', color: '#000000', textAlign: 'right' },
 
   // PIE DE PÁGINA
   footer: {
@@ -151,7 +153,7 @@ const CatalogoDocument = ({ productos, fechaHoy }) => (
       />
 
       {productos.map((grupo, index) => {
-        // 🧠 LA LÓGICA INTELIGENTE: ¿Son 3 referencias o menos?
+        // 🧠 LÓGICA INTELIGENTE: Si son 3 referencias o menos, usa 1 sola columna. Si son 4 o más, usa 2 columnas.
         const isSingleColumn = grupo.referencias.length <= 3;
 
         return (
@@ -168,7 +170,7 @@ const CatalogoDocument = ({ productos, fechaHoy }) => (
 
               <View style={styles.tableSection}>
                 
-                {/* RENDERIZADO CONDICIONAL DE LA CABECERA */}
+                {/* RENDERIZADO DE LA CABECERA (DINÁMICO) */}
                 <View style={styles.tableHead}>
                   {isSingleColumn ? (
                     <View style={styles.fullHead}>
@@ -189,7 +191,7 @@ const CatalogoDocument = ({ productos, fechaHoy }) => (
                   )}
                 </View>
 
-                {/* RENDERIZADO CONDICIONAL DEL CUERPO (FILAS) */}
+                {/* RENDERIZADO DEL CUERPO (DINÁMICO) */}
                 <View style={styles.tableBody}>
                   {grupo.referencias.map((ref, i) => {
                     if (isSingleColumn) {
@@ -249,7 +251,7 @@ export default function BotonDescargaPDF({ productos, fechaHoy }) {
       document={<CatalogoDocument productos={productos} fechaHoy={fechaHoy} />} 
       fileName="Catalogo_Premium_Racing_Oficial.pdf"
       style={{
-        backgroundColor: COLOR_ZAPOTE, // Botón también en color Zapote
+        backgroundColor: COLOR_ZAPOTE, // Botón con el color Zapote
         color: '#FFFFFF',
         padding: '12px 24px',
         borderRadius: '2px',
