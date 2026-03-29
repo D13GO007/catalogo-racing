@@ -1,0 +1,940 @@
+---
+import '../../styles.css';
+import { supabase } from '../../lib/supabase.js';
+
+// Obtenemos las órdenes ordenadas desde la más reciente
+const { data: ordenesData, error } = await supabase
+  .from('ventas')
+  .select('*')
+  .order('fecha', { ascending: false });
+
+const ordenes = ordenesData || [];
+
+// 1. LÓGICA DE AGRUPACIÓN POR FECHA
+const ordenesAgrupadas = ordenes.reduce((acc, orden) => {
+  const fechaObj = new Date(orden.fecha);
+  const diaStr = fechaObj.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
+  const clave = diaStr.charAt(0).toUpperCase() + diaStr.slice(1); 
+  
+  if (!acc[clave]) acc[clave] = [];
+  acc[clave].push(orden);
+  return acc;
+}, {});
+
+const formatoPesos = (num) => '$' + Math.round(num).toLocaleString('es-CO');
+const formatearHora = (isoString) => {
+  if (!isoString) return '--:--';
+  return new Date(isoString).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true });
+};
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Historial y Cartera - Premium Racing</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#ea580c" />
+    <link rel="apple-touch-icon" href="/icono-192.png" />
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" is:inline></script>
+    <script is:inline>
+      window.jsPDF = window.jspdf.jsPDF;
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js" is:inline></script>
+
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+      body {
+        font-family: 'Inter', sans-serif;
+        background: #e6e7ee;
+        min-height: 100vh;
+        color: #2d3748;
+        overflow-x: hidden;
+      }
+      .page-bg {
+        position: fixed; inset: 0; z-index: -10;
+        background: radial-gradient(circle at top, rgba(255, 107, 53, 0.18), transparent 55%),
+          radial-gradient(circle at 25% 30%, rgba(45, 55, 72, 0.25), transparent 50%),
+          linear-gradient(135deg, #e6e7ee 0%, #f6f7fb 100%);
+      }
+      .neumorphism {
+        background: #e6e7ee;
+        box-shadow: 10px 10px 20px #bebebe, -10px -10px 20px #ffffff;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+      }
+      .neumorphism-inset {
+        background: #e6e7ee;
+        box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff;
+        border-radius: 15px;
+      }
+      .search-input, .filter-input {
+        width: 100%;
+        padding: 0.7rem 1rem;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        background: rgba(255, 255, 255, 0.85);
+        box-shadow: inset 4px 4px 8px rgba(0,0,0,0.05);
+        outline: none;
+      }
+      .search-input:focus, .filter-input:focus {
+        border-color: rgba(255, 107, 53, 0.6);
+        box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.15);
+      }
+      .layout-height {
+        height: calc(100vh - 5rem); 
+      }
+      .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+      .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+      .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+  </head>
+  <body>
+    <div class="page-bg"></div>
+
+    <header class="w-full h-16 bg-gray-900 shadow-lg border-b-4 border-orange-500 relative z-10 flex items-center shrink-0">
+      <div class="w-full max-w-[98%] mx-auto px-4 flex justify-between items-center">
+        <div class="flex items-center space-x-4">
+          <div class="w-12 h-12 bg-black rounded-xl flex items-center justify-center shadow-lg overflow-hidden shrink-0 border border-gray-700">
+            <img src="/logo.png" alt="Premium Racing" class="w-full h-full object-contain p-1" onerror="this.src='https://placehold.co/100x100?text=PR'" />
+          </div>
+          <div class="hidden lg:block">
+            <h1 class="text-xl font-bold text-white tracking-wide leading-tight">Premium Racing</h1>
+            <p class="text-orange-400 text-[10px] font-black uppercase tracking-widest">Sistema de Gestión</p>
+          </div>
+        </div>
+
+        <nav class="flex items-center gap-1 md:gap-2 overflow-x-auto whitespace-nowrap custom-scrollbar pb-1 md:pb-0">
+          <a href="/pos/inicio" data-astro-prefetch class="nav-link px-3 md:px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-gray-300 border border-transparent hover:bg-gray-800 hover:text-white whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+            <span class="hidden md:inline">Inicio</span>
+          </a>
+          <a href="/pos/ventas" data-astro-prefetch class="nav-link px-3 md:px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-gray-300 border border-transparent hover:bg-gray-800 hover:text-white whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+            <span class="hidden md:inline">Ventas</span>
+          </a>
+          <a href="/pos/historial" data-astro-prefetch class="nav-link px-3 md:px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-gray-300 border border-transparent hover:bg-gray-800 hover:text-white whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span class="hidden md:inline">Historial</span>
+          </a>
+
+          <a href="/pos" data-astro-prefetch class="nav-link px-3 md:px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-gray-300 border border-transparent hover:bg-gray-800 hover:text-white whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+            <span class="hidden md:inline">Inventario</span>
+          </a>
+
+          <a href="/pos/estadisticas" data-astro-prefetch class="nav-link px-3 md:px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-gray-300 border border-transparent hover:bg-gray-800 hover:text-white whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+            <span class="hidden md:inline">Estadísticas</span>
+          </a>
+        </nav>
+
+        <div class="hidden sm:block ml-2 pl-2 md:ml-4 md:pl-4 border-l border-gray-700 shrink-0">
+           <button class="text-gray-400 hover:text-red-400 transition-colors p-2 rounded-lg hover:bg-gray-800" title="Cerrar Sesión">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+               <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+             </svg>
+           </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-[98%] mx-auto py-4 layout-height flex flex-col gap-4">
+      
+      <div class="flex flex-col md:flex-row gap-4 justify-between items-center mb-1 shrink-0 border-b-2 border-gray-300/50 pb-2 px-2">
+        <div class="flex gap-6 w-full md:w-auto">
+          <button id="tabOrdenes" class="text-orange-600 font-black border-b-4 border-orange-500 pb-2 px-2 transition-all flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+            Historial General
+          </button>
+          <button id="tabCartera" class="text-gray-500 font-bold border-b-4 border-transparent hover:text-orange-500 pb-2 px-2 transition-all flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+            Cartera de Clientes
+          </button>
+        </div>
+
+        <div class="flex items-center bg-white border border-gray-200 rounded-full px-4 shadow-sm h-[42px] overflow-hidden w-full md:w-auto">
+          <span class="text-xs font-bold text-gray-400 mr-2 uppercase tracking-wider">De:</span>
+          <input type="date" id="filtroDesde" class="bg-transparent text-sm text-gray-700 outline-none font-medium w-full md:w-auto" />
+          <span class="text-gray-300 mx-2">|</span>
+          <span class="text-xs font-bold text-gray-400 mr-2 uppercase tracking-wider">A:</span>
+          <input type="date" id="filtroHasta" class="bg-transparent text-sm text-gray-700 outline-none font-medium w-full md:w-auto" />
+        </div>
+      </div>
+
+      <div id="vistaOrdenes" class="flex-1 flex flex-col gap-4 overflow-hidden">
+        <section class="neumorphism p-4 shrink-0 flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div class="relative w-full md:max-w-xs">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400 pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            </span>
+            <input type="text" id="buscarOrden" placeholder="Buscar cliente o ID..." class="search-input bg-white/60" style="padding-left: 2.8rem;" />
+          </div>
+
+          <div class="flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 shrink-0">
+            <button class="filter-btn active px-4 py-2 bg-gray-800 text-white font-bold rounded-lg shadow-sm text-sm whitespace-nowrap" data-estado="all">Todas</button>
+            <button class="filter-btn px-4 py-2 bg-white text-gray-600 border border-gray-200 hover:bg-green-50 hover:text-green-700 font-bold rounded-lg transition-colors text-sm whitespace-nowrap" data-estado="completada">Completadas</button>
+            <button class="filter-btn px-4 py-2 bg-white text-gray-600 border border-gray-200 hover:bg-blue-50 hover:text-blue-700 font-bold rounded-lg transition-colors text-sm whitespace-nowrap" data-estado="cotizacion">Cotizaciones</button>
+            <button class="filter-btn px-4 py-2 bg-white text-gray-600 border border-gray-200 hover:bg-orange-50 hover:text-orange-700 font-bold rounded-lg transition-colors text-sm whitespace-nowrap" data-estado="pendiente">Pendientes</button>
+          </div>
+        </section>
+
+        <section class="neumorphism p-4 flex-1 flex flex-col overflow-hidden bg-white/30">
+          <div class="w-full overflow-x-auto custom-scrollbar flex-1 rounded-xl border border-gray-200 bg-white">
+            <table class="w-full min-w-[800px] text-left text-sm whitespace-nowrap">
+              <thead class="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
+                <tr>
+                  <th class="py-3 px-4 font-black text-gray-500 uppercase tracking-wider text-xs">Ref Orden</th>
+                  <th class="py-3 px-4 font-black text-gray-500 uppercase tracking-wider text-xs">Fecha y Hora</th>
+                  <th class="py-3 px-4 font-black text-gray-500 uppercase tracking-wider text-xs">Cliente</th>
+                  <th class="py-3 px-4 font-black text-gray-500 uppercase tracking-wider text-xs">Estado</th>
+                  <th class="py-3 px-4 font-black text-gray-500 uppercase tracking-wider text-xs text-right">Total Neto</th>
+                  <th class="py-3 px-4 font-black text-gray-500 uppercase tracking-wider text-xs text-center">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tablaOrdenes" class="divide-y divide-gray-100">
+                {Object.entries(ordenesAgrupadas).flatMap(([diaString, grupoOrdenes]) => {
+                  const filas = [];
+                  filas.push(
+                    <tr class="grupo-fecha bg-gray-100/80 border-y border-gray-300">
+                      <td colspan="6" class="py-2.5 px-4 text-xs font-black text-gray-800 uppercase tracking-widest">{diaString}</td>
+                    </tr>
+                  );
+                  grupoOrdenes.forEach((orden) => {
+                    let badgeClass = "bg-gray-100 text-gray-700";
+                    let estadoTexto = orden.estado.toUpperCase();
+                    
+                    if (orden.estado === 'completada') badgeClass = "bg-green-100 text-green-700 border-green-200";
+                    else if (orden.estado === 'cotizacion') badgeClass = "bg-blue-100 text-blue-700 border-blue-200";
+                    else if (orden.estado === 'pendiente' || orden.tipo_venta === 'credito') {
+                      badgeClass = "bg-orange-100 text-orange-700 border-orange-200";
+                      if(orden.tipo_venta === 'credito') estadoTexto = 'CRÉDITO';
+                    }
+
+                    const idCorto = orden.id ? orden.id.split('-').pop().substring(6).toUpperCase() : 'N/A';
+                    const timestampObj = new Date(orden.fecha).getTime();
+
+                    filas.push(
+                      <tr class="orden-row hover:bg-orange-50/50 transition-colors group cursor-pointer" 
+                          data-id={orden.id} data-estado={orden.estado} data-cliente={orden.cliente_nombre.toLowerCase()} 
+                          data-idcorto={idCorto.toLowerCase()} data-timestamp={timestampObj}>
+                        <td class="py-3 px-4"><span class="font-bold text-gray-900">#{idCorto}</span></td>
+                        <td class="py-3 px-4 text-gray-600 font-medium">{formatearHora(orden.fecha)}</td>
+                        <td class="py-3 px-4">
+                          <div class="flex flex-col">
+                            <span class="font-black text-gray-800">{orden.cliente_nombre.toUpperCase()}</span>
+                            {orden.cliente_telefono && orden.cliente_telefono !== 'N/A' && (
+                              <span class="text-[10px] text-gray-500 font-bold">{orden.cliente_telefono}</span>
+                            )}
+                          </div>
+                        </td>
+                        <td class="py-3 px-4"><span class={`px-2.5 py-1 rounded-md text-[10px] font-black border tracking-wider uppercase ${badgeClass}`}>{estadoTexto}</span></td>
+                        <td class="py-3 px-4 text-right"><span class="font-black text-gray-900">{formatoPesos(orden.total_neto)}</span></td>
+                        <td class="py-3 px-4 text-center">
+                          <button class="text-gray-400 hover:text-orange-500 p-1" title="Ver Detalles">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  });
+                  return filas;
+                })}
+                {ordenes.length === 0 && (<tr><td colspan="6" class="py-8 text-center text-gray-500 font-medium">No hay órdenes registradas.</td></tr>)}
+              </tbody>
+            </table>
+            <div id="noResultsMsg" class="hidden py-8 text-center text-gray-500 font-medium border-t border-gray-100">
+              No se encontraron órdenes.
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div id="vistaCartera" class="hidden flex-1 flex flex-col gap-4 overflow-hidden">
+        <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm shrink-0 flex items-center gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input type="text" id="inputBuscarCartera" placeholder="Filtrar por nombre de cliente..." class="w-full outline-none text-sm font-medium text-gray-700 bg-transparent placeholder-gray-400" />
+        </div>
+
+        <section class="neumorphism p-4 shrink-0 grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
+          <div class="col-span-1 md:col-span-1">
+            <select id="selectCarteraCliente" class="filter-input bg-white/60 font-bold text-gray-700 cursor-pointer">
+              <option value="">-- Seleccionar Cliente --</option>
+            </select>
+          </div>
+          <div class="col-span-1 md:col-span-1 relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">🔍</span>
+            <input type="text" id="filtroRepuesto" placeholder="Contiene Repuesto (Ej: Filtro)" class="filter-input bg-white/60" style="padding-left: 2.5rem;" />
+          </div>
+          <div class="col-span-1 md:col-span-2 flex items-center gap-2">
+            <input type="number" id="filtroPrecioMin" placeholder="Precio Min ($)" class="filter-input bg-white/60 text-sm" />
+            <span class="text-gray-400 font-bold">-</span>
+            <input type="number" id="filtroPrecioMax" placeholder="Precio Max ($)" class="filter-input bg-white/60 text-sm" />
+          </div>
+        </section>
+
+        <section id="statsCartera" class="hidden shrink-0 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="neumorphism p-4 bg-white/50 border-l-4 border-green-500">
+            <p class="text-[10px] font-black uppercase text-gray-500 tracking-widest">Total Comprado</p>
+            <p class="text-2xl font-black text-gray-900 mt-1" id="carteraTotal">$0</p>
+          </div>
+          <div class="neumorphism p-4 bg-white/50 border-l-4 border-orange-500">
+            <p class="text-[10px] font-black uppercase text-gray-500 tracking-widest">Deuda Pendiente</p>
+            <p class="text-2xl font-black text-orange-600 mt-1" id="carteraDeuda">$0</p>
+          </div>
+          <div class="neumorphism p-4 bg-white/50 border-l-4 border-blue-500">
+            <p class="text-[10px] font-black uppercase text-gray-500 tracking-widest">Cantidad de Facturas</p>
+            <p class="text-2xl font-black text-gray-900 mt-1" id="carteraCompras">0</p>
+          </div>
+        </section>
+
+        <section class="neumorphism p-4 flex-1 flex flex-col overflow-hidden bg-white/30">
+          <div class="w-full overflow-x-auto custom-scrollbar flex-1 rounded-xl border border-gray-200 bg-white">
+            <table class="w-full min-w-[800px] text-left text-sm whitespace-nowrap">
+              <thead class="bg-gray-800 text-white sticky top-0 z-10">
+                <tr>
+                  <th class="py-3 px-4 font-black uppercase tracking-wider text-xs">ID Factura / Ref</th>
+                  <th class="py-3 px-4 font-black uppercase tracking-wider text-xs">Cliente</th>
+                  <th class="py-3 px-4 font-black uppercase tracking-wider text-xs">Fecha y Hora</th>
+                  <th class="py-3 px-4 font-black uppercase tracking-wider text-xs">Estado</th>
+                  <th class="py-3 px-4 font-black uppercase tracking-wider text-xs text-right">Total Neto</th>
+                  <th class="py-3 px-4 font-black uppercase tracking-wider text-xs text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tablaCarteraItems" class="divide-y divide-gray-100">
+                <tr><td colspan="6" class="text-center py-8 text-gray-400 font-bold">Selecciona un cliente arriba para ver sus facturas.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <div id="modalDetalle" class="hidden fixed inset-0 bg-neutral-950/80 z-[200] backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+      <div class="neumorphism w-full max-w-3xl bg-[#e6e7ee] rounded-[2rem] flex flex-col overflow-hidden border border-white/50 shadow-2xl scale-95 transition-transform duration-300 max-h-[90vh]" id="modalDetalleContainer">
+        
+        <div class="bg-gray-900 text-white px-6 py-4 flex justify-between items-center border-b-4 border-orange-500 shrink-0">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-xl font-black tracking-wide leading-tight">Detalle de Documento</h2>
+              <p class="text-gray-400 text-xs font-bold" id="detIdOrden">REF: ---</p>
+            </div>
+          </div>
+          <button id="closeDetalle" class="text-gray-400 hover:text-white transition-colors bg-gray-800 p-1.5 rounded-xl hover:bg-red-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto flex-1 flex flex-col gap-6">
+          <div class="flex flex-wrap gap-4 justify-between bg-white p-4 rounded-xl border border-gray-200 shadow-sm shrink-0">
+            <div>
+              <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Cliente</p>
+              <p class="text-base font-black text-gray-800 uppercase" id="detCliente">---</p>
+              <p class="text-xs font-bold text-gray-500" id="detTelefono">TEL: ---</p>
+            </div>
+            <div>
+              <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Fecha</p>
+              <p class="text-sm font-bold text-gray-800" id="detFecha">---</p>
+            </div>
+            <div class="text-right">
+              <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Estado</p>
+              <span id="detEstadoBadge" class="px-2.5 py-1 rounded-md text-[11px] font-black border tracking-wider uppercase bg-gray-100 text-gray-700">---</span>
+              <p class="text-xs font-bold text-gray-500 mt-1 uppercase" id="detMetodo">Pago: ---</p>
+            </div>
+          </div>
+
+          <div class="neumorphism-inset p-2 rounded-xl border border-gray-200 bg-white flex-1 overflow-hidden flex flex-col min-h-[200px]">
+            <div class="overflow-y-auto custom-scrollbar flex-1 pr-2">
+              <table class="w-full text-left text-sm">
+                <thead class="sticky top-0 bg-white border-b border-gray-200 z-10">
+                  <tr>
+                    <th class="py-2 px-3 font-bold text-gray-500 uppercase tracking-wider text-[10px]">Cant.</th>
+                    <th class="py-2 px-3 font-bold text-gray-500 uppercase tracking-wider text-[10px]">Repuesto</th>
+                    <th class="py-2 px-3 font-bold text-gray-500 uppercase tracking-wider text-[10px] text-right">V. Unit</th>
+                    <th class="py-2 px-3 font-bold text-gray-500 uppercase tracking-wider text-[10px] text-right">Total</th>
+                  </tr>
+                </thead>
+                <tbody id="detItemsTbody" class="divide-y divide-gray-100"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 shrink-0 ml-auto w-full max-w-sm space-y-2">
+            <div class="flex justify-between items-center text-gray-600 text-sm font-bold">
+              <span>Subtotal Productos:</span>
+              <span id="detSubtotal">$0</span>
+            </div>
+            <div class="flex justify-between items-center text-red-500 text-sm font-bold">
+              <span>Descuento Global:</span>
+              <span id="detDescuento">-$0</span>
+            </div>
+            
+            <div id="detAbonadoContainer" class="hidden flex justify-between items-center text-green-600 text-sm font-bold">
+              <span>Monto Abonado:</span>
+              <span id="detAbonado">$0</span>
+            </div>
+            <div id="detSaldoContainer" class="hidden flex justify-between items-center text-orange-600 text-sm font-bold">
+              <span>Saldo Pendiente:</span>
+              <span id="detSaldo">$0</span>
+            </div>
+
+            <div class="flex justify-between items-center border-t border-gray-200 pt-2 mt-2">
+              <span class="text-gray-900 font-black uppercase text-base">Total Neto:</span>
+              <span id="detTotalNeto" class="text-2xl font-black text-gray-900">$0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 bg-gray-100 border-t border-gray-300 flex gap-3 shrink-0 flex-wrap">
+          <button id="btnHistorialImprimir" class="flex-1 min-w-[140px] py-3 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+            Imprimir
+          </button>
+          <button id="btnHistorialDescargar" class="flex-1 min-w-[140px] py-3 bg-gray-800 border border-gray-900 text-white hover:bg-gray-700 font-black rounded-xl transition-all shadow-md flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+            PDF
+          </button>
+          <button id="btnEditarFactura" class="flex-1 min-w-[180px] bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Modificar / Facturar
+          </button>
+          <button id="btnRegistrarAbono" class="hidden flex w-full md:w-auto flex-1 min-w-[180px] py-3 bg-gradient-to-r from-green-500 to-green-600 border border-green-700 text-white hover:from-green-600 hover:to-green-700 font-black rounded-xl transition-all shadow-md items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            Registrar Abono
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="modalAbono" class="hidden fixed inset-0 bg-neutral-950/80 z-[300] backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity duration-200">
+      <div class="neumorphism w-full max-w-sm p-6 bg-[#e6e7ee] rounded-[2rem] border border-white/50 scale-95 transition-transform duration-200" id="modalAbonoBox">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-black text-gray-800">Registrar Pago</h3>
+          <button id="closeAbono" class="text-gray-400 hover:text-red-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button>
+        </div>
+        <div class="space-y-4">
+          <div class="bg-orange-50 p-3 rounded-xl border border-orange-200">
+            <p class="text-xs font-bold text-orange-600 uppercase mb-1">Saldo Pendiente Actual</p>
+            <p class="text-2xl font-black text-orange-700" id="abonoSaldoFaltante">$0</p>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Monto a Ingresar</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 font-bold">$</span>
+              <input type="text" id="inputMontoAbono" class="w-full bg-white border border-gray-300 text-gray-900 font-bold text-lg rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 block pl-8 p-3 shadow-sm" placeholder="0">
+            </div>
+            <button id="btnAbonarTodo" class="text-xs font-bold text-blue-600 mt-1 hover:underline">Saldar deuda completa</button>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Método de Pago</label>
+            <select id="selectMetodoAbono" class="w-full bg-white border border-gray-300 text-gray-900 font-bold rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 block p-3 shadow-sm">
+              <option value="efectivo">Efectivo</option>
+              <option value="nequi">Nequi</option>
+              <option value="tarjeta">Tarjeta</option>
+            </select>
+          </div>
+          <button id="btnConfirmarAbono" class="w-full py-3 mt-2 bg-green-500 text-white font-black rounded-xl hover:bg-green-600 transition-colors shadow-md flex justify-center items-center">
+            Confirmar Pago
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script is:inline define:vars={{ ordenes }}>
+      window.ORDENES_DB = ordenes;
+    </script>
+
+    <script>
+      import { supabase } from '../../lib/supabase.js';
+      import { generarFacturaPDF } from '../../pos/ventas/pdf.js';
+
+      const formatoPesos = (num: number) => '$' + Math.round(num).toLocaleString('es-CO');
+      const mostrarToast = (mensaje: string) => { alert(mensaje); };
+
+      // ==========================================
+      // LÓGICA DE PESTAÑAS
+      // ==========================================
+      const tabOrdenes = document.getElementById('tabOrdenes');
+      const tabCartera = document.getElementById('tabCartera');
+      const vistaOrdenes = document.getElementById('vistaOrdenes');
+      const vistaCartera = document.getElementById('vistaCartera');
+
+      const activarTab = (modo: string) => {
+        if (modo === 'ordenes') {
+          vistaCartera?.classList.add('hidden'); vistaOrdenes?.classList.remove('hidden');
+          tabOrdenes?.classList.replace('text-gray-500', 'text-orange-600'); tabOrdenes?.classList.replace('border-transparent', 'border-orange-500');
+          tabCartera?.classList.replace('text-orange-600', 'text-gray-500'); tabCartera?.classList.replace('border-orange-500', 'border-transparent');
+        } else {
+          vistaOrdenes?.classList.add('hidden'); vistaCartera?.classList.remove('hidden');
+          tabCartera?.classList.replace('text-gray-500', 'text-orange-600'); tabCartera?.classList.replace('border-transparent', 'border-orange-500');
+          tabOrdenes?.classList.replace('text-orange-600', 'text-gray-500'); tabOrdenes?.classList.replace('border-orange-500', 'border-transparent');
+        }
+      };
+      tabOrdenes?.addEventListener('click', () => activarTab('ordenes'));
+      tabCartera?.addEventListener('click', () => activarTab('cartera'));
+
+      // ==========================================
+      // LÓGICA DE CARTERA Y FILTROS
+      // ==========================================
+      const filtroDesde = document.getElementById('filtroDesde') as HTMLInputElement;
+      const filtroHasta = document.getElementById('filtroHasta') as HTMLInputElement;
+      const selectCliente = document.getElementById('selectCarteraCliente') as HTMLSelectElement;
+      const inputRepuesto = document.getElementById('filtroRepuesto') as HTMLInputElement;
+      const inputPMin = document.getElementById('filtroPrecioMin') as HTMLInputElement;
+      const inputPMax = document.getElementById('filtroPrecioMax') as HTMLInputElement;
+      const inputBuscarCartera = document.getElementById('inputBuscarCartera') as HTMLInputElement;
+      const tbodyCartera = document.getElementById('tablaCarteraItems');
+
+      const aplicarFiltroBuscadorCartera = () => {
+        const termino = (inputBuscarCartera?.value || '').toLowerCase().trim();
+        const filasCartera = document.querySelectorAll('.fila-cartera');
+
+        filasCartera.forEach((fila) => {
+          const filaEl = fila as HTMLElement;
+          const nombreCliente = fila.children[1]?.textContent?.toLowerCase() || '';
+          filaEl.style.display = nombreCliente.includes(termino) ? '' : 'none';
+        });
+      };
+
+      const clientesMap = new Map();
+      if (window.ORDENES_DB) {
+        window.ORDENES_DB.forEach((o: any) => {
+          if(o.cliente_nombre) {
+            const nombre = o.cliente_nombre.toUpperCase();
+            if(!clientesMap.has(nombre)) clientesMap.set(nombre, { nombre, tel: o.cliente_telefono });
+          }
+        });
+        Array.from(clientesMap.values()).sort((a,b) => a.nombre.localeCompare(b.nombre)).forEach(c => {
+            const opt = document.createElement('option'); opt.value = c.nombre;
+            opt.textContent = `${c.nombre} ${c.tel && c.tel !== 'N/A' ? ' - ' + c.tel : ''}`;
+            selectCliente?.appendChild(opt);
+        });
+      }
+
+      const renderizarCartera = () => {
+        const clienteSel = selectCliente?.value;
+        if(!clienteSel) {
+          document.getElementById('statsCartera')?.classList.add('hidden');
+          if (tbodyCartera) tbodyCartera.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-400 font-bold">Selecciona un cliente para analizar.</td></tr>';
+          return;
+        }
+        document.getElementById('statsCartera')?.classList.remove('hidden');
+
+        const txtRepuesto = inputRepuesto?.value.toLowerCase() || '';
+        const minP = parseFloat(inputPMin?.value) || 0;
+        const maxP = parseFloat(inputPMax?.value) || Infinity;
+        const d = filtroDesde?.value ? new Date(filtroDesde.value + 'T00:00:00').getTime() : 0;
+        const h = filtroHasta?.value ? new Date(filtroHasta.value + 'T23:59:59').getTime() : Infinity;
+
+        let totalGasto = 0; let totalDeuda = 0; let cantCompras = 0;
+        const filasHTML: string[] = [];
+
+        window.ORDENES_DB.filter((o: any) => o.cliente_nombre.toUpperCase() === clienteSel).forEach((orden: any) => {
+          const t = new Date(orden.fecha).getTime();
+          let items = []; try { items = typeof orden.items === 'string' ? JSON.parse(orden.items) : (orden.items || []); } catch(e){}
+
+          if (t >= d && t <= h) {
+            let pasaFiltroAvanzado = true;
+            if (txtRepuesto !== '' || minP > 0 || maxP < Infinity) {
+              pasaFiltroAvanzado = items.some((item: any) => {
+                const desc = (item.modelo || item.descripcion || '').toLowerCase();
+                const precio = item.precio_venta || item.precio || 0;
+                return desc.includes(txtRepuesto) && precio >= minP && precio <= maxP;
+              });
+            }
+
+            if (pasaFiltroAvanzado) {
+              if(orden.estado === 'completada') totalGasto += orden.total_neto;
+              if(orden.estado === 'pendiente' || orden.tipo_venta === 'credito') {
+                 totalDeuda += (orden.total_neto - (orden.monto_recibido || 0));
+              }
+              cantCompras++;
+
+              let badgeClass = "bg-gray-100 text-gray-700"; let estadoTexto = orden.estado.toUpperCase();
+              if (orden.estado === 'completada') badgeClass = "bg-green-100 text-green-700 border-green-200";
+              else if (orden.estado === 'cotizacion') badgeClass = "bg-blue-100 text-blue-700 border-blue-200";
+              else if (orden.estado === 'pendiente' || orden.tipo_venta === 'credito') {
+                badgeClass = "bg-orange-100 text-orange-700 border-orange-200"; estadoTexto = 'CRÉDITO';
+              }
+
+              const idCorto = orden.id ? orden.id.split('-').pop().substring(6).toUpperCase() : 'N/A';
+              const fechaStr = new Date(orden.fecha).toLocaleDateString('es-CO') + ' ' + new Date(orden.fecha).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+              filasHTML.push(`
+                <tr class="orden-row-cartera fila-cartera hover:bg-orange-50/50 transition-colors cursor-pointer border-b border-gray-100" data-id="${orden.id}">
+                  <td class="py-3 px-4"><span class="font-bold text-gray-900">#${idCorto}</span></td>
+                  <td class="py-3 px-4 font-black text-gray-800">${(orden.cliente_nombre || '').toUpperCase()}</td>
+                  <td class="py-3 px-4 text-gray-600 font-medium">${fechaStr}</td>
+                  <td class="py-3 px-4"><span class="px-2.5 py-1 rounded-md text-[10px] font-black border tracking-wider uppercase ${badgeClass}">${estadoTexto}</span></td>
+                  <td class="py-3 px-4 text-right"><span class="font-black text-gray-900">${formatoPesos(orden.total_neto)}</span></td>
+                  <td class="py-3 px-4 text-center">
+                    <button class="text-gray-400 hover:text-orange-500 p-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg></button>
+                  </td>
+                </tr>
+              `);
+            }
+          }
+        });
+
+        if (document.getElementById('carteraTotal')) document.getElementById('carteraTotal')!.textContent = formatoPesos(totalGasto);
+        if (document.getElementById('carteraDeuda')) document.getElementById('carteraDeuda')!.textContent = formatoPesos(totalDeuda);
+        if (document.getElementById('carteraCompras')) document.getElementById('carteraCompras')!.textContent = cantCompras.toString();
+
+        if (tbodyCartera) tbodyCartera.innerHTML = filasHTML.length > 0 ? filasHTML.join('') : '<tr><td colspan="6" class="text-center py-8 text-gray-400 font-bold">No se encontraron facturas.</td></tr>';
+        aplicarFiltroBuscadorCartera();
+      };
+
+      [selectCliente, inputRepuesto, inputPMin, inputPMax].forEach(el => el?.addEventListener('input', renderizarCartera));
+      inputBuscarCartera?.addEventListener('input', aplicarFiltroBuscadorCartera);
+      tbodyCartera?.addEventListener('click', (e) => {
+        const row = (e.target as HTMLElement).closest('.orden-row-cartera');
+        if (row) { const id = row.getAttribute('data-id'); if(id) abrirModalDetalle(id); }
+      });
+
+      // ==========================================
+      // FILTROS GENERALES HISTORIAL
+      // ==========================================
+      const searchInput = document.getElementById('buscarOrden') as HTMLInputElement;
+      const filterBtns = document.querySelectorAll('.filter-btn');
+      let currentFilter = 'all';
+
+      const aplicarFiltros = () => {
+        const query = searchInput.value.toLowerCase().trim();
+        const startTimestamp = filtroDesde.value ? new Date(filtroDesde.value + 'T00:00:00').getTime() : null;
+        const endTimestamp = filtroHasta.value ? new Date(filtroHasta.value + 'T23:59:59').getTime() : null;
+
+        let visiblesTotales = 0; let currentHeader: HTMLElement | null = null; let itemsInCurrentGroup = 0;
+
+        document.querySelectorAll('#tablaOrdenes tr').forEach((row: any) => {
+          if (row.classList.contains('grupo-fecha')) {
+            if (currentHeader && itemsInCurrentGroup === 0) currentHeader.style.display = 'none';
+            currentHeader = row; itemsInCurrentGroup = 0; row.style.display = ''; 
+          } else if (row.classList.contains('orden-row')) {
+            const estado = row.getAttribute('data-estado'); const cliente = row.getAttribute('data-cliente');
+            const idcorto = row.getAttribute('data-idcorto'); const rowTimestamp = Number(row.getAttribute('data-timestamp'));
+
+            const matchesSearch = cliente.includes(query) || idcorto.includes(query);
+            let matchesState = false;
+            if (currentFilter === 'all') matchesState = true;
+            else if (currentFilter === 'completada' && estado === 'completada') matchesState = true;
+            else if (currentFilter === 'cotizacion' && estado === 'cotizacion') matchesState = true;
+            else if (currentFilter === 'pendiente' && (estado === 'pendiente' || row.querySelector('td:nth-child(4) span').innerText.includes('CRÉDITO'))) matchesState = true;
+
+            let matchesDate = true;
+            if (startTimestamp && rowTimestamp < startTimestamp) matchesDate = false;
+            if (endTimestamp && rowTimestamp > endTimestamp) matchesDate = false;
+
+            if (matchesSearch && matchesState && matchesDate) { row.style.display = ''; itemsInCurrentGroup++; visiblesTotales++; } 
+            else { row.style.display = 'none'; }
+          }
+        });
+
+        if (currentHeader && itemsInCurrentGroup === 0) currentHeader.style.display = 'none';
+        if (visiblesTotales === 0) document.getElementById('noResultsMsg')?.classList.remove('hidden');
+        else document.getElementById('noResultsMsg')?.classList.add('hidden');
+        
+        renderizarCartera();
+      };
+
+      searchInput?.addEventListener('input', aplicarFiltros);
+      filtroDesde?.addEventListener('change', aplicarFiltros); filtroHasta?.addEventListener('change', aplicarFiltros);
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          filterBtns.forEach(b => b.className = "filter-btn px-4 py-2 bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 font-bold rounded-lg transition-colors text-sm whitespace-nowrap");
+          const target = e.target as HTMLElement;
+          target.className = "filter-btn active px-4 py-2 bg-gray-800 text-white font-bold rounded-lg shadow-sm text-sm whitespace-nowrap";
+          currentFilter = target.getAttribute('data-estado') || 'all'; aplicarFiltros();
+        });
+      });
+
+      // ==========================================
+      // MODALES Y MAPEADO EXACTO PARA PDF
+      // ==========================================
+      const modalDetalle = document.getElementById('modalDetalle');
+      const modalDetalleContainer = document.getElementById('modalDetalleContainer');
+      let ordenActualSnapshot: any = null;
+      let ordenActual: any = null;
+
+      let ordenSeleccionadaId = ''; let saldoPendienteGlobal = 0; let montoRecibidoGlobal = 0; let totalNetoGlobal = 0;
+
+      const abrirModalDetalle = (ordenId: string) => {
+        const orden = window.ORDENES_DB.find((o: any) => o.id === ordenId);
+        if(!orden) return;
+
+        ordenActual = orden;
+
+        ordenSeleccionadaId = orden.id;
+        totalNetoGlobal = Number(orden.total_neto) || 0;
+        montoRecibidoGlobal = Number(orden.monto_recibido) || 0;
+        saldoPendienteGlobal = totalNetoGlobal - montoRecibidoGlobal;
+
+        const idCorto = orden.id.split('-').pop().toUpperCase();
+        const itemsCarrito = typeof orden.snapshot_carrito === 'string' ? JSON.parse(orden.snapshot_carrito) : (orden.snapshot_carrito || []);
+
+        // EL SECRETO PARA EL PDF ESTÁ AQUÍ: Construir el VentaSnapshot exacto
+        const itemsNormalizados = itemsCarrito.map((item: any) => ({
+          cantidad: Number(item.cantidad || 1),
+          precio: Number(item.precio || item.precio_venta || 0),
+          descuentoTotal: Number(item.descuentoTotal || 0),
+          familia: item.familia || 'REPUESTOS',
+          modelo: item.modelo || item.descripcion || 'GENÉRICO'
+        }));
+
+        ordenActualSnapshot = {
+          cliente: orden.cliente_nombre,
+          telefono: orden.cliente_telefono && orden.cliente_telefono !== 'N/A' ? orden.cliente_telefono : '',
+          fecha: new Date(orden.fecha).toLocaleDateString('es-CO') + ' ' + new Date(orden.fecha).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true }),
+          items: itemsNormalizados,
+          subtotal: Number(orden.subtotal || 0),
+          descuentoGlobal: Number(orden.descuento_global || 0),
+          totalNeto: totalNetoGlobal,
+          recibido: montoRecibidoGlobal,
+          tipoVenta: orden.estado === 'cotizacion' ? 'cotizacion' : (orden.tipo_venta || 'contado'),
+          metodoPago: orden.metodo_pago || 'efectivo',
+          numeroComprobante: idCorto
+        };
+
+        document.getElementById('detIdOrden')!.innerText = `REF: ${idCorto}`;
+        document.getElementById('detCliente')!.innerText = orden.cliente_nombre;
+        document.getElementById('detTelefono')!.innerText = `TEL: ${orden.cliente_telefono || 'N/A'}`;
+        document.getElementById('detFecha')!.innerText = ordenActualSnapshot.fecha;
+        document.getElementById('detMetodo')!.innerText = `Pago: ${orden.metodo_pago}`;
+        document.getElementById('detSubtotal')!.innerText = formatoPesos(orden.subtotal);
+        document.getElementById('detDescuento')!.innerText = `-${formatoPesos(orden.descuento_global)}`;
+        document.getElementById('detTotalNeto')!.innerText = formatoPesos(totalNetoGlobal);
+
+        const badge = document.getElementById('detEstadoBadge')!;
+        badge.className = "px-2.5 py-1 rounded-md text-[11px] font-black border tracking-wider uppercase";
+        
+        const containerAbono = document.getElementById('detAbonadoContainer')!;
+        const containerSaldo = document.getElementById('detSaldoContainer')!;
+        const btnAbonar = document.getElementById('btnRegistrarAbono')!;
+
+        containerAbono.classList.add('hidden'); containerSaldo.classList.add('hidden');
+        btnAbonar.classList.add('hidden'); btnAbonar.style.display = ''; 
+
+        if (orden.estado === 'completada') {
+          badge.classList.add("bg-green-100", "text-green-700", "border-green-200"); badge.innerText = "Completada";
+        } else if (orden.estado === 'cotizacion') {
+          badge.classList.add("bg-blue-100", "text-blue-700", "border-blue-200"); badge.innerText = "Cotización";
+        } else if (orden.estado === 'pendiente') {
+          badge.classList.add("bg-orange-100", "text-orange-700", "border-orange-200"); badge.innerText = orden.tipo_venta === 'credito' ? 'Crédito' : 'Pendiente';
+          if (totalNetoGlobal > 0) {
+            document.getElementById('detAbonado')!.innerText = formatoPesos(montoRecibidoGlobal); document.getElementById('detSaldo')!.innerText = formatoPesos(saldoPendienteGlobal);
+            containerAbono.classList.remove('hidden'); containerSaldo.classList.remove('hidden'); btnAbonar.classList.remove('hidden');
+          }
+        }
+
+        const tbody = document.getElementById('detItemsTbody')!; tbody.innerHTML = '';
+        if(itemsNormalizados.length === 0) {
+           tbody.innerHTML = '<tr><td colspan="4" class="py-4 text-center text-gray-400 text-xs">Sin detalle</td></tr>';
+        } else {
+          itemsNormalizados.forEach((item: any) => {
+             const subtotalLinea = (item.precio * item.cantidad) - item.descuentoTotal;
+            tbody.innerHTML += `
+              <tr class="hover:bg-gray-50 transition-colors">
+                <td class="py-2 px-3 font-bold text-gray-700 align-top">${item.cantidad}</td>
+                <td class="py-2 px-3 align-top">
+                  <p class="font-bold text-gray-800 uppercase text-xs leading-tight">${item.familia}</p>
+                  <p class="text-[10px] text-gray-500 uppercase mt-0.5">Ref: ${item.modelo}</p>
+                </td>
+                <td class="py-2 px-3 text-right text-gray-600 font-medium align-top">${formatoPesos(item.precio)}</td>
+                <td class="py-2 px-3 text-right font-black text-gray-900 align-top">${formatoPesos(subtotalLinea)}</td>
+              </tr>`;
+          });
+        }
+
+        modalDetalle?.classList.remove('hidden');
+        requestAnimationFrame(() => { modalDetalle?.classList.remove('opacity-0'); document.getElementById('modalDetalleContainer')?.classList.remove('scale-95'); });
+      };
+
+      // ==========================================
+      // MANEJO DE ABONOS Y BOTONES PDF
+      // ==========================================
+      const modalAbono = document.getElementById('modalAbono'); const modalAbonoBox = document.getElementById('modalAbonoBox');
+      const inputMontoAbono = document.getElementById('inputMontoAbono') as HTMLInputElement;
+
+      inputMontoAbono?.addEventListener('input', function(e) {
+        let valorRaw = this.value.replace(/\D/g, ''); if (!valorRaw) { this.value = ''; return; }
+        this.value = Number(valorRaw).toLocaleString('es-CO');
+      });
+
+      document.getElementById('btnRegistrarAbono')?.addEventListener('click', () => {
+        document.getElementById('abonoSaldoFaltante')!.innerText = formatoPesos(saldoPendienteGlobal); inputMontoAbono.value = ''; 
+        modalAbono?.classList.remove('hidden');
+        requestAnimationFrame(() => { modalAbono?.classList.remove('opacity-0'); modalAbonoBox?.classList.remove('scale-95'); });
+      });
+
+      document.getElementById('btnAbonarTodo')?.addEventListener('click', () => inputMontoAbono.value = saldoPendienteGlobal.toLocaleString('es-CO'));
+      document.getElementById('closeAbono')?.addEventListener('click', () => {
+        modalAbono?.classList.add('opacity-0'); modalAbonoBox?.classList.add('scale-95');
+        setTimeout(() => modalAbono?.classList.add('hidden'), 200);
+      });
+
+      document.getElementById('btnConfirmarAbono')?.addEventListener('click', async () => {
+        const montoIngresado = Number(inputMontoAbono.value.replace(/\D/g, ''));
+        if (montoIngresado <= 0) return alert('Ingresa un monto válido mayor a cero.');
+        if (montoIngresado > saldoPendienteGlobal) return alert('El monto no puede ser mayor al saldo pendiente.');
+
+        const btn = document.getElementById('btnConfirmarAbono') as HTMLButtonElement; const textoOriginal = btn.innerHTML;
+        btn.innerHTML = 'Procesando...'; btn.disabled = true;
+
+        const nuevoMontoRecibido = montoRecibidoGlobal + montoIngresado;
+        const nuevoEstado = (nuevoMontoRecibido >= totalNetoGlobal) ? 'completada' : 'pendiente';
+
+        try {
+          const { error } = await supabase.from('ventas').update({ monto_recibido: nuevoMontoRecibido, estado: nuevoEstado }).eq('id', ordenSeleccionadaId);
+          if (error) throw error; window.location.reload();
+        } catch (error) { alert("Error al procesar el pago."); btn.innerHTML = textoOriginal; btn.disabled = false; }
+      });
+
+      const cerrarModal = () => {
+        modalDetalle?.classList.add('opacity-0'); modalDetalleContainer?.classList.add('scale-95');
+        setTimeout(() => modalDetalle?.classList.add('hidden'), 300);
+      };
+      document.querySelectorAll('.orden-row').forEach(row => { row.addEventListener('click', () => { const id = row.getAttribute('data-id'); if(id) abrirModalDetalle(id); }); });
+      document.getElementById('closeDetalle')?.addEventListener('click', cerrarModal);
+
+      // --- DISPARADOR DEL PDF ---
+      const ejecutarPDF = async (btn: HTMLButtonElement, accion: 'descargar' | 'imprimir') => {
+        if(!ordenActualSnapshot) return;
+        const textoOriginal = btn.innerHTML;
+        btn.innerHTML = `<svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Procesando...`;
+        btn.disabled = true;
+        
+        try {
+          await generarFacturaPDF(ordenActualSnapshot, accion);
+        } catch (error) {
+          console.error("Error al generar PDF:", error);
+          alert("Error interno al cargar la librería de PDF.");
+        } finally {
+          btn.innerHTML = textoOriginal; btn.disabled = false;
+        }
+      };
+
+      const obtenerOrdenActual = () => {
+        if (!ordenSeleccionadaId || !window.ORDENES_DB) return null;
+        return window.ORDENES_DB.find((o: any) => o.id === ordenSeleccionadaId) || null;
+      };
+
+      const marcarDeudaComoSaldada = async (btn: HTMLButtonElement) => {
+        const ordenActual = obtenerOrdenActual();
+        if (!ordenActual) {
+          console.error('No se encontró la orden actual para saldar.');
+          return;
+        }
+
+        const idCorto = ordenActual.id?.split('-').pop()?.substring(6)?.toUpperCase() || 'N/A';
+        const confirmar = confirm(`¿Estás seguro de marcar la orden #${idCorto} como totalmente PAGADA?`);
+        if (!confirmar) return;
+
+        const textoOriginal = btn.innerHTML;
+        btn.innerHTML = 'Procesando...';
+        btn.disabled = true;
+
+        try {
+          const payload: any = {
+            estado: 'completada',
+            tipo_venta: 'contado',
+            monto_recibido: Number(ordenActual.total_neto) || 0,
+            abono: Number(ordenActual.total_neto) || 0,
+          };
+
+          let { error } = await supabase
+            .from('ventas')
+            .update(payload)
+            .eq('id', ordenActual.id);
+
+          // Compatibilidad si la tabla no tiene la columna `abono`.
+          if (error && String(error.message || '').toLowerCase().includes('abono')) {
+            ({ error } = await supabase
+              .from('ventas')
+              .update({
+                estado: 'completada',
+                tipo_venta: 'contado',
+                monto_recibido: Number(ordenActual.total_neto) || 0,
+              })
+              .eq('id', ordenActual.id));
+          }
+
+          if (error) throw error;
+
+          alert('¡Deuda saldada con éxito!');
+          window.location.reload();
+        } catch (error) {
+          console.error('Error al saldar la deuda:', error);
+          alert('Hubo un error al actualizar la base de datos.');
+          btn.innerHTML = textoOriginal;
+          btn.disabled = false;
+        }
+      };
+
+      document.getElementById('btnHistorialDescargar')?.addEventListener('click', function() { ejecutarPDF(this as HTMLButtonElement, 'descargar'); });
+      document.getElementById('btnHistorialImprimir')?.addEventListener('click', function() { ejecutarPDF(this as HTMLButtonElement, 'imprimir'); });
+
+      const btnEditarFactura = document.getElementById('btnEditarFactura');
+      if (btnEditarFactura) {
+        btnEditarFactura.addEventListener('click', () => {
+          if (typeof ordenActual !== 'undefined' && ordenActual) {
+            localStorage.setItem('facturaEnEdicion', JSON.stringify(ordenActual));
+            window.location.href = '/pos/ventas';
+          }
+        });
+      }
+
+      // Compatibilidad con IDs alternos usados en otros modales.
+      const btnImprimir = document.getElementById('btnImprimir') as HTMLButtonElement | null;
+      const btnDescargar = document.getElementById('btnDescargar') as HTMLButtonElement | null;
+      const btnSaldar = document.getElementById('btnSaldar') as HTMLButtonElement | null;
+
+      if (btnImprimir) {
+        btnImprimir.addEventListener('click', () => ejecutarPDF(btnImprimir, 'imprimir'));
+      }
+
+      if (btnDescargar) {
+        btnDescargar.addEventListener('click', () => ejecutarPDF(btnDescargar, 'descargar'));
+      }
+
+      if (btnSaldar) {
+        btnSaldar.addEventListener('click', () => {
+          marcarDeudaComoSaldada(btnSaldar);
+        });
+      }
+
+      // --- CONECTAR CARTERA CON EL MODAL DEL HISTORIAL ---
+      document.querySelectorAll('.fila-cartera').forEach(row => {
+        row.addEventListener('click', () => {
+          const id = row.getAttribute('data-id');
+          if (id && typeof abrirModalDetalle === 'function') {
+            abrirModalDetalle(id);
+          }
+        });
+      });
+
+      // Navegación
+      (function() {
+        const currentPath = window.location.pathname.replace(/\/$/, ""); 
+        document.querySelectorAll('.nav-link').forEach(link => {
+          const href = link.getAttribute('href')?.replace(/\/$/, ""); 
+          if ((href === '/pos' ? currentPath === '/pos' : currentPath.includes(href || ''))) {
+            link.classList.remove('text-gray-300', 'border-transparent', 'hover:bg-gray-800', 'hover:text-white');
+            link.classList.add('bg-gray-800', 'text-orange-400', 'border-gray-700', 'shadow-inner');
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

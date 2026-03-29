@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
+    "pos": "astro dev --open /pos",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
@@ -11,6 +12,7 @@
   "dependencies": {
     "@astrojs/react": "^4.4.2",
     "@react-pdf/renderer": "^4.3.2",
+    "@supabase/supabase-js": "^2.99.1",
     "@tailwindcss/vite": "^4.1.18",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
