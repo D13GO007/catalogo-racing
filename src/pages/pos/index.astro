@@ -2,7 +2,6 @@
 // Importamos tus estilos globales (subiendo dos carpetas: de pos -> pages -> src)
 import '../../styles.css'; 
 import { supabase } from '../../lib/supabase.js';
-import posClientUrl from '../../lib/pos-client.ts?url';
 
 // Traemos el inventario
 
@@ -660,6 +659,8 @@ const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
         });
       })();
     </script>
-    <script type="module" src={posClientUrl}></script>
+    <script>
+      import "../../lib/pos-client.ts";
+    </script>
   </body>
 </html>
