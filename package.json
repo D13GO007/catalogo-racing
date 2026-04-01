@@ -12,13 +12,29 @@
   "dependencies": {
     "@astrojs/react": "^4.4.2",
     "@react-pdf/renderer": "^4.3.2",
-    "@supabase/supabase-js": "^2.99.1",
+    "@supabase/supabase-js": "^2.101.0",
     "@tailwindcss/vite": "^4.1.18",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "astro": "^5.16.9",
+    "csv-parser": "^3.2.0",
+    "fast-csv": "^5.0.5",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "tailwindcss": "^4.1.18"
-  }
+    "tailwindcss": "^4.1.18",
+    "xlsx": "^0.18.5"
+  },
+  "description": "```sh npm create astro@latest -- --template minimal ```",
+  "main": "limpiar_datos.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/D13GO007/catalogo-racing.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/D13GO007/catalogo-racing/issues"
+  },
+  "homepage": "https://github.com/D13GO007/catalogo-racing#readme"
 }

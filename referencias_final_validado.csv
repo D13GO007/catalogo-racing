@@ -1,0 +1,227 @@
+familia_id,modelo,precio_venta,precio_costo,stock_actual,stock_minimo,imagen_especifica,visible_en_catalogo,activo
+2fa90f7a-85cf-4658-8b62-6e85703035ad,agility 125 rs,95000,61972,172,2,/productos/automatico-completo-agility-125-rs.jpg,true,true
+2fa90f7a-85cf-4658-8b62-6e85703035ad,bws 125,118000,61962,171,2,/productos/automatico-completo-bws-125.jpg,true,true
+da92a34d-34c2-432b-b812-72f5c596fe6a,6201 2rs,2200,1171,71,2,,true,true
+da92a34d-34c2-432b-b812-72f5c596fe6a,6202 2rs,2500,1240,682,2,,true,true
+da92a34d-34c2-432b-b812-72f5c596fe6a,6203 2rs,2800,1489,317,2,,true,true
+da92a34d-34c2-432b-b812-72f5c596fe6a,6301 2rs,3200,1764,137,2,,true,true
+da92a34d-34c2-432b-b812-72f5c596fe6a,6302 2rs,3200,1764,277,2,,true,true
+fdb69669-0771-4d39-b33d-12026b6d72e4,akt 110s/viva r/best banda freno trasero,7500,4452,0,2,,true,true
+fdb69669-0771-4d39-b33d-12026b6d72e4,boxer ct /ax 100/platino banda freno trasero,8000,4536,6,2,,true,true
+fdb69669-0771-4d39-b33d-12026b6d72e4,discover 125st-150/pulsar 135-180 banda de freno trasero,10000,5217,1125,2,,true,true
+fdb69669-0771-4d39-b33d-12026b6d72e4,eco deluxe / cb 110/xr 150 banda freno delantero,10000,5068,253,2,,true,true
+fdb69669-0771-4d39-b33d-12026b6d72e4,eco deluxe / cb 110/xr 150 trasero,7500,3892,1195,2,,true,true
+fdb69669-0771-4d39-b33d-12026b6d72e4,xtz 125e/dr 150/ybr/libero banda freno trasero,11000,6285,71,2,,true,true
+810ba581-b376-473d-a690-54391f14841d,discover 125 st izquierda,5500,1814,730,2,,true,true
+810ba581-b376-473d-a690-54391f14841d,eco deluxe izquierda,5500,2160,681,2,,true,true
+45d92d82-4ebe-44a2-accc-f13a7437550d,akt nkd 125,9500,4953,219,2,,true,true
+45d92d82-4ebe-44a2-accc-f13a7437550d,boxer ct 100,10500,4953,165,2,,true,true
+45d92d82-4ebe-44a2-accc-f13a7437550d,cb 110,15500,8016,148,2,/productos/bobina-alta-cb-110.jpg,true,true
+45d92d82-4ebe-44a2-accc-f13a7437550d,eco deluxe,15500,8222,226,2,,true,true
+75337fc7-0b30-48b5-9d98-6f533c97b402,akt 110 delantero,18500,9734,963,2,/productos/bomba-de-freno-delantero-akt-110s.jpg,true,true
+75337fc7-0b30-48b5-9d98-6f533c97b402,pulsar 135 delantero,19500,9734,409,2,/productos/bomba-de-freno-delantero-pulsar-135-ls.jpg,true,true
+75337fc7-0b30-48b5-9d98-6f533c97b402,pulsar 200ns trasero,23000,9734,232,2,/productos/disco-de-freno-trasero-pulsar-200ns.jpg,true,true
+75337fc7-0b30-48b5-9d98-6f533c97b402,universal delantero,18500,9734,1291,2,/productos/bomba-de-freno-delantero-universal.jpg,true,true
+75337fc7-0b30-48b5-9d98-6f533c97b402,universal trasero,19500,10084,212,2,,true,true
+37200f8e-84d7-4a56-bbf7-0bb8541de19e,motoled triseta 4 caras,10000,0,0,2,,true,true
+37200f8e-84d7-4a56-bbf7-0bb8541de19e,motoled ventilador 4 caras 8000 lumines,39000,0,733,2,,true,true
+5abef5d9-3248-4216-be06-277c2f5057fa,cbf 150,14000,5582,183,2,,true,true
+5abef5d9-3248-4216-be06-277c2f5057fa,eco deluxe,12000,5164,203,2,,true,true
+d4dac5ec-a354-46b9-bb38-be2d388f3ef4,eco deluxe,1800,898,190,2,,true,true
+d4dac5ec-a354-46b9-bb38-be2d388f3ef4,pulsar 135-180/discover 125-150,6000,2899,633,2,,true,true
+d4dac5ec-a354-46b9-bb38-be2d388f3ef4,yesky negro,2000,1022,413,2,,true,true
+bb3f811b-f94c-4479-a0c8-e8c9b905071c,akt 110,43000,20169,162,2,,true,true
+bb3f811b-f94c-4479-a0c8-e8c9b905071c,akt nkd 125,45000,13910,153,2,,true,true
+bb3f811b-f94c-4479-a0c8-e8c9b905071c,boxer ct 100,43000,20865,198,2,/productos/carburador-boxer-ct-100.jpg,true,true
+bb3f811b-f94c-4479-a0c8-e8c9b905071c,eco deluxe,48000,22252,162,2,,true,true
+a0a044e0-c7b4-41a4-8e1b-b4f87926d8f4,akt 110,13000,6504,169,2,,true,true
+e02dd6ca-6b6e-476d-86ae-15cefe81d896,eco deluxe,6000,2731,339,2,,true,true
+e02dd6ca-6b6e-476d-86ae-15cefe81d896,nkd 125,12500,6355,134,2,,true,true
+e02dd6ca-6b6e-476d-86ae-15cefe81d896,tvs 100 es,15500,7560,175,2,,true,true
+e888287c-552a-47ad-b92e-efa4eaac98a9,akt nkd 125,12500,6566,156,2,,true,true
+e888287c-552a-47ad-b92e-efa4eaac98a9,cb 110,16500,8649,234,2,,true,true
+e888287c-552a-47ad-b92e-efa4eaac98a9,eco deluxe,17500,8376,289,2,,true,true
+e888287c-552a-47ad-b92e-efa4eaac98a9,tvs 100,27000,14097,174,2,,true,true
+263cffc5-ceba-475e-9bc9-0ded692e923f,akt nkd 125,6000,2985,351,2,,true,true
+263cffc5-ceba-475e-9bc9-0ded692e923f,boxer ct,5000,2544,0,2,,true,true
+263cffc5-ceba-475e-9bc9-0ded692e923f,cb 110 / xr 150,6000,3196,1074,2,,true,true
+263cffc5-ceba-475e-9bc9-0ded692e923f,cbf 150,6500,3196,410,2,,true,true
+263cffc5-ceba-475e-9bc9-0ded692e923f,discover 125 st,6500,3460,8,2,,true,true
+263cffc5-ceba-475e-9bc9-0ded692e923f,splendor nxg,6000,3268,5586,2,,true,true
+263cffc5-ceba-475e-9bc9-0ded692e923f,tvs 100,6500,3686,728,2,,true,true
+263cffc5-ceba-475e-9bc9-0ded692e923f,xtz 125 /fz 16,6000,2784,990,2,,true,true
+235c15bb-9b5d-4d9b-8dab-77fae37af480,akt 110,8000,3686,262,2,,true,true
+235c15bb-9b5d-4d9b-8dab-77fae37af480,best 125,8000,3825,259,2,,true,true
+235c15bb-9b5d-4d9b-8dab-77fae37af480,boxer ct 100,8000,3686,280,2,,true,true
+235c15bb-9b5d-4d9b-8dab-77fae37af480,cb 110,8000,3614,265,2,,true,true
+235c15bb-9b5d-4d9b-8dab-77fae37af480,eco deluxe,8000,3686,1554,2,,true,true
+235c15bb-9b5d-4d9b-8dab-77fae37af480,fz 16,9000,4449,247,2,,true,true
+235c15bb-9b5d-4d9b-8dab-77fae37af480,gn 125,9000,4171,262,2,,true,true
+235c15bb-9b5d-4d9b-8dab-77fae37af480,pulsar 135,8000,3825,243,2,,true,true
+9594d8d6-e401-4eb2-a130-1c80ed3c494b,disco de freno akt ttr 125,45000,23006,76,2,/productos/disco-freno-delantero-akt-ttr-125.jpg,true,true
+9594d8d6-e401-4eb2-a130-1c80ed3c494b,disco de freno ank nkd 125 disco freno,44000,17443,161,2,/productos/disco-freno-delantero-nkd-125.jpg,true,true
+9594d8d6-e401-4eb2-a130-1c80ed3c494b,disco de freno cbf 150 /invicta 150/ thriller/ignitor delantero,35000,20675,122,2,,true,true
+9594d8d6-e401-4eb2-a130-1c80ed3c494b,disco de freno discover 125st delantero,35000,20675,78,2,,true,true
+9594d8d6-e401-4eb2-a130-1c80ed3c494b,disco de freno dr 150 disco freno,45000,17443,119,2,/productos/banda-de-freno-discover-125.jpg,true,true
+9594d8d6-e401-4eb2-a130-1c80ed3c494b,disco de freno pulsar 200ns,46000,24340,81,2,/productos/disco-de-freno-trasero-pulsar-200ns.jpg,true,true
+e265967d-87bd-4217-9cf2-92e63985b68b,disco de freno pulsar 200ns,36000,15993,72,2,/productos/disco-de-freno-trasero-pulsar-200ns.jpg,true,true
+e265967d-87bd-4217-9cf2-92e63985b68b,disco de freno trasero invicta 150 /xpulse200/thriller150/hunk 160 trasero,33000,17995,115,2,,true,true
+9594d8d6-e401-4eb2-a130-1c80ed3c494b,disco de freno xtz 125 disco freno,34000,15355,71,2,/productos/banda-de-freno-discover-125.jpg,true,true
+fe01401e-76f3-4b56-85cb-e074767da1b9,boxer ct,5000,1953,46,2,,true,true
+fe01401e-76f3-4b56-85cb-e074767da1b9,cb 110,6000,2337,153,2,/productos/eje-trasero-cb-110.jpg,true,true
+fe01401e-76f3-4b56-85cb-e074767da1b9,discover 100,6500,2438,187,2,/productos/eje-trasero-discover-100.jpg,true,true
+fe01401e-76f3-4b56-85cb-e074767da1b9,dr 150,8000,2649,184,2,/productos/eje-trasero-xr-150l.jpg,true,true
+fe01401e-76f3-4b56-85cb-e074767da1b9,eco deluxe,5000,2059,85,2,,true,true
+fe01401e-76f3-4b56-85cb-e074767da1b9,neo 100,6500,2649,102,2,/productos/eje-trasero-dream-neo-100.jpg,true,true
+fe01401e-76f3-4b56-85cb-e074767da1b9,xr 150,8000,4180,183,2,/productos/eje-trasero-xr-150l.jpg,true,true
+fe01401e-76f3-4b56-85cb-e074767da1b9,xtz 125,8500,3134,136,2,,true,true
+353a9430-25a1-4dbb-a559-e5336b51c624,akt evo / cb 110,8500,4406,825,2,,true,true
+353a9430-25a1-4dbb-a559-e5336b51c624,discover 125 st,12500,6604,376,2,,true,true
+353a9430-25a1-4dbb-a559-e5336b51c624,eco deluxe,8500,4406,753,2,,true,true
+353a9430-25a1-4dbb-a559-e5336b51c624,vivar 115,11000,5424,297,2,,true,true
+353a9430-25a1-4dbb-a559-e5336b51c624,xr 150,10500,4521,331,2,,true,true
+353a9430-25a1-4dbb-a559-e5336b51c624,xtz 125,10500,4867,317,2,,true,true
+74afa5dc-5f39-454a-9e3b-16c76b1416c7,12v,2600,1358,2466,2,,true,true
+ab307c98-d206-4617-8f8d-3ff03dc37b46,akt 125 nkd,5000,2125,0,2,,true,true
+ab307c98-d206-4617-8f8d-3ff03dc37b46,boxer ct doble,7000,3741,0,2,,true,true
+ab307c98-d206-4617-8f8d-3ff03dc37b46,bws 125 guaya acelerador,15000,6691,254,2,,true,true
+ab307c98-d206-4617-8f8d-3ff03dc37b46,cb 110,6500,3625,0,2,,true,true
+ab307c98-d206-4617-8f8d-3ff03dc37b46,cb 125f guaya acelerador,7000,3211,303,2,,true,true
+ab307c98-d206-4617-8f8d-3ff03dc37b46,discover 125st,5000,2777,37,2,,true,true
+ab307c98-d206-4617-8f8d-3ff03dc37b46,dr 150 guaya acelerador,7000,2582,157,2,,true,true
+ab307c98-d206-4617-8f8d-3ff03dc37b46,eco 100 / deluxe /nxg,5000,1939,327,2,,true,true
+ab307c98-d206-4617-8f8d-3ff03dc37b46,fz 16 guaya acelerador,6000,2558,173,2,,true,true
+ab307c98-d206-4617-8f8d-3ff03dc37b46,invicta guaya acelerador,7000,2174,246,2,,true,true
+ab307c98-d206-4617-8f8d-3ff03dc37b46,xr 150,6000,1776,283,2,,true,true
+ab307c98-d206-4617-8f8d-3ff03dc37b46,xtz 125 doble,8500,4392,480,2,,true,true
+cd923ffb-bd04-4160-bd16-aaa64e05c061,akt 125 nkd,4500,2559,0,2,,true,true
+cd923ffb-bd04-4160-bd16-aaa64e05c061,akt evo 125 guaya clutch,7000,2496,234,2,,true,true
+cd923ffb-bd04-4160-bd16-aaa64e05c061,akt ttr guaya clutch,7000,2275,222,2,,true,true
+cd923ffb-bd04-4160-bd16-aaa64e05c061,boxer ct / platino 100,5000,2814,159,2,,true,true
+cd923ffb-bd04-4160-bd16-aaa64e05c061,cb 110,6000,2179,534,2,,true,true
+cd923ffb-bd04-4160-bd16-aaa64e05c061,cb 125f,6000,2193,272,2,,true,true
+cd923ffb-bd04-4160-bd16-aaa64e05c061,cbf 150,5500,2862,33,2,,true,true
+cd923ffb-bd04-4160-bd16-aaa64e05c061,discover 125 st,6000,2856,539,2,,true,true
+cd923ffb-bd04-4160-bd16-aaa64e05c061,eco deluxe,6000,2352,102,2,,true,true
+cd923ffb-bd04-4160-bd16-aaa64e05c061,xr 150,6000,2232,243,2,,true,true
+cd923ffb-bd04-4160-bd16-aaa64e05c061,xtz 125 m/n,7000,3124,600,2,,true,true
+a0445560-5bbc-4ee3-bfeb-3dc5026bd322,boxer ct,5500,2809,150,2,,true,true
+a0445560-5bbc-4ee3-bfeb-3dc5026bd322,bws 125 guaya de freno trasero,9500,4512,251,2,,true,true
+a0445560-5bbc-4ee3-bfeb-3dc5026bd322,cb 110,5500,2803,229,2,,true,true
+a0445560-5bbc-4ee3-bfeb-3dc5026bd322,honda eco deluxe,5500,3026,0,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,akt 110s / wave 100,35000,19345,731,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,akt 125 nkd,36000,20882,497,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,akt ttr 125 / 150,62000,34593,361,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,akt ttr 200(520h),58000,0,295,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,apache rtr 200(520h),65000,0,292,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,boxer ct / platino,39000,21995,194,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,cb 110 / neo,38000,22864,490,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,cb 125f,43000,23779,207,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,cb 160f,46000,0,476,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,cbf 150 / thriller,45000,23971,247,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,cripton t115 fi,39000,20913,578,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,discover 125 st,43000,23420,155,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,eco deluxe,41000,22000,0,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,gixxer 250(520h),65000,0,292,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,mrx 150(concavo),45000,0,485,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,pulsar 200ns(520h),57000,0,288,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,suzuki dr 150,45000,24666,894,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,tvs 100,40000,0,483,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,tvs neo 110nx,42000,0,476,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,tvs raider 125,44000,0,460,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,viva r 115 / best,36000,19270,500,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,wave ii / wave 110,36000,20807,692,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,xr 150 / bross 125,45000,25805,720,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,xtz 125 m/n,45000,24523,793,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,xtz-150,45000,0,482,2,,true,true
+d2c19ad5-1485-4c6d-8046-bb9ea44e1179,ybr 125/libero 125,40000,0,289,2,,true,true
+db9d6df6-733c-479d-8216-73e401c0cba8,cb 110 / neo 110,14000,6345,1145,2,,true,true
+db9d6df6-733c-479d-8216-73e401c0cba8,cb 125f,15000,7785,1001,2,,true,true
+db9d6df6-733c-479d-8216-73e401c0cba8,eco 100 / eco deluxe / akt 110 / wave,14000,5587,560,2,,true,true
+09379696-9f78-410e-a17b-935b2f6e8546,akt ttr 150,75000,38947,64,2,,true,true
+09379696-9f78-410e-a17b-935b2f6e8546,cb 110,75000,36859,311,2,/productos/kit-cilindro-cb-110.jpg,true,true
+09379696-9f78-410e-a17b-935b2f6e8546,cb 125f,88000,39696,164,2,/productos/kit-cilindro-cb-125f.jpg,true,true
+09379696-9f78-410e-a17b-935b2f6e8546,cbf 150,88000,42772,79,2,,true,true
+09379696-9f78-410e-a17b-935b2f6e8546,eco deluxe,58000,29208,183,2,,true,true
+09379696-9f78-410e-a17b-935b2f6e8546,xr 150,88000,42422,95,2,/productos/kit-cilindro-xr-150l.jpg,true,true
+09379696-9f78-410e-a17b-935b2f6e8546,xtz 125,88000,41380,84,2,/productos/kit-cilindro-xtz-125.jpg,true,true
+d089e2aa-a36e-41ab-89f5-669fc7175610,akt 125 nkd/cb 125f /eco 100,8000,4128,69,2,,true,true
+d089e2aa-a36e-41ab-89f5-669fc7175610,boxer ct / paltino 100 / pulsar 135-180,8000,4685,127,2,,true,true
+d089e2aa-a36e-41ab-89f5-669fc7175610,discover 125 st-150,9500,4685,137,2,,true,true
+d089e2aa-a36e-41ab-89f5-669fc7175610,dr 150,11500,6116,410,2,,true,true
+d089e2aa-a36e-41ab-89f5-669fc7175610,eco deluxe cuna direccion,8500,4032,1368,2,,true,true
+d089e2aa-a36e-41ab-89f5-669fc7175610,xr 150,11000,4685,94,2,,true,true
+d089e2aa-a36e-41ab-89f5-669fc7175610,xtz 125 m/n,10500,5277,69,2,,true,true
+2a66e078-b40d-4e26-958c-78a32cd5236b,xl,9000,4171,1838,2,,true,true
+2a66e078-b40d-4e26-958c-78a32cd5236b,xxl,11000,4315,491,2,,true,true
+2a66e078-b40d-4e26-958c-78a32cd5236b,xxxl,13000,4454,482,2,,true,true
+166110a5-7a57-4ce1-b20c-fc9652f01ce4,azul,16000,0,134,2,,true,true
+166110a5-7a57-4ce1-b20c-fc9652f01ce4,cromado,16000,0,160,2,,true,true
+166110a5-7a57-4ce1-b20c-fc9652f01ce4,morado,16000,0,129,2,,true,true
+166110a5-7a57-4ce1-b20c-fc9652f01ce4,negro,16000,0,143,2,,true,true
+166110a5-7a57-4ce1-b20c-fc9652f01ce4,rojo,16000,0,116,2,,true,true
+ece2c624-6b02-46d3-9d26-6c85bb87a342,azul,13000,0,139,2,,true,true
+ece2c624-6b02-46d3-9d26-6c85bb87a342,cromado,13000,0,126,2,,true,true
+ece2c624-6b02-46d3-9d26-6c85bb87a342,morado,13000,0,130,2,,true,true
+ece2c624-6b02-46d3-9d26-6c85bb87a342,negro,13000,0,140,2,,true,true
+ece2c624-6b02-46d3-9d26-6c85bb87a342,rojo,13000,0,118,2,,true,true
+01c648e8-67ff-43ab-8331-b3ee17786d51,maniguetas clutch discover st,4500,1828,318,2,,true,true
+01c648e8-67ff-43ab-8331-b3ee17786d51,maniguetas clutch dr 150,4500,2035,82,2,,true,true
+01c648e8-67ff-43ab-8331-b3ee17786d51,maniguetas clutch eco deluxe,3800,1161,10,2,,true,true
+01c648e8-67ff-43ab-8331-b3ee17786d51,maniguetas clutch xtz 125,4500,2241,3,2,,true,true
+2889eabc-bc98-4d4d-856b-159495d62a5b,maniguetas freno dr 150,4500,2035,335,2,,true,true
+2889eabc-bc98-4d4d-856b-159495d62a5b,maniguetas freno xtz 125,4500,1900,500,2,,true,true
+41eeb087-1896-41ae-b3c1-2e7243db02fc,akt 110s,38000,16689,158,2,,true,true
+41eeb087-1896-41ae-b3c1-2e7243db02fc,akt nkd 125,38000,16689,426,2,,true,true
+41eeb087-1896-41ae-b3c1-2e7243db02fc,discover 125 st,48000,19473,408,2,/productos/banda-de-freno-discover-125.jpg,true,true
+df8f0351-7f0b-462c-95eb-f685c5c40576,pastilla de freno akt 110 delantero,5000,2433,1979,2,/productos/bomba-de-freno-delantero-akt-110s.jpg,true,true
+df8f0351-7f0b-462c-95eb-f685c5c40576,pastilla de freno akt 125 flex delantero,5000,2572,316,2,/productos/pastilla-freno-akt-125-flex.jpg,true,true
+fbbb52f7-26fe-406c-96b9-cb42dc75df4f,pastilla de freno apache 180 trasero,6000,2572,187,2,/productos/pastilla-freno-apache-180.jpg,true,true
+df8f0351-7f0b-462c-95eb-f685c5c40576,pastilla de freno best 125 delantero,5000,2433,301,2,/productos/pastilla-freno-best-125.jpg,true,true
+df8f0351-7f0b-462c-95eb-f685c5c40576,pastilla de freno cb 125f delantero,5000,2572,394,2,,true,true
+df8f0351-7f0b-462c-95eb-f685c5c40576,pastilla de freno cbf 150 delantero,5000,2505,210,2,/productos/pastilla-freno-cbf-150.jpg,true,true
+df8f0351-7f0b-462c-95eb-f685c5c40576,pastilla de freno crypton t115 fi delantero,5000,2572,404,2,,true,true
+df8f0351-7f0b-462c-95eb-f685c5c40576,pastilla de freno dr 150 delantero,6000,2184,318,2,,true,true
+fbbb52f7-26fe-406c-96b9-cb42dc75df4f,pastilla de freno invicta trasero,6000,2572,384,2,,true,true
+df8f0351-7f0b-462c-95eb-f685c5c40576,pastilla de freno pulsar 135 delantero,5000,2433,2337,2,/productos/bomba-de-freno-delantero-pulsar-135-ls.jpg,true,true
+fbbb52f7-26fe-406c-96b9-cb42dc75df4f,pastilla de freno pulsar 200ns trasero,6000,2572,297,2,/productos/disco-de-freno-trasero-pulsar-200ns.jpg,true,true
+fbbb52f7-26fe-406c-96b9-cb42dc75df4f,pastilla de freno triller 150 trasero,6000,2572,395,2,/productos/pastilla-freno-triller-150.jpg,true,true
+df8f0351-7f0b-462c-95eb-f685c5c40576,pastilla de freno vivar 115 delantero,5000,2505,256,2,/productos/pastilla-freno-vivar-115.jpg,true,true
+df8f0351-7f0b-462c-95eb-f685c5c40576,pastilla de freno xr 150 delantero,5000,2505,239,2,,true,true
+df8f0351-7f0b-462c-95eb-f685c5c40576,pastilla de freno xtz 125 delantero,5000,2433,276,2,/productos/disco-freno-delantero-xtz-125e.jpg,true,true
+df8f0351-7f0b-462c-95eb-f685c5c40576,pastilla de freno xtz 150 delantero,5000,2433,146,2,/productos/pastilla-freno-xtz-150.jpg,true,true
+fbbb52f7-26fe-406c-96b9-cb42dc75df4f,pastilla de freno xtz 250 trasero,7000,2784,82,2,/productos/pastilla-freno-xtz250.jpg,true,true
+df8f0351-7f0b-462c-95eb-f685c5c40576,pastilla de freno ybr 125 delantero,5000,2433,300,2,/productos/pastilla-freno-ybr-125.jpg,true,true
+b3dba7e3-dedc-4f2e-82c4-1939938b8008,único,6000,3105,132,2,,true,true
+e564f76b-9e0f-4b69-ab60-01929c693b90,akt nkd 125,30000,15926,169,2,,true,true
+65db5cfc-4ee1-478c-afb6-4d6a225a344b,akt 125 nkd / ttr 125-150,32000,17951,41,2,,true,true
+65db5cfc-4ee1-478c-afb6-4d6a225a344b,cb 110 / neo 110,33000,17155,368,2,,true,true
+65db5cfc-4ee1-478c-afb6-4d6a225a344b,cb125,36000,17510,260,2,,true,true
+65db5cfc-4ee1-478c-afb6-4d6a225a344b,cbf 150 / invicta 150 /xr 150,36000,17736,27,2,,true,true
+65db5cfc-4ee1-478c-afb6-4d6a225a344b,discover 125 st,35000,18000,62,2,,true,true
+65db5cfc-4ee1-478c-afb6-4d6a225a344b,dr 150,39000,17385,166,2,,true,true
+65db5cfc-4ee1-478c-afb6-4d6a225a344b,eco deluxe,31000,17558,2,2,,true,true
+65db5cfc-4ee1-478c-afb6-4d6a225a344b,tvs 100,36000,15302,170,2,,true,true
+65db5cfc-4ee1-478c-afb6-4d6a225a344b,xtz 125,34000,16444,287,2,,true,true
+031eafd2-b61c-427e-8aec-bbbc00eee913,akt 110,12000,5736,361,2,,true,true
+031eafd2-b61c-427e-8aec-bbbc00eee913,akt nkd 125,12000,5736,353,2,,true,true
+07dd5beb-888b-4a73-8de3-c81350073cb7,eco deluxe,8500,4016,1491,2,,true,true
+07dd5beb-888b-4a73-8de3-c81350073cb7,universal,9500,5121,990,2,/productos/relay-universal.png,true,true
+07dd5beb-888b-4a73-8de3-c81350073cb7,xtz 125 / ybr 125 / libero 125,14500,7824,1265,2,,true,true
+08ecf78d-22ab-48da-aed9-8cc717f51ffe,akt 125 nkd,10500,5400,0,2,,true,true
+08ecf78d-22ab-48da-aed9-8cc717f51ffe,ax 4,27000,13910,275,2,,true,true
+08ecf78d-22ab-48da-aed9-8cc717f51ffe,boxer ct / platino 100,18500,9873,171,2,,true,true
+08ecf78d-22ab-48da-aed9-8cc717f51ffe,cb 110 / neo 110,17000,9043,631,2,,true,true
+08ecf78d-22ab-48da-aed9-8cc717f51ffe,cb 125f,22500,10430,195,2,,true,true
+08ecf78d-22ab-48da-aed9-8cc717f51ffe,crypton t-115 fi,34000,13910,237,2,,true,true
+08ecf78d-22ab-48da-aed9-8cc717f51ffe,discover 125st-150,19000,9873,180,2,,true,true
+08ecf78d-22ab-48da-aed9-8cc717f51ffe,dr 150,26000,12864,267,2,,true,true
+08ecf78d-22ab-48da-aed9-8cc717f51ffe,eco deluxe,20000,10780,681,2,,true,true
+08ecf78d-22ab-48da-aed9-8cc717f51ffe,tvs 100,27000,13910,273,2,,true,true
+08ecf78d-22ab-48da-aed9-8cc717f51ffe,vivar 115,35000,18081,81,2,,true,true
+08ecf78d-22ab-48da-aed9-8cc717f51ffe,xtz 125 e,18500,9873,79,2,,true,true
+2481105c-1e9a-4227-94ba-121e2a4a74c4,2 cables,3000,1483,1654,2,,true,true
+2481105c-1e9a-4227-94ba-121e2a4a74c4,3 cables,3000,1483,711,2,,true,true
+aa2e0b48-cb03-4013-aa93-2d947fc84e03,akt nkd 125,23000,12744,254,2,/productos/tapa-gasolina-akt-nkd.jpg,true,true
+aa2e0b48-cb03-4013-aa93-2d947fc84e03,eco deluxe,25000,14136,165,2,,true,true
+6982014c-209a-4b26-9c80-85c53c3e8e7a,paquete x10,18000,840,951,2,,true,true

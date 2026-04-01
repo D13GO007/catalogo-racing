@@ -128,9 +128,8 @@ export async function generarFacturaPDF(
 
   pdf.setFontSize(9.2);
   pdf.setTextColor(65, 65, 65);
-  pdf.text('NIT: 900.000.000-1',              margin + 26, headTop + 19.5);
   pdf.text('Cali, Valle del Cauca - Colombia', margin + 26, headTop + 24);
-  pdf.text('Tel: +57 300 000 0000',            margin + 26, headTop + 28.5);
+  pdf.text('Tel: +57 3132240559',              margin + 26, headTop + 28.5);
 
   const esCotizacion = venta.tipoVenta === 'cotizacion';
   const tituloDocumento = esCotizacion ? 'COTIZACION' : 'FACTURA';
