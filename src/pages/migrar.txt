@@ -1,0 +1,85 @@
+---
+import { supabase } from '../lib/supabase.js';
+
+// 1. Pon aquí la URL de tu Google Sheets (la misma que usas en index.astro)
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIQG65879ah7LwHRW8AOiOsah5dO8aJaRhqab75I_5cxhv5slN_YEjmZCaqLOVx6m1R-5Ak2j35C7c/pub?output=csv"; 
+
+let mensaje = "Iniciando migración...";
+
+try {
+  // 2. Traemos los datos del CSV
+  const response = await fetch(SHEET_URL);
+  const csvText = await response.text();
+
+  // 3. Limpiamos y separamos por filas
+  const filas = csvText.split('\n').filter(fila => fila.trim() !== '');
+
+  // 4. Mapeamos las columnas (Familia, Modelo, Precio, Imagen)
+  const productos = filas.map(fila => {
+    // Si tienes comas dentro de los nombres, esto podría fallar, 
+    // pero para un CSV estándar esto separa las 4 columnas perfectamente.
+    const [familia, modelo, precio, imagen] = fila.split(',');
+    return { 
+      familia: familia?.trim(), 
+      modelo: modelo?.trim(), 
+      precio: Number(precio), 
+      imagen: imagen?.trim() 
+    };
+  }).filter(p => p.familia && p.modelo); // Quitamos filas vacías
+
+  // 5. Extraemos las Familias únicas para no repetirlas
+  const familiasUnicas = [...new Set(productos.map(p => p.familia))];
+
+  // 6. Insertamos Familias en Supabase
+  const { data: familiasInsertadas, error: errorFamilias } = await supabase
+    .from('familias')
+    .upsert(
+      familiasUnicas.map(nombre => ({ nombre })),
+      { onConflict: 'nombre' } // Evita duplicados si corres esto dos veces
+    )
+    .select();
+
+  if (errorFamilias) throw new Error("Error guardando familias: " + errorFamilias.message);
+
+  // 7. Preparamos las Referencias cruzando el ID de la familia recién creada
+  const referenciasAInsertar = productos.map(prod => {
+    const familiaBD = familiasInsertadas.find(f => f.nombre === prod.familia);
+    return {
+      familia_id: familiaBD.id,
+      modelo: prod.modelo,
+      precio_venta: prod.precio,
+      precio_costo: prod.precio * 0.7, // Ejemplo: asumiendo un margen del 30%
+      stock_actual: 10, // Un stock inicial de prueba
+      imagen_especifica: prod.imagen
+    };
+  });
+
+  // 8. Insertamos todo el inventario de una sola vez
+  const { error: errorRef } = await supabase
+    .from('referencias')
+    .insert(referenciasAInsertar);
+
+  if (errorRef) throw new Error("Error guardando referencias: " + errorRef.message);
+
+  mensaje = "✅ ¡Migración completada con éxito! Tienes una base de datos real.";
+
+} catch (err) {
+  mensaje = "❌ Hubo un error: " + err.message;
+}
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Migrador de Base de Datos</title>
+  </head>
+  <body style="background: #1a1a1a; color: white; padding: 3rem; font-family: system-ui;">
+    <h1>Motor de Migración 🚀</h1>
+    <div style="padding: 1rem; border: 1px solid #333; border-radius: 8px; background: #222;">
+      <h2>Estado: {mensaje}</h2>
+    </div>
+    <p style="margin-top: 2rem; color: #888;">
+      *Nota de seguridad: Cuando veas el mensaje de éxito, borra este archivo (migrar.astro) para que nadie más pueda ejecutarlo.
+    </p>
+  </body>
+</html>

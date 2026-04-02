@@ -1,29 +1,50 @@
 ---
+
 import '../styles.css';
 import BotonDescargaPDF from '../components/CatalogoPDF.jsx';
+import { supabase } from '../lib/supabase.js';
 // 🗑️ Ya no importamos CatalogoWeb porque todo se hará nativamente aquí
 
-// 🔗 TU ENLACE
-const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSIQG65879ah7LwHRW8AOiOsah5dO8aJaRhqab75I_5cxhv5slN_YEjmZCaqLOVx6m1R-5Ak2j35C7c/pub?output=csv';
+// 🔗 Supabase
+const { data: familiasBD, error } = await supabase
+  .from('familias')
+  .select('id, nombre, referencias(id, modelo, precio_venta, imagen_especifica)')
+  .eq('referencias.activo', true)                // <-- CANDADO 1: Oculta los eliminados
+  .eq('referencias.visible_en_catalogo', true)   // <-- CANDADO 2: Oculta los recién agregados
+  .order('nombre');
 
-interface Referencia {
-  modelo: string;
-  precio: number;
-  imagenEspecifica: string;
-}
-
-interface ProductoAgrupado {
-  id: string;
-  nombre: string;
-  imagenDefault: string;
-  referencias: Referencia[];
-}
-
-let productosAgrupados: ProductoAgrupado[] = [];
 let errorCarga = '';
-const IMAGEN_SIN_FOTO = 'https://placehold.co/500x500/f0f0f0/FF6600?text=SIN+FOTO'; // Cambiado a Zapote
 
-try {
+if (error) {
+  console.error('❌ Error al consultar familias en Supabase:', error);
+  errorCarga = 'No pudimos cargar la lista.';
+}
+
+const productosAgrupados: any = (familiasBD ?? []).map((familia: any) => {
+  const referencias = (familia.referencias ?? []).map((ref: any) => ({
+    Modelo: ref.modelo,
+    Precio: ref.precio_venta,
+    Imagen: ref.imagen_especifica,
+
+    // Mantener compatibilidad con la estructura previa
+    modelo: ref.modelo,
+    precio: ref.precio_venta,
+    imagenEspecifica: ref.imagen_especifica,
+  }));
+
+  return {
+    Familia: familia.nombre,
+    Referencias: referencias,
+
+    // Propiedades usadas por el template existente
+    id: familia.id,
+    nombre: familia.nombre,
+    imagenDefault: referencias[0]?.Imagen ?? '',
+    referencias,
+  };
+});
+
+/*
   const response = await fetch(SHEET_URL);
   if (!response.ok) throw new Error('Error al conectar con Google Sheets');
   const data = await response.text();
@@ -72,9 +93,9 @@ try {
     return 0;
   });
 
-} catch (e) { errorCarga = "No pudimos cargar la lista."; }
+*/
 
-const formatoPeso = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(v);
+const formatoPeso = (v: number) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(v);
 const fechaHoy = new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
 ---
 
@@ -214,12 +235,12 @@ const fechaHoy = new Date().toLocaleDateString('es-CO', { year: 'numeric', month
         </div>
 
         <div id="product-grid" class="columns-1 lg:columns-2 gap-8">
-            {productosAgrupados.map((item) => (
+            {productosAgrupados.map((item: any) => (
                 <article 
                     class="producto-card mb-8 inline-block w-full break-inside-avoid bg-white rounded-md border-2 border-black shadow-[6px_6px_0px_#000000] overflow-hidden transition-transform hover:-translate-y-1"
                     data-nombre={item.nombre.toLowerCase()} 
                     data-referencias={JSON.stringify(item.referencias).toLowerCase()}
-                    data-all-images={JSON.stringify(item.referencias.map(r => r.imagenEspecifica))} 
+                    data-all-images={JSON.stringify(item.referencias.map((r: any) => r.imagenEspecifica))} 
                 >
                     <div class="bg-[#FF6600] p-3 border-b-2 border-black flex justify-between items-center">
                         <h3 class="texto-buscable m-0 text-white text-lg md:text-xl font-black uppercase tracking-wider">
@@ -252,7 +273,7 @@ const fechaHoy = new Date().toLocaleDateString('es-CO', { year: 'numeric', month
                             <div class="flex-1 w-full">
                                 <table class="w-full text-xs md:text-sm text-left">
                                     <tbody class="divide-y divide-gray-200">
-                                        {item.referencias.map((ref, i) => (
+                                        {item.referencias.map((ref: any, i: number) => (
                                             <tr 
                                                 class={`hover:bg-[#FFF0E5] transition-colors cursor-pointer ref-row group/row ${i % 2 === 0 ? 'bg-white' : 'bg-[#FAFAFA]'}`}
                                                 data-img={ref.imagenEspecifica}
@@ -306,19 +327,19 @@ const fechaHoy = new Date().toLocaleDateString('es-CO', { year: 'numeric', month
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const input = document.getElementById('search-input');
-            const cards = document.querySelectorAll('.producto-card');
+            const cards = document.querySelectorAll<HTMLElement>('.producto-card');
             const noResults = document.getElementById('no-results');
-            const elementosBuscables = document.querySelectorAll('.texto-buscable');
+            const elementosBuscables = document.querySelectorAll<HTMLElement>('.texto-buscable');
 
             setTimeout(() => {
-                const uniqueImages = new Set();
+                const uniqueImages = new Set<string>();
                 cards.forEach(card => {
                     try {
-                        const images = JSON.parse(card.dataset.allImages || '[]');
-                        images.forEach(img => {
-                            if(img && img !== '' && !img.includes('placehold.co')) uniqueImages.add(img);
+                        const images: string[] = JSON.parse(card.dataset.allImages || '[]');
+                        images.forEach((img: string) => {
+                            if (img && img !== '' && !img.includes('placehold.co')) uniqueImages.add(img);
                         });
-                    } catch(e){}
+                    } catch (e) {}
                 });
                 
                 const imageArray = Array.from(uniqueImages);
