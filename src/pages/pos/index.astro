@@ -34,7 +34,20 @@ const { data: referenciasRaw, error } = await supabase
   // Nota: en el panel de administración mostramos todos los ítems (incluso los que aún no están visibles en el catálogo público)
   .order('modelo');
 
-const referencias: Referencia[] = (referenciasRaw ?? []) as Referencia[];
+let referencias: Referencia[] = (referenciasRaw ?? []) as Referencia[];
+
+// Ordenar por familia alfabéticamente, luego por modelo dentro de cada familia
+referencias = referencias.sort((a, b) => {
+  const familiaA = (a.familias?.nombre || '').toLowerCase();
+  const familiaB = (b.familias?.nombre || '').toLowerCase();
+  
+  // Primero compara por familia
+  const cmpFamily = familiaA.localeCompare(familiaB, 'es');
+  if (cmpFamily !== 0) return cmpFamily;
+  
+  // Si la familia es igual, compara por modelo
+  return (a.modelo || '').localeCompare(b.modelo || '', 'es');
+});
 
 const familias = Array.from(
   new Map(
@@ -660,7 +673,7 @@ const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
       })();
     </script>
     <script>
-      import "../../lib/pos-client.ts";
+      import '../../lib/pos-client.ts';
     </script>
   </body>
 </html>
