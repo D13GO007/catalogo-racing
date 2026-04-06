@@ -88,10 +88,22 @@ clearFilterBtn?.addEventListener('click', () => resetFilters());
 resetFilters();
 
 // --- Lógica de Abrir/Cerrar Modales ---
-(
-  document.getElementById('btnNuevoRepuesto') ||
-  document.getElementById('btnOpenAddModal')
-)?.addEventListener('click', () => addModal?.classList.remove('hidden'));
+
+// 1. Buscamos TODOS los botones que tengan cualquiera de esos dos IDs
+const botonesAbrirModal = document.querySelectorAll('#btnNuevoRepuesto, #btnOpenAddModal');
+
+// 2. Le asignamos la función de abrir a cada uno de ellos
+botonesAbrirModal.forEach((boton) => {
+  boton.addEventListener('click', () => {
+    // Buscamos el modal en el momento del clic (evita problemas si Astro recarga el DOM)
+    const modalNuevo = document.getElementById('addModal');
+    if (modalNuevo) {
+      modalNuevo.classList.remove('hidden');
+    }
+  });
+});
+
+// Cierre del modal de agregar
 document.getElementById('closeAddModal')?.addEventListener('click', () =>
   addModal?.classList.add('hidden')
 );
