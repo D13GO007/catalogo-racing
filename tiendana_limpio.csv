@@ -1,0 +1,227 @@
+nombre_normalizado,precio_venta,precio_costo,stock_actual,categoria,activo,visible
+automatico agility 125 rs,95000,61972,172,AUTOMATICO,true,true
+automatico bws 125,118000,61962,171,AUTOMATICO,true,true
+balineras 6201 2rs,2200,1171,71,BALINERAS,true,true
+balineras 6202 2rs,2500,1240,682,BALINERAS,true,true
+balineras 6203 2rs,2800,1489,317,BALINERAS,true,true
+balineras 6301 2rs,3200,1764,137,BALINERAS,true,true
+balineras 6302 2rs,3200,1764,277,BALINERAS,true,true
+bandas freno akt 110s/viva r/best banda freno trasero,7500,4452,0,BANDAS FRENO,true,true
+bandas freno boxer ct /ax 100/platino banda freno trasero,8000,4536,6,BANDAS FRENO,true,true
+bandas freno discover 125st-150/pulsar 135-180 banda de freno trasero,10000,5217,1125,BANDAS FRENO,true,true
+bandas freno eco deluxe / cb 110/xr 150 banda freno delantero,10000,5068,253,BANDAS FRENO,true,true
+bandas freno eco deluxe / cb 110/xr 150 trasero,7500,3892,1195,BANDAS FRENO,true,true
+bandas freno xtz 125e/dr 150/ybr/libero banda freno trasero,11000,6285,71,BANDAS FRENO,true,true
+base manigueta discover 125 st izquierda,5500,1814,730,BASE MANIGUETA,true,true
+base manigueta eco deluxe izquierda,5500,2160,681,BASE MANIGUETA,true,true
+bobina alta akt nkd 125,9500,4953,219,BOBINA ALTA,true,true
+bobina alta boxer ct 100,10500,4953,165,BOBINA ALTA,true,true
+bobina alta cb 110,15500,8016,148,BOBINA ALTA,true,true
+bobina alta eco deluxe,15500,8222,226,BOBINA ALTA,true,true
+bomba de freno akt 110 delantero,18500,9734,963,BOMBA DE FRENO,true,true
+bomba de freno pulsar 135 delantero,19500,9734,409,BOMBA DE FRENO,true,true
+bomba de freno pulsar 200ns trasero,23000,9734,232,BOMBA DE FRENO,true,true
+bomba de freno universal delantero,18500,9734,1291,BOMBA DE FRENO,true,true
+bomba de freno universal trasero,19500,10084,212,BOMBA DE FRENO,true,true
+bombillo motoled motoled triseta 4 caras,10000,0,0,BOMBILLO MOTOLED,true,true
+bombillo motoled motoled ventilador 4 caras 8000 lumines,39000,0,733,BOMBILLO MOTOLED,true,true
+calapies delanteros cbf 150,14000,5582,183,CALAPIES DELANTEROS,true,true
+calapies delanteros eco deluxe,12000,5164,203,CALAPIES DELANTEROS,true,true
+capuchon eco deluxe,1800,898,190,CAPUCHON,true,true
+capuchon pulsar 135-180/discover 125-150,6000,2899,633,CAPUCHON,true,true
+capuchon yesky negro,2000,1022,413,CAPUCHON,true,true
+carburador akt 110,43000,20169,162,CARBURADOR,true,true
+carburador akt nkd 125,45000,13910,153,CARBURADOR,true,true
+carburador boxer ct 100,43000,20865,198,CARBURADOR,true,true
+carburador eco deluxe,48000,22252,162,CARBURADOR,true,true
+cdi akt 110,13000,6504,169,CDI,true,true
+comando derecho eco deluxe,6000,2731,339,COMANDO DERECHO,true,true
+comando derecho nkd 125,12500,6355,134,COMANDO DERECHO,true,true
+comando derecho tvs 100 es,15500,7560,175,COMANDO DERECHO,true,true
+comando izquierdo akt nkd 125,12500,6566,156,COMANDO IZQUIERDO,true,true
+comando izquierdo cb 110,16500,8649,234,COMANDO IZQUIERDO,true,true
+comando izquierdo eco deluxe,17500,8376,289,COMANDO IZQUIERDO,true,true
+comando izquierdo tvs 100,27000,14097,174,COMANDO IZQUIERDO,true,true
+direccionales akt nkd 125,6000,2985,351,DIRECCIONALES,true,true
+direccionales boxer ct,5000,2544,0,DIRECCIONALES,true,true
+direccionales cb 110 / xr 150,6000,3196,1074,DIRECCIONALES,true,true
+direccionales cbf 150,6500,3196,410,DIRECCIONALES,true,true
+direccionales discover 125 st,6500,3460,8,DIRECCIONALES,true,true
+direccionales splendor nxg,6000,3268,5586,DIRECCIONALES,true,true
+direccionales tvs 100,6500,3686,728,DIRECCIONALES,true,true
+direccionales xtz 125 /fz 16,6000,2784,990,DIRECCIONALES,true,true
+disco clutch akt 110,8000,3686,262,DISCO CLUTCH,true,true
+disco clutch best 125,8000,3825,259,DISCO CLUTCH,true,true
+disco clutch boxer ct 100,8000,3686,280,DISCO CLUTCH,true,true
+disco clutch cb 110,8000,3614,265,DISCO CLUTCH,true,true
+disco clutch eco deluxe,8000,3686,1554,DISCO CLUTCH,true,true
+disco clutch fz 16,9000,4449,247,DISCO CLUTCH,true,true
+disco clutch gn 125,9000,4171,262,DISCO CLUTCH,true,true
+disco clutch pulsar 135,8000,3825,243,DISCO CLUTCH,true,true
+disco de freno akt ttr 125,45000,23006,76,DISCO FRENO DELANTERO,true,true
+disco de freno ank nkd 125 disco freno,44000,17443,161,DISCO FRENO DELANTERO,true,true
+disco de freno cbf 150 /invicta 150/ thriller/ignitor delantero,35000,20675,122,DISCO FRENO DELANTERO,true,true
+disco de freno discover 125st delantero,35000,20675,78,DISCO FRENO DELANTERO,true,true
+disco de freno dr 150 disco freno,45000,17443,119,DISCO FRENO DELANTERO,true,true
+disco de freno pulsar 200ns disco freno delantero,46000,24340,81,DISCO FRENO DELANTERO,true,true
+disco de freno pulsar 200ns disco freno trasero,36000,15993,72,DISCO FRENO TRASERO,true,true
+disco de freno trasero invicta 150 /xpulse200/thriller150/hunk 160 trasero,33000,17995,115,DISCO FRENO TRASERO,true,true
+disco de freno xtz 125 disco freno,34000,15355,71,DISCO FRENO DELANTERO,true,true
+eje trasero boxer ct,5000,1953,46,EJE TRASERO,true,true
+eje trasero cb 110,6000,2337,153,EJE TRASERO,true,true
+eje trasero discover 100,6500,2438,187,EJE TRASERO,true,true
+eje trasero dr 150,8000,2649,184,EJE TRASERO,true,true
+eje trasero eco deluxe,5000,2059,85,EJE TRASERO,true,true
+eje trasero neo 100,6500,2649,102,EJE TRASERO,true,true
+eje trasero xr 150,8000,4180,183,EJE TRASERO,true,true
+eje trasero xtz 125,8500,3134,136,EJE TRASERO,true,true
+espejos akt evo / cb 110,8500,4406,825,ESPEJOS,true,true
+espejos discover 125 st,12500,6604,376,ESPEJOS,true,true
+espejos eco deluxe,8500,4406,753,ESPEJOS,true,true
+espejos vivar 115,11000,5424,297,ESPEJOS,true,true
+espejos xr 150,10500,4521,331,ESPEJOS,true,true
+espejos xtz 125,10500,4867,317,ESPEJOS,true,true
+flasher 12v,2600,1358,2466,FLASHER,true,true
+guayas acelerador akt 125 nkd,5000,2125,0,GUAYAS ACELERADOR,true,true
+guayas acelerador boxer ct doble,7000,3741,0,GUAYAS ACELERADOR,true,true
+guayas acelerador bws 125 guaya acelerador,15000,6691,254,GUAYAS ACELERADOR,true,true
+guayas acelerador cb 110,6500,3625,0,GUAYAS ACELERADOR,true,true
+guayas acelerador cb 125f guaya acelerador,7000,3211,303,GUAYAS ACELERADOR,true,true
+guayas acelerador discover 125st,5000,2777,37,GUAYAS ACELERADOR,true,true
+guayas acelerador dr 150 guaya acelerador,7000,2582,157,GUAYAS ACELERADOR,true,true
+guayas acelerador eco 100 / deluxe /nxg,5000,1939,327,GUAYAS ACELERADOR,true,true
+guayas acelerador fz 16 guaya acelerador,6000,2558,173,GUAYAS ACELERADOR,true,true
+guayas acelerador invicta guaya acelerador,7000,2174,246,GUAYAS ACELERADOR,true,true
+guayas acelerador xr 150,6000,1776,283,GUAYAS ACELERADOR,true,true
+guayas acelerador xtz 125 doble,8500,4392,480,GUAYAS ACELERADOR,true,true
+guayas clucth akt 125 nkd,4500,2559,0,GUAYAS CLUCTH,true,true
+guayas clucth akt evo 125 guaya clutch,7000,2496,234,GUAYAS CLUCTH,true,true
+guayas clucth akt ttr guaya clutch,7000,2275,222,GUAYAS CLUCTH,true,true
+guayas clucth boxer ct / platino 100,5000,2814,159,GUAYAS CLUCTH,true,true
+guayas clucth cb 110,6000,2179,534,GUAYAS CLUCTH,true,true
+guayas clucth cb 125f,6000,2193,272,GUAYAS CLUCTH,true,true
+guayas clucth cbf 150,5500,2862,33,GUAYAS CLUCTH,true,true
+guayas clucth discover 125 st,6000,2856,539,GUAYAS CLUCTH,true,true
+guayas clucth eco deluxe,6000,2352,102,GUAYAS CLUCTH,true,true
+guayas clucth xr 150,6000,2232,243,GUAYAS CLUCTH,true,true
+guayas clucth xtz 125 m/n,7000,3124,600,GUAYAS CLUCTH,true,true
+guayas freno boxer ct,5500,2809,150,GUAYAS FRENO,true,true
+guayas freno bws 125 guaya de freno trasero,9500,4512,251,GUAYAS FRENO,true,true
+guayas freno cb 110,5500,2803,229,GUAYAS FRENO,true,true
+guayas freno honda eco deluxe,5500,3026,0,GUAYAS FRENO,true,true
+kit arrastre akt 110s / wave 100,35000,19345,731,KIT ARRASTRE,true,true
+kit arrastre akt 125 nkd,36000,20882,497,KIT ARRASTRE,true,true
+kit arrastre akt ttr 125 / 150,62000,34593,361,KIT ARRASTRE,true,true
+kit arrastre akt ttr 200(520h),58000,0,295,KIT ARRASTRE,true,true
+kit arrastre apache rtr 200(520h),65000,0,292,KIT ARRASTRE,true,true
+kit arrastre boxer ct / platino,39000,21995,194,KIT ARRASTRE,true,true
+kit arrastre cb 110 / neo,38000,22864,490,KIT ARRASTRE,true,true
+kit arrastre cb 125f,43000,23779,207,KIT ARRASTRE,true,true
+kit arrastre cb 160f,46000,0,476,KIT ARRASTRE,true,true
+kit arrastre cbf 150 / thriller,45000,23971,247,KIT ARRASTRE,true,true
+kit arrastre cripton t115 fi,39000,20913,578,KIT ARRASTRE,true,true
+kit arrastre discover 125 st,43000,23420,155,KIT ARRASTRE,true,true
+kit arrastre eco deluxe,41000,22000,0,KIT ARRASTRE,true,true
+kit arrastre gixxer 250(520h),65000,0,292,KIT ARRASTRE,true,true
+kit arrastre mrx 150(concavo),45000,0,485,KIT ARRASTRE,true,true
+kit arrastre pulsar 200ns(520h),57000,0,288,KIT ARRASTRE,true,true
+kit arrastre suzuki dr 150,45000,24666,894,KIT ARRASTRE,true,true
+kit arrastre tvs 100,40000,0,483,KIT ARRASTRE,true,true
+kit arrastre tvs neo 110nx,42000,0,476,KIT ARRASTRE,true,true
+kit arrastre tvs raider 125,44000,0,460,KIT ARRASTRE,true,true
+kit arrastre viva r 115 / best,36000,19270,500,KIT ARRASTRE,true,true
+kit arrastre wave ii / wave 110,36000,20807,692,KIT ARRASTRE,true,true
+kit arrastre xr 150 / bross 125,45000,25805,720,KIT ARRASTRE,true,true
+kit arrastre xtz 125 m/n,45000,24523,793,KIT ARRASTRE,true,true
+kit arrastre xtz-150,45000,0,482,KIT ARRASTRE,true,true
+kit arrastre ybr 125/libero 125,40000,0,289,KIT ARRASTRE,true,true
+kit cadenilla cb 110 / neo 110,14000,6345,1145,KIT CADENILLA,true,true
+kit cadenilla cb 125f,15000,7785,1001,KIT CADENILLA,true,true
+kit cadenilla eco 100 / eco deluxe / akt 110 / wave,14000,5587,560,KIT CADENILLA,true,true
+kit cilindro akt ttr 150,75000,38947,64,KIT CILINDRO,true,true
+kit cilindro cb 110,75000,36859,311,KIT CILINDRO,true,true
+kit cilindro cb 125f,88000,39696,164,KIT CILINDRO,true,true
+kit cilindro cbf 150,88000,42772,79,KIT CILINDRO,true,true
+kit cilindro eco deluxe,58000,29208,183,KIT CILINDRO,true,true
+kit cilindro xr 150,88000,42422,95,KIT CILINDRO,true,true
+kit cilindro xtz 125,88000,41380,84,KIT CILINDRO,true,true
+kit cunas direccion akt 125 nkd/cb 125f /eco 100,8000,4128,69,KIT CUNAS DIRECCION,true,true
+kit cunas direccion boxer ct / paltino 100 / pulsar 135-180,8000,4685,127,KIT CUNAS DIRECCION,true,true
+kit cunas direccion discover 125 st-150,9500,4685,137,KIT CUNAS DIRECCION,true,true
+kit cunas direccion dr 150,11500,6116,410,KIT CUNAS DIRECCION,true,true
+kit cunas direccion eco deluxe cuna direccion,8500,4032,1368,KIT CUNAS DIRECCION,true,true
+kit cunas direccion xr 150,11000,4685,94,KIT CUNAS DIRECCION,true,true
+kit cunas direccion xtz 125 m/n,10500,5277,69,KIT CUNAS DIRECCION,true,true
+malla sillin xl,9000,4171,1838,MALLA SILLIN,true,true
+malla sillin xxl,11000,4315,491,MALLA SILLIN,true,true
+malla sillin xxxl,13000,4454,482,MALLA SILLIN,true,true
+mango copa azul,16000,0,134,MANGO COPA,true,true
+mango copa cromado,16000,0,160,MANGO COPA,true,true
+mango copa morado,16000,0,129,MANGO COPA,true,true
+mango copa negro,16000,0,143,MANGO COPA,true,true
+mango copa rojo,16000,0,116,MANGO COPA,true,true
+mango moxi tope azul,13000,0,139,MANGO MOXI TOPE,true,true
+mango moxi tope cromado,13000,0,126,MANGO MOXI TOPE,true,true
+mango moxi tope morado,13000,0,130,MANGO MOXI TOPE,true,true
+mango moxi tope negro,13000,0,140,MANGO MOXI TOPE,true,true
+mango moxi tope rojo,13000,0,118,MANGO MOXI TOPE,true,true
+maniguetas clutch discover st,4500,1828,318,MANIGUETA CLUTCH,true,true
+maniguetas clutch dr 150,4500,2035,82,MANIGUETA CLUTCH,true,true
+maniguetas clutch eco deluxe,3800,1161,10,MANIGUETA CLUTCH,true,true
+maniguetas clutch xtz 125,4500,2241,3,MANIGUETA CLUTCH,true,true
+maniguetas freno dr 150,4500,2035,335,MANIGUETA FRENO,true,true
+maniguetas freno xtz 125,4500,1900,500,MANIGUETA FRENO,true,true
+mordaza freno disco akt 110s,38000,16689,158,MORDAZA FRENO DISCO,true,true
+mordaza freno disco akt nkd 125,38000,16689,426,MORDAZA FRENO DISCO,true,true
+mordaza freno disco discover 125 st,48000,19473,408,MORDAZA FRENO DISCO,true,true
+pastilla de freno akt 110 delantero,5000,2433,1979,PASTILLA FRENO DELANTERO,true,true
+pastilla de freno akt 125 flex delantero,5000,2572,316,PASTILLA FRENO DELANTERO,true,true
+pastilla de freno apache 180 trasero,6000,2572,187,PASTILLA FRENO TRASERO,true,true
+pastilla de freno best 125 delantero,5000,2433,301,PASTILLA FRENO DELANTERO,true,true
+pastilla de freno cb 125f delantero,5000,2572,394,PASTILLA FRENO DELANTERO,true,true
+pastilla de freno cbf 150 delantero,5000,2505,210,PASTILLA FRENO DELANTERO,true,true
+pastilla de freno crypton t115 fi delantero,5000,2572,404,PASTILLA FRENO DELANTERO,true,true
+pastilla de freno dr 150 delantero,6000,2184,318,PASTILLA FRENO DELANTERO,true,true
+pastilla de freno invicta trasero,6000,2572,384,PASTILLA FRENO TRASERO,true,true
+pastilla de freno pulsar 135 delantero,5000,2433,2337,PASTILLA FRENO DELANTERO,true,true
+pastilla de freno pulsar 200ns trasero,6000,2572,297,PASTILLA FRENO TRASERO,true,true
+pastilla de freno triller 150 trasero,6000,2572,395,PASTILLA FRENO TRASERO,true,true
+pastilla de freno vivar 115 delantero,5000,2505,256,PASTILLA FRENO DELANTERO,true,true
+pastilla de freno xr 150 delantero,5000,2505,239,PASTILLA FRENO DELANTERO,true,true
+pastilla de freno xtz 125 delantero,5000,2433,276,PASTILLA FRENO DELANTERO,true,true
+pastilla de freno xtz 150 delantero,5000,2433,146,PASTILLA FRENO DELANTERO,true,true
+pastilla de freno xtz 250 trasero,7000,2784,82,PASTILLA FRENO TRASERO,true,true
+pastilla de freno ybr 125 delantero,5000,2433,300,PASTILLA FRENO DELANTERO,true,true
+pitos,6000,3105,132,PITOS,true,true
+plato bobina akt nkd 125,30000,15926,169,PLATO BOBINA,true,true
+prensa clutch akt 125 nkd / ttr 125-150,32000,17951,41,PRENSA CLUTCH,true,true
+prensa clutch cb 110 / neo 110,33000,17155,368,PRENSA CLUTCH,true,true
+prensa clutch cb125,36000,17510,260,PRENSA CLUTCH,true,true
+prensa clutch cbf 150 / invicta 150 /xr 150,36000,17736,27,PRENSA CLUTCH,true,true
+prensa clutch discover 125 st,35000,18000,62,PRENSA CLUTCH,true,true
+prensa clutch dr 150,39000,17385,166,PRENSA CLUTCH,true,true
+prensa clutch eco deluxe,31000,17558,2,PRENSA CLUTCH,true,true
+prensa clutch tvs 100,36000,15302,170,PRENSA CLUTCH,true,true
+prensa clutch xtz 125,34000,16444,287,PRENSA CLUTCH,true,true
+regulador akt 110,12000,5736,361,REGULADOR,true,true
+regulador akt nkd 125,12000,5736,353,REGULADOR,true,true
+relay eco deluxe,8500,4016,1491,RELAY,true,true
+relay universal,9500,5121,990,RELAY,true,true
+relay xtz 125 / ybr 125 / libero 125,14500,7824,1265,RELAY,true,true
+switch encendido akt 125 nkd,10500,5400,0,SWITCH ENCENDIDO,true,true
+switch encendido ax 4,27000,13910,275,SWITCH ENCENDIDO,true,true
+switch encendido boxer ct / platino 100,18500,9873,171,SWITCH ENCENDIDO,true,true
+switch encendido cb 110 / neo 110,17000,9043,631,SWITCH ENCENDIDO,true,true
+switch encendido cb 125f,22500,10430,195,SWITCH ENCENDIDO,true,true
+switch encendido crypton t-115 fi,34000,13910,237,SWITCH ENCENDIDO,true,true
+switch encendido discover 125st-150,19000,9873,180,SWITCH ENCENDIDO,true,true
+switch encendido dr 150,26000,12864,267,SWITCH ENCENDIDO,true,true
+switch encendido eco deluxe,20000,10780,681,SWITCH ENCENDIDO,true,true
+switch encendido tvs 100,27000,13910,273,SWITCH ENCENDIDO,true,true
+switch encendido vivar 115,35000,18081,81,SWITCH ENCENDIDO,true,true
+switch encendido xtz 125 e,18500,9873,79,SWITCH ENCENDIDO,true,true
+switch run 2 cables,3000,1483,1654,SWITCH RUN,true,true
+switch run 3 cables,3000,1483,711,SWITCH RUN,true,true
+tapa gasolina akt nkd 125,23000,12744,254,TAPA GASOLINA,true,true
+tapa gasolina eco deluxe,25000,14136,165,TAPA GASOLINA,true,true
+trompo stop paquete x10,18000,840,951,TROMPO STOP,true,true

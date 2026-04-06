@@ -1,0 +1,1810 @@
+[
+  {
+    "nombre": "AUTOMATICO AGILITY 125 RS",
+    "familia": "AUTOMATICO",
+    "costo": 61972,
+    "precio_venta": 95000,
+    "stock_actual": 172,
+    "imagen_especifica": "/productos/automatico-agility-125-rs.jpg"
+  },
+  {
+    "nombre": "AUTOMATICO BWS 125",
+    "familia": "AUTOMATICO",
+    "costo": 61962,
+    "precio_venta": 118000,
+    "stock_actual": 171,
+    "imagen_especifica": "/productos/automatico-bws-125.jpg"
+  },
+  {
+    "nombre": "BALINERAS 6201 2RS",
+    "familia": "BALINERAS",
+    "costo": 1171,
+    "precio_venta": 2200,
+    "stock_actual": 71,
+    "imagen_especifica": "/productos/balineras-6201-2rs.jpg"
+  },
+  {
+    "nombre": "BALINERAS 6202 2RS",
+    "familia": "BALINERAS",
+    "costo": 1240,
+    "precio_venta": 2500,
+    "stock_actual": 682,
+    "imagen_especifica": "/productos/balineras-6202-2rs.jpg"
+  },
+  {
+    "nombre": "BALINERAS 6203 2RS",
+    "familia": "BALINERAS",
+    "costo": 1489,
+    "precio_venta": 2800,
+    "stock_actual": 317,
+    "imagen_especifica": "/productos/balineras-6203-2rs.jpg"
+  },
+  {
+    "nombre": "BALINERAS 6301 2RS",
+    "familia": "BALINERAS",
+    "costo": 1764,
+    "precio_venta": 3200,
+    "stock_actual": 137,
+    "imagen_especifica": "/productos/balineras-6301-2rs.jpg"
+  },
+  {
+    "nombre": "BALINERAS 6302 2RS",
+    "familia": "BALINERAS",
+    "costo": 1764,
+    "precio_venta": 3200,
+    "stock_actual": 277,
+    "imagen_especifica": "/productos/balineras-6302-2rs.jpg"
+  },
+  {
+    "nombre": "BANDAS FRENO AKT 110S/VIVA R/BEST BANDA FRENO TRASERO",
+    "familia": "BANDAS FRENO",
+    "costo": 4452,
+    "precio_venta": 7500,
+    "stock_actual": 0,
+    "imagen_especifica": "/productos/bandas-freno-akt-110s/viva-r/best-banda-freno-trasero.jpg"
+  },
+  {
+    "nombre": "BANDAS FRENO BOXER CT /AX 100/PLATINO BANDA FRENO TRASERO",
+    "familia": "BANDAS FRENO",
+    "costo": 4536,
+    "precio_venta": 8000,
+    "stock_actual": 6,
+    "imagen_especifica": "/productos/bandas-freno-boxer-ct-/ax-100/platino-banda-freno-trasero.jpg"
+  },
+  {
+    "nombre": "BANDAS FRENO DISCOVER 125ST-150/PULSAR 135-180 BANDA DE FRENO TRASERO",
+    "familia": "BANDAS FRENO",
+    "costo": 5217,
+    "precio_venta": 10000,
+    "stock_actual": 1,
+    "imagen_especifica": "/productos/bandas-freno-discover-125st-150/pulsar-135-180-banda-de-freno-trasero.jpg"
+  },
+  {
+    "nombre": "BANDAS FRENO ECO DELUXE / CB 110/XR 150 BANDA FRENO DELANTERO",
+    "familia": "BANDAS FRENO",
+    "costo": 5068,
+    "precio_venta": 10000,
+    "stock_actual": 253,
+    "imagen_especifica": "/productos/bandas-freno-eco-deluxe-/-cb-110/xr-150-banda-freno-delantero.jpg"
+  },
+  {
+    "nombre": "BANDAS FRENO ECO DELUXE / CB 110/XR 150 TRASERO",
+    "familia": "BANDAS FRENO",
+    "costo": 3892,
+    "precio_venta": 7500,
+    "stock_actual": 1,
+    "imagen_especifica": "/productos/bandas-freno-eco-deluxe-/-cb-110/xr-150-trasero.jpg"
+  },
+  {
+    "nombre": "BANDAS FRENO XTZ 125E/DR 150/YBR/LIBERO BANDA FRENO TRASERO",
+    "familia": "BANDAS FRENO",
+    "costo": 6285,
+    "precio_venta": 11000,
+    "stock_actual": 71,
+    "imagen_especifica": "/productos/bandas-freno-xtz-125e/dr-150/ybr/libero-banda-freno-trasero.jpg"
+  },
+  {
+    "nombre": "BASE MANIGUETA DISCOVER 125 ST IZQUIERDA",
+    "familia": "BASE MANIGUETA",
+    "costo": 1814,
+    "precio_venta": 5500,
+    "stock_actual": 730,
+    "imagen_especifica": "/productos/base-manigueta-discover-125-st-izquierda.jpg"
+  },
+  {
+    "nombre": "BASE MANIGUETA ECO DELUXE IZQUIERDA",
+    "familia": "BASE MANIGUETA",
+    "costo": 2160,
+    "precio_venta": 5500,
+    "stock_actual": 681,
+    "imagen_especifica": "/productos/base-manigueta-eco-deluxe-izquierda.jpg"
+  },
+  {
+    "nombre": "BOBINA ALTA AKT NKD 125",
+    "familia": "BOBINA ALTA",
+    "costo": 4953,
+    "precio_venta": 9500,
+    "stock_actual": 219,
+    "imagen_especifica": "/productos/bobina-alta-akt-nkd-125.jpg"
+  },
+  {
+    "nombre": "BOBINA ALTA BOXER CT 100",
+    "familia": "BOBINA ALTA",
+    "costo": 4953,
+    "precio_venta": 10500,
+    "stock_actual": 165,
+    "imagen_especifica": "/productos/bobina-alta-boxer-ct-100.jpg"
+  },
+  {
+    "nombre": "BOBINA ALTA CB 110",
+    "familia": "BOBINA ALTA",
+    "costo": 8016,
+    "precio_venta": 15500,
+    "stock_actual": 148,
+    "imagen_especifica": "/productos/bobina-alta-cb-110.jpg"
+  },
+  {
+    "nombre": "BOBINA ALTA ECO DELUXE",
+    "familia": "BOBINA ALTA",
+    "costo": 8222,
+    "precio_venta": 15500,
+    "stock_actual": 226,
+    "imagen_especifica": "/productos/bobina-alta-eco-deluxe.jpg"
+  },
+  {
+    "nombre": "BOMBA DE FRENO AKT 110 DELANTERO",
+    "familia": "BOMBA DE FRENO",
+    "costo": 9734,
+    "precio_venta": 18500,
+    "stock_actual": 963,
+    "imagen_especifica": "/productos/bomba-de-freno-akt-110-delantero.jpg"
+  },
+  {
+    "nombre": "BOMBA DE FRENO PULSAR 135 DELANTERO",
+    "familia": "BOMBA DE FRENO",
+    "costo": 9734,
+    "precio_venta": 19500,
+    "stock_actual": 409,
+    "imagen_especifica": "/productos/bomba-de-freno-pulsar-135-delantero.jpg"
+  },
+  {
+    "nombre": "BOMBA DE FRENO PULSAR 200NS TRASERO",
+    "familia": "BOMBA DE FRENO",
+    "costo": 9734,
+    "precio_venta": 23000,
+    "stock_actual": 232,
+    "imagen_especifica": "/productos/bomba-de-freno-pulsar-200ns-trasero.jpg"
+  },
+  {
+    "nombre": "BOMBA DE FRENO UNIVERSAL DELANTERO",
+    "familia": "BOMBA DE FRENO",
+    "costo": 9734,
+    "precio_venta": 18500,
+    "stock_actual": 1,
+    "imagen_especifica": "/productos/bomba-de-freno-universal-delantero.jpg"
+  },
+  {
+    "nombre": "BOMBA DE FRENO UNIVERSAL TRASERO",
+    "familia": "BOMBA DE FRENO",
+    "costo": 10084,
+    "precio_venta": 19500,
+    "stock_actual": 212,
+    "imagen_especifica": "/productos/bomba-de-freno-universal-trasero.jpg"
+  },
+  {
+    "nombre": "BOMBILLO MOTOLED MOTOLED TRISETA 4 CARAS",
+    "familia": "BOMBILLO MOTOLED",
+    "costo": 0,
+    "precio_venta": 10000,
+    "stock_actual": 0,
+    "imagen_especifica": "/productos/bombillo-motoled-motoled-triseta-4-caras.jpg"
+  },
+  {
+    "nombre": "BOMBILLO MOTOLED MOTOLED VENTILADOR 4 CARAS 8000 LUMINES",
+    "familia": "BOMBILLO MOTOLED",
+    "costo": 0,
+    "precio_venta": 39000,
+    "stock_actual": 733,
+    "imagen_especifica": "/productos/bombillo-motoled-motoled-ventilador-4-caras-8000-lumines.jpg"
+  },
+  {
+    "nombre": "CALAPIES DELANTEROS CBF 150",
+    "familia": "CALAPIES DELANTEROS",
+    "costo": 5582,
+    "precio_venta": 14000,
+    "stock_actual": 183,
+    "imagen_especifica": "/productos/calapies-delanteros-cbf-150.jpg"
+  },
+  {
+    "nombre": "CALAPIES DELANTEROS ECO DELUXE",
+    "familia": "CALAPIES DELANTEROS",
+    "costo": 5164,
+    "precio_venta": 12000,
+    "stock_actual": 203,
+    "imagen_especifica": "/productos/calapies-delanteros-eco-deluxe.jpg"
+  },
+  {
+    "nombre": "CAPUCHON ECO DELUXE",
+    "familia": "CAPUCHON",
+    "costo": 898,
+    "precio_venta": 1800,
+    "stock_actual": 190,
+    "imagen_especifica": "/productos/capuchon-eco-deluxe.jpg"
+  },
+  {
+    "nombre": "CAPUCHON PULSAR 135-180/DISCOVER 125-150",
+    "familia": "CAPUCHON",
+    "costo": 2899,
+    "precio_venta": 6000,
+    "stock_actual": 633,
+    "imagen_especifica": "/productos/capuchon-pulsar-135-180/discover-125-150.jpg"
+  },
+  {
+    "nombre": "CAPUCHON YESKY NEGRO",
+    "familia": "CAPUCHON",
+    "costo": 1022,
+    "precio_venta": 2000,
+    "stock_actual": 413,
+    "imagen_especifica": "/productos/capuchon-yesky-negro.jpg"
+  },
+  {
+    "nombre": "CARBURADOR AKT 110",
+    "familia": "CARBURADOR",
+    "costo": 20169,
+    "precio_venta": 43000,
+    "stock_actual": 162,
+    "imagen_especifica": "/productos/carburador-akt-110.jpg"
+  },
+  {
+    "nombre": "CARBURADOR AKT NKD 125",
+    "familia": "CARBURADOR",
+    "costo": 13910,
+    "precio_venta": 45000,
+    "stock_actual": 153,
+    "imagen_especifica": "/productos/carburador-akt-nkd-125.jpg"
+  },
+  {
+    "nombre": "CARBURADOR BOXER CT 100",
+    "familia": "CARBURADOR",
+    "costo": 20865,
+    "precio_venta": 43000,
+    "stock_actual": 198,
+    "imagen_especifica": "/productos/carburador-boxer-ct-100.jpg"
+  },
+  {
+    "nombre": "CARBURADOR ECO DELUXE",
+    "familia": "CARBURADOR",
+    "costo": 22252,
+    "precio_venta": 48000,
+    "stock_actual": 162,
+    "imagen_especifica": "/productos/carburador-eco-deluxe.jpg"
+  },
+  {
+    "nombre": "CDI AKT 110",
+    "familia": "CDI",
+    "costo": 6504,
+    "precio_venta": 13000,
+    "stock_actual": 169,
+    "imagen_especifica": "/productos/cdi-akt-110.jpg"
+  },
+  {
+    "nombre": "COMANDO DERECHO ECO DELUXE",
+    "familia": "COMANDO DERECHO",
+    "costo": 2731,
+    "precio_venta": 6000,
+    "stock_actual": 339,
+    "imagen_especifica": "/productos/comando-derecho-eco-deluxe.jpg"
+  },
+  {
+    "nombre": "COMANDO DERECHO NKD 125",
+    "familia": "COMANDO DERECHO",
+    "costo": 6355,
+    "precio_venta": 12500,
+    "stock_actual": 134,
+    "imagen_especifica": "/productos/comando-derecho-nkd-125.jpg"
+  },
+  {
+    "nombre": "COMANDO DERECHO TVS 100 ES",
+    "familia": "COMANDO DERECHO",
+    "costo": 7560,
+    "precio_venta": 15500,
+    "stock_actual": 175,
+    "imagen_especifica": "/productos/comando-derecho-tvs-100-es.jpg"
+  },
+  {
+    "nombre": "COMANDO IZQUIERDO AKT NKD 125",
+    "familia": "COMANDO IZQUIERDO",
+    "costo": 6566,
+    "precio_venta": 12500,
+    "stock_actual": 156,
+    "imagen_especifica": "/productos/comando-izquierdo-akt-nkd-125.jpg"
+  },
+  {
+    "nombre": "COMANDO IZQUIERDO CB 110",
+    "familia": "COMANDO IZQUIERDO",
+    "costo": 8649,
+    "precio_venta": 16500,
+    "stock_actual": 234,
+    "imagen_especifica": "/productos/comando-izquierdo-cb-110.jpg"
+  },
+  {
+    "nombre": "COMANDO IZQUIERDO ECO DELUXE",
+    "familia": "COMANDO IZQUIERDO",
+    "costo": 8376,
+    "precio_venta": 17500,
+    "stock_actual": 289,
+    "imagen_especifica": "/productos/comando-izquierdo-eco-deluxe.jpg"
+  },
+  {
+    "nombre": "COMANDO IZQUIERDO TVS 100",
+    "familia": "COMANDO IZQUIERDO",
+    "costo": 14097,
+    "precio_venta": 27000,
+    "stock_actual": 174,
+    "imagen_especifica": "/productos/comando-izquierdo-tvs-100.jpg"
+  },
+  {
+    "nombre": "DIRECCIONALES AKT NKD 125",
+    "familia": "DIRECCIONALES",
+    "costo": 2985,
+    "precio_venta": 6000,
+    "stock_actual": 351,
+    "imagen_especifica": "/productos/direccionales-akt-nkd-125.jpg"
+  },
+  {
+    "nombre": "DIRECCIONALES BOXER CT",
+    "familia": "DIRECCIONALES",
+    "costo": 2544,
+    "precio_venta": 5000,
+    "stock_actual": 0,
+    "imagen_especifica": "/productos/direccionales-boxer-ct.jpg"
+  },
+  {
+    "nombre": "DIRECCIONALES CB 110 / XR 150",
+    "familia": "DIRECCIONALES",
+    "costo": 3196,
+    "precio_venta": 6000,
+    "stock_actual": 1,
+    "imagen_especifica": "/productos/direccionales-cb-110-/-xr-150.jpg"
+  },
+  {
+    "nombre": "DIRECCIONALES CBF 150",
+    "familia": "DIRECCIONALES",
+    "costo": 3196,
+    "precio_venta": 6500,
+    "stock_actual": 410,
+    "imagen_especifica": "/productos/direccionales-cbf-150.jpg"
+  },
+  {
+    "nombre": "DIRECCIONALES DISCOVER 125 ST",
+    "familia": "DIRECCIONALES",
+    "costo": 3460,
+    "precio_venta": 6500,
+    "stock_actual": 8,
+    "imagen_especifica": "/productos/direccionales-discover-125-st.jpg"
+  },
+  {
+    "nombre": "DIRECCIONALES SPLENDOR NXG",
+    "familia": "DIRECCIONALES",
+    "costo": 3268,
+    "precio_venta": 6000,
+    "stock_actual": 5,
+    "imagen_especifica": "/productos/direccionales-splendor-nxg.jpg"
+  },
+  {
+    "nombre": "DIRECCIONALES TVS 100",
+    "familia": "DIRECCIONALES",
+    "costo": 3686,
+    "precio_venta": 6500,
+    "stock_actual": 728,
+    "imagen_especifica": "/productos/direccionales-tvs-100.jpg"
+  },
+  {
+    "nombre": "DIRECCIONALES XTZ 125 /FZ 16",
+    "familia": "DIRECCIONALES",
+    "costo": 2784,
+    "precio_venta": 6000,
+    "stock_actual": 990,
+    "imagen_especifica": "/productos/direccionales-xtz-125-/fz-16.jpg"
+  },
+  {
+    "nombre": "DISCO CLUTCH AKT 110",
+    "familia": "DISCO CLUTCH",
+    "costo": 3686,
+    "precio_venta": 8000,
+    "stock_actual": 262,
+    "imagen_especifica": "/productos/disco-clutch-akt-110.jpg"
+  },
+  {
+    "nombre": "DISCO CLUTCH BEST 125",
+    "familia": "DISCO CLUTCH",
+    "costo": 3825,
+    "precio_venta": 8000,
+    "stock_actual": 259,
+    "imagen_especifica": "/productos/disco-clutch-best-125.jpg"
+  },
+  {
+    "nombre": "DISCO CLUTCH BOXER CT 100",
+    "familia": "DISCO CLUTCH",
+    "costo": 3686,
+    "precio_venta": 8000,
+    "stock_actual": 280,
+    "imagen_especifica": "/productos/disco-clutch-boxer-ct-100.jpg"
+  },
+  {
+    "nombre": "DISCO CLUTCH CB 110",
+    "familia": "DISCO CLUTCH",
+    "costo": 3614,
+    "precio_venta": 8000,
+    "stock_actual": 265,
+    "imagen_especifica": "/productos/disco-clutch-cb-110.jpg"
+  },
+  {
+    "nombre": "DISCO CLUTCH ECO DELUXE",
+    "familia": "DISCO CLUTCH",
+    "costo": 3686,
+    "precio_venta": 8000,
+    "stock_actual": 1,
+    "imagen_especifica": "/productos/disco-clutch-eco-deluxe.jpg"
+  },
+  {
+    "nombre": "DISCO CLUTCH FZ 16",
+    "familia": "DISCO CLUTCH",
+    "costo": 4449,
+    "precio_venta": 9000,
+    "stock_actual": 247,
+    "imagen_especifica": "/productos/disco-clutch-fz-16.jpg"
+  },
+  {
+    "nombre": "DISCO CLUTCH GN 125",
+    "familia": "DISCO CLUTCH",
+    "costo": 4171,
+    "precio_venta": 9000,
+    "stock_actual": 262,
+    "imagen_especifica": "/productos/disco-clutch-gn-125.jpg"
+  },
+  {
+    "nombre": "DISCO CLUTCH PULSAR 135",
+    "familia": "DISCO CLUTCH",
+    "costo": 3825,
+    "precio_venta": 8000,
+    "stock_actual": 243,
+    "imagen_especifica": "/productos/disco-clutch-pulsar-135.jpg"
+  },
+  {
+    "nombre": "DISCO DE FRENO AKT TTR 125",
+    "familia": "DISCO FRENO DELANTERO",
+    "costo": 23006,
+    "precio_venta": 45000,
+    "stock_actual": 76,
+    "imagen_especifica": "/productos/disco-de-freno-akt-ttr-125.jpg"
+  },
+  {
+    "nombre": "DISCO DE FRENO ANK NKD 125 DISCO FRENO",
+    "familia": "DISCO FRENO DELANTERO",
+    "costo": 17443,
+    "precio_venta": 44000,
+    "stock_actual": 161,
+    "imagen_especifica": "/productos/disco-de-freno-ank-nkd-125-disco-freno.jpg"
+  },
+  {
+    "nombre": "DISCO DE FRENO CBF 150 /INVICTA 150/ THRILLER/IGNITOR DELANTERO",
+    "familia": "DISCO FRENO DELANTERO",
+    "costo": 20675,
+    "precio_venta": 35000,
+    "stock_actual": 122,
+    "imagen_especifica": "/productos/disco-de-freno-cbf-150-/invicta-150/-thriller/ignitor-delantero.jpg"
+  },
+  {
+    "nombre": "DISCO DE FRENO DISCOVER 125ST DELANTERO",
+    "familia": "DISCO FRENO DELANTERO",
+    "costo": 20675,
+    "precio_venta": 35000,
+    "stock_actual": 78,
+    "imagen_especifica": "/productos/disco-de-freno-discover-125st-delantero.jpg"
+  },
+  {
+    "nombre": "DISCO DE FRENO DR 150 DISCO FRENO",
+    "familia": "DISCO FRENO DELANTERO",
+    "costo": 17443,
+    "precio_venta": 45000,
+    "stock_actual": 119,
+    "imagen_especifica": "/productos/disco-de-freno-dr-150-disco-freno.jpg"
+  },
+  {
+    "nombre": "DISCO DE FRENO PULSAR 200NS DISCO FRENO DELANTERO",
+    "familia": "DISCO FRENO DELANTERO",
+    "costo": 24340,
+    "precio_venta": 46000,
+    "stock_actual": 81,
+    "imagen_especifica": "/productos/disco-de-freno-pulsar-200ns-disco-freno-delantero.jpg"
+  },
+  {
+    "nombre": "DISCO DE FRENO PULSAR 200NS DISCO FRENO TRASERO",
+    "familia": "DISCO FRENO TRASERO",
+    "costo": 15993,
+    "precio_venta": 36000,
+    "stock_actual": 72,
+    "imagen_especifica": "/productos/disco-de-freno-pulsar-200ns-disco-freno-trasero.jpg"
+  },
+  {
+    "nombre": "DISCO DE FRENO TRASERO INVICTA 150 /XPULSE200/THRILLER150/HUNK 160 TRASERO",
+    "familia": "DISCO FRENO TRASERO",
+    "costo": 17995,
+    "precio_venta": 33000,
+    "stock_actual": 115,
+    "imagen_especifica": "/productos/disco-de-freno-trasero-invicta-150-/xpulse200/thriller150/hunk-160-trasero.jpg"
+  },
+  {
+    "nombre": "DISCO DE FRENO XTZ 125 DISCO FRENO",
+    "familia": "DISCO FRENO DELANTERO",
+    "costo": 15355,
+    "precio_venta": 34000,
+    "stock_actual": 71,
+    "imagen_especifica": "/productos/disco-de-freno-xtz-125-disco-freno.jpg"
+  },
+  {
+    "nombre": "EJE TRASERO BOXER CT",
+    "familia": "EJE TRASERO",
+    "costo": 1953,
+    "precio_venta": 5000,
+    "stock_actual": 46,
+    "imagen_especifica": "/productos/eje-trasero-boxer-ct.jpg"
+  },
+  {
+    "nombre": "EJE TRASERO CB 110",
+    "familia": "EJE TRASERO",
+    "costo": 2337,
+    "precio_venta": 6000,
+    "stock_actual": 153,
+    "imagen_especifica": "/productos/eje-trasero-cb-110.jpg"
+  },
+  {
+    "nombre": "EJE TRASERO DISCOVER 100",
+    "familia": "EJE TRASERO",
+    "costo": 2438,
+    "precio_venta": 6500,
+    "stock_actual": 187,
+    "imagen_especifica": "/productos/eje-trasero-discover-100.jpg"
+  },
+  {
+    "nombre": "EJE TRASERO DR 150",
+    "familia": "EJE TRASERO",
+    "costo": 2649,
+    "precio_venta": 8000,
+    "stock_actual": 184,
+    "imagen_especifica": "/productos/eje-trasero-dr-150.jpg"
+  },
+  {
+    "nombre": "EJE TRASERO ECO DELUXE",
+    "familia": "EJE TRASERO",
+    "costo": 2059,
+    "precio_venta": 5000,
+    "stock_actual": 85,
+    "imagen_especifica": "/productos/eje-trasero-eco-deluxe.jpg"
+  },
+  {
+    "nombre": "EJE TRASERO NEO 100",
+    "familia": "EJE TRASERO",
+    "costo": 2649,
+    "precio_venta": 6500,
+    "stock_actual": 102,
+    "imagen_especifica": "/productos/eje-trasero-neo-100.jpg"
+  },
+  {
+    "nombre": "EJE TRASERO XR 150",
+    "familia": "EJE TRASERO",
+    "costo": 4180,
+    "precio_venta": 8000,
+    "stock_actual": 183,
+    "imagen_especifica": "/productos/eje-trasero-xr-150.jpg"
+  },
+  {
+    "nombre": "EJE TRASERO XTZ 125",
+    "familia": "EJE TRASERO",
+    "costo": 3134,
+    "precio_venta": 8500,
+    "stock_actual": 136,
+    "imagen_especifica": "/productos/eje-trasero-xtz-125.jpg"
+  },
+  {
+    "nombre": "ESPEJOS AKT EVO / CB 110",
+    "familia": "ESPEJOS",
+    "costo": 4406,
+    "precio_venta": 8500,
+    "stock_actual": 825,
+    "imagen_especifica": "/productos/espejos-akt-evo-/-cb-110.jpg"
+  },
+  {
+    "nombre": "ESPEJOS DISCOVER 125 ST",
+    "familia": "ESPEJOS",
+    "costo": 6604,
+    "precio_venta": 12500,
+    "stock_actual": 376,
+    "imagen_especifica": "/productos/espejos-discover-125-st.jpg"
+  },
+  {
+    "nombre": "ESPEJOS ECO DELUXE",
+    "familia": "ESPEJOS",
+    "costo": 4406,
+    "precio_venta": 8500,
+    "stock_actual": 753,
+    "imagen_especifica": "/productos/espejos-eco-deluxe.jpg"
+  },
+  {
+    "nombre": "ESPEJOS VIVAR 115",
+    "familia": "ESPEJOS",
+    "costo": 5424,
+    "precio_venta": 11000,
+    "stock_actual": 297,
+    "imagen_especifica": "/productos/espejos-vivar-115.jpg"
+  },
+  {
+    "nombre": "ESPEJOS XR 150",
+    "familia": "ESPEJOS",
+    "costo": 4521,
+    "precio_venta": 10500,
+    "stock_actual": 331,
+    "imagen_especifica": "/productos/espejos-xr-150.jpg"
+  },
+  {
+    "nombre": "ESPEJOS XTZ 125",
+    "familia": "ESPEJOS",
+    "costo": 4867,
+    "precio_venta": 10500,
+    "stock_actual": 317,
+    "imagen_especifica": "/productos/espejos-xtz-125.jpg"
+  },
+  {
+    "nombre": "FLASHER 12V",
+    "familia": "FLASHER",
+    "costo": 1358,
+    "precio_venta": 2600,
+    "stock_actual": 2,
+    "imagen_especifica": "/productos/flasher-12v.jpg"
+  },
+  {
+    "nombre": "GUAYAS ACELERADOR AKT 125 NKD",
+    "familia": "GUAYAS ACELERADOR",
+    "costo": 2125,
+    "precio_venta": 5000,
+    "stock_actual": 0,
+    "imagen_especifica": "/productos/guayas-acelerador-akt-125-nkd.jpg"
+  },
+  {
+    "nombre": "GUAYAS ACELERADOR BOXER CT DOBLE",
+    "familia": "GUAYAS ACELERADOR",
+    "costo": 3741,
+    "precio_venta": 7000,
+    "stock_actual": 0,
+    "imagen_especifica": "/productos/guayas-acelerador-boxer-ct-doble.jpg"
+  },
+  {
+    "nombre": "GUAYAS ACELERADOR BWS 125 GUAYA ACELERADOR",
+    "familia": "GUAYAS ACELERADOR",
+    "costo": 6691,
+    "precio_venta": 15000,
+    "stock_actual": 254,
+    "imagen_especifica": "/productos/guayas-acelerador-bws-125-guaya-acelerador.jpg"
+  },
+  {
+    "nombre": "GUAYAS ACELERADOR CB 110",
+    "familia": "GUAYAS ACELERADOR",
+    "costo": 3625,
+    "precio_venta": 6500,
+    "stock_actual": 0,
+    "imagen_especifica": "/productos/guayas-acelerador-cb-110.jpg"
+  },
+  {
+    "nombre": "GUAYAS ACELERADOR CB 125F GUAYA ACELERADOR",
+    "familia": "GUAYAS ACELERADOR",
+    "costo": 3211,
+    "precio_venta": 7000,
+    "stock_actual": 303,
+    "imagen_especifica": "/productos/guayas-acelerador-cb-125f-guaya-acelerador.jpg"
+  },
+  {
+    "nombre": "GUAYAS ACELERADOR DISCOVER 125ST",
+    "familia": "GUAYAS ACELERADOR",
+    "costo": 2777,
+    "precio_venta": 5000,
+    "stock_actual": 37,
+    "imagen_especifica": "/productos/guayas-acelerador-discover-125st.jpg"
+  },
+  {
+    "nombre": "GUAYAS ACELERADOR DR 150 GUAYA ACELERADOR",
+    "familia": "GUAYAS ACELERADOR",
+    "costo": 2582,
+    "precio_venta": 7000,
+    "stock_actual": 157,
+    "imagen_especifica": "/productos/guayas-acelerador-dr-150-guaya-acelerador.jpg"
+  },
+  {
+    "nombre": "GUAYAS ACELERADOR ECO 100 / DELUXE /NXG",
+    "familia": "GUAYAS ACELERADOR",
+    "costo": 1939,
+    "precio_venta": 5000,
+    "stock_actual": 327,
+    "imagen_especifica": "/productos/guayas-acelerador-eco-100-/-deluxe-/nxg.jpg"
+  },
+  {
+    "nombre": "GUAYAS ACELERADOR FZ 16 GUAYA ACELERADOR",
+    "familia": "GUAYAS ACELERADOR",
+    "costo": 2558,
+    "precio_venta": 6000,
+    "stock_actual": 173,
+    "imagen_especifica": "/productos/guayas-acelerador-fz-16-guaya-acelerador.jpg"
+  },
+  {
+    "nombre": "GUAYAS ACELERADOR INVICTA GUAYA ACELERADOR",
+    "familia": "GUAYAS ACELERADOR",
+    "costo": 2174,
+    "precio_venta": 7000,
+    "stock_actual": 246,
+    "imagen_especifica": "/productos/guayas-acelerador-invicta-guaya-acelerador.jpg"
+  },
+  {
+    "nombre": "GUAYAS ACELERADOR XR 150",
+    "familia": "GUAYAS ACELERADOR",
+    "costo": 1776,
+    "precio_venta": 6000,
+    "stock_actual": 283,
+    "imagen_especifica": "/productos/guayas-acelerador-xr-150.jpg"
+  },
+  {
+    "nombre": "GUAYAS ACELERADOR XTZ 125 DOBLE",
+    "familia": "GUAYAS ACELERADOR",
+    "costo": 4392,
+    "precio_venta": 8500,
+    "stock_actual": 480,
+    "imagen_especifica": "/productos/guayas-acelerador-xtz-125-doble.jpg"
+  },
+  {
+    "nombre": "GUAYAS CLUCTH AKT 125 NKD",
+    "familia": "GUAYAS CLUCTH",
+    "costo": 2559,
+    "precio_venta": 4500,
+    "stock_actual": 0,
+    "imagen_especifica": "/productos/guayas-clucth-akt-125-nkd.jpg"
+  },
+  {
+    "nombre": "GUAYAS CLUCTH AKT EVO 125 GUAYA CLUTCH",
+    "familia": "GUAYAS CLUCTH",
+    "costo": 2496,
+    "precio_venta": 7000,
+    "stock_actual": 234,
+    "imagen_especifica": "/productos/guayas-clucth-akt-evo-125-guaya-clutch.jpg"
+  },
+  {
+    "nombre": "GUAYAS CLUCTH AKT TTR GUAYA CLUTCH",
+    "familia": "GUAYAS CLUCTH",
+    "costo": 2275,
+    "precio_venta": 7000,
+    "stock_actual": 222,
+    "imagen_especifica": "/productos/guayas-clucth-akt-ttr-guaya-clutch.jpg"
+  },
+  {
+    "nombre": "GUAYAS CLUCTH BOXER CT / PLATINO 100",
+    "familia": "GUAYAS CLUCTH",
+    "costo": 2814,
+    "precio_venta": 5000,
+    "stock_actual": 159,
+    "imagen_especifica": "/productos/guayas-clucth-boxer-ct-/-platino-100.jpg"
+  },
+  {
+    "nombre": "GUAYAS CLUCTH CB 110",
+    "familia": "GUAYAS CLUCTH",
+    "costo": 2179,
+    "precio_venta": 6000,
+    "stock_actual": 534,
+    "imagen_especifica": "/productos/guayas-clucth-cb-110.jpg"
+  },
+  {
+    "nombre": "GUAYAS CLUCTH CB 125F",
+    "familia": "GUAYAS CLUCTH",
+    "costo": 2193,
+    "precio_venta": 6000,
+    "stock_actual": 272,
+    "imagen_especifica": "/productos/guayas-clucth-cb-125f.jpg"
+  },
+  {
+    "nombre": "GUAYAS CLUCTH CBF 150",
+    "familia": "GUAYAS CLUCTH",
+    "costo": 2862,
+    "precio_venta": 5500,
+    "stock_actual": 33,
+    "imagen_especifica": "/productos/guayas-clucth-cbf-150.jpg"
+  },
+  {
+    "nombre": "GUAYAS CLUCTH DISCOVER 125 ST",
+    "familia": "GUAYAS CLUCTH",
+    "costo": 2856,
+    "precio_venta": 6000,
+    "stock_actual": 539,
+    "imagen_especifica": "/productos/guayas-clucth-discover-125-st.jpg"
+  },
+  {
+    "nombre": "GUAYAS CLUCTH ECO DELUXE",
+    "familia": "GUAYAS CLUCTH",
+    "costo": 2352,
+    "precio_venta": 6000,
+    "stock_actual": 102,
+    "imagen_especifica": "/productos/guayas-clucth-eco-deluxe.jpg"
+  },
+  {
+    "nombre": "GUAYAS CLUCTH XR 150",
+    "familia": "GUAYAS CLUCTH",
+    "costo": 2232,
+    "precio_venta": 6000,
+    "stock_actual": 243,
+    "imagen_especifica": "/productos/guayas-clucth-xr-150.jpg"
+  },
+  {
+    "nombre": "GUAYAS CLUCTH XTZ 125 M/N",
+    "familia": "GUAYAS CLUCTH",
+    "costo": 3124,
+    "precio_venta": 7000,
+    "stock_actual": 600,
+    "imagen_especifica": "/productos/guayas-clucth-xtz-125-m/n.jpg"
+  },
+  {
+    "nombre": "GUAYAS FRENO BOXER CT",
+    "familia": "GUAYAS FRENO",
+    "costo": 2809,
+    "precio_venta": 5500,
+    "stock_actual": 150,
+    "imagen_especifica": "/productos/guayas-freno-boxer-ct.jpg"
+  },
+  {
+    "nombre": "GUAYAS FRENO BWS 125 GUAYA DE FRENO TRASERO",
+    "familia": "GUAYAS FRENO",
+    "costo": 4512,
+    "precio_venta": 9500,
+    "stock_actual": 251,
+    "imagen_especifica": "/productos/guayas-freno-bws-125-guaya-de-freno-trasero.jpg"
+  },
+  {
+    "nombre": "GUAYAS FRENO CB 110",
+    "familia": "GUAYAS FRENO",
+    "costo": 2803,
+    "precio_venta": 5500,
+    "stock_actual": 229,
+    "imagen_especifica": "/productos/guayas-freno-cb-110.jpg"
+  },
+  {
+    "nombre": "GUAYAS FRENO HONDA ECO DELUXE",
+    "familia": "GUAYAS FRENO",
+    "costo": 3026,
+    "precio_venta": 5500,
+    "stock_actual": 0,
+    "imagen_especifica": "/productos/guayas-freno-honda-eco-deluxe.jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE AKT 110S / WAVE 100",
+    "familia": "KIT ARRASTRE",
+    "costo": 19345,
+    "precio_venta": 35000,
+    "stock_actual": 731,
+    "imagen_especifica": "/productos/kit-arrastre-akt-110s-/-wave-100.jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE AKT 125 NKD",
+    "familia": "KIT ARRASTRE",
+    "costo": 20882,
+    "precio_venta": 36000,
+    "stock_actual": 497,
+    "imagen_especifica": "/productos/kit-arrastre-akt-125-nkd.jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE AKT TTR 125 / 150",
+    "familia": "KIT ARRASTRE",
+    "costo": 34593,
+    "precio_venta": 62000,
+    "stock_actual": 361,
+    "imagen_especifica": "/productos/kit-arrastre-akt-ttr-125-/-150.jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE AKT TTR 200(520H)",
+    "familia": "KIT ARRASTRE",
+    "costo": 0,
+    "precio_venta": 58000,
+    "stock_actual": 295,
+    "imagen_especifica": "/productos/kit-arrastre-akt-ttr-200(520h).jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE APACHE RTR 200(520H)",
+    "familia": "KIT ARRASTRE",
+    "costo": 0,
+    "precio_venta": 65000,
+    "stock_actual": 292,
+    "imagen_especifica": "/productos/kit-arrastre-apache-rtr-200(520h).jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE BOXER CT / PLATINO",
+    "familia": "KIT ARRASTRE",
+    "costo": 21995,
+    "precio_venta": 39000,
+    "stock_actual": 194,
+    "imagen_especifica": "/productos/kit-arrastre-boxer-ct-/-platino.jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE CB 110 / NEO",
+    "familia": "KIT ARRASTRE",
+    "costo": 22864,
+    "precio_venta": 38000,
+    "stock_actual": 490,
+    "imagen_especifica": "/productos/kit-arrastre-cb-110-/-neo.jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE CB 125F",
+    "familia": "KIT ARRASTRE",
+    "costo": 23779,
+    "precio_venta": 43000,
+    "stock_actual": 207,
+    "imagen_especifica": "/productos/kit-arrastre-cb-125f.jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE CB 160F",
+    "familia": "KIT ARRASTRE",
+    "costo": 0,
+    "precio_venta": 46000,
+    "stock_actual": 476,
+    "imagen_especifica": "/productos/kit-arrastre-cb-160f.jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE CBF 150 / THRILLER",
+    "familia": "KIT ARRASTRE",
+    "costo": 23971,
+    "precio_venta": 45000,
+    "stock_actual": 247,
+    "imagen_especifica": "/productos/kit-arrastre-cbf-150-/-thriller.jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE CRIPTON T115 FI",
+    "familia": "KIT ARRASTRE",
+    "costo": 20913,
+    "precio_venta": 39000,
+    "stock_actual": 578,
+    "imagen_especifica": "/productos/kit-arrastre-cripton-t115-fi.jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE DISCOVER 125 ST",
+    "familia": "KIT ARRASTRE",
+    "costo": 23420,
+    "precio_venta": 43000,
+    "stock_actual": 155,
+    "imagen_especifica": "/productos/kit-arrastre-discover-125-st.jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE ECO DELUXE",
+    "familia": "KIT ARRASTRE",
+    "costo": 22000,
+    "precio_venta": 41000,
+    "stock_actual": 0,
+    "imagen_especifica": "/productos/kit-arrastre-eco-deluxe.jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE GIXXER 250(520H)",
+    "familia": "KIT ARRASTRE",
+    "costo": 0,
+    "precio_venta": 65000,
+    "stock_actual": 292,
+    "imagen_especifica": "/productos/kit-arrastre-gixxer-250(520h).jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE MRX 150(CONCAVO)",
+    "familia": "KIT ARRASTRE",
+    "costo": 0,
+    "precio_venta": 45000,
+    "stock_actual": 485,
+    "imagen_especifica": "/productos/kit-arrastre-mrx-150(concavo).jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE PULSAR 200NS(520H)",
+    "familia": "KIT ARRASTRE",
+    "costo": 0,
+    "precio_venta": 57000,
+    "stock_actual": 288,
+    "imagen_especifica": "/productos/kit-arrastre-pulsar-200ns(520h).jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE SUZUKI DR 150",
+    "familia": "KIT ARRASTRE",
+    "costo": 24666,
+    "precio_venta": 45000,
+    "stock_actual": 894,
+    "imagen_especifica": "/productos/kit-arrastre-suzuki-dr-150.jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE TVS 100",
+    "familia": "KIT ARRASTRE",
+    "costo": 0,
+    "precio_venta": 40000,
+    "stock_actual": 483,
+    "imagen_especifica": "/productos/kit-arrastre-tvs-100.jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE TVS NEO 110NX",
+    "familia": "KIT ARRASTRE",
+    "costo": 0,
+    "precio_venta": 42000,
+    "stock_actual": 476,
+    "imagen_especifica": "/productos/kit-arrastre-tvs-neo-110nx.jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE TVS RAIDER 125",
+    "familia": "KIT ARRASTRE",
+    "costo": 0,
+    "precio_venta": 44000,
+    "stock_actual": 460,
+    "imagen_especifica": "/productos/kit-arrastre-tvs-raider-125.jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE VIVA R 115 / BEST",
+    "familia": "KIT ARRASTRE",
+    "costo": 19270,
+    "precio_venta": 36000,
+    "stock_actual": 500,
+    "imagen_especifica": "/productos/kit-arrastre-viva-r-115-/-best.jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE WAVE II / WAVE 110",
+    "familia": "KIT ARRASTRE",
+    "costo": 20807,
+    "precio_venta": 36000,
+    "stock_actual": 692,
+    "imagen_especifica": "/productos/kit-arrastre-wave-ii-/-wave-110.jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE XR 150 / BROSS 125",
+    "familia": "KIT ARRASTRE",
+    "costo": 25805,
+    "precio_venta": 45000,
+    "stock_actual": 720,
+    "imagen_especifica": "/productos/kit-arrastre-xr-150-/-bross-125.jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE XTZ 125 M/N",
+    "familia": "KIT ARRASTRE",
+    "costo": 24523,
+    "precio_venta": 45000,
+    "stock_actual": 793,
+    "imagen_especifica": "/productos/kit-arrastre-xtz-125-m/n.jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE XTZ-150",
+    "familia": "KIT ARRASTRE",
+    "costo": 0,
+    "precio_venta": 45000,
+    "stock_actual": 482,
+    "imagen_especifica": "/productos/kit-arrastre-xtz-150.jpg"
+  },
+  {
+    "nombre": "KIT ARRASTRE YBR 125/LIBERO 125",
+    "familia": "KIT ARRASTRE",
+    "costo": 0,
+    "precio_venta": 40000,
+    "stock_actual": 289,
+    "imagen_especifica": "/productos/kit-arrastre-ybr-125/libero-125.jpg"
+  },
+  {
+    "nombre": "KIT CADENILLA CB 110 / NEO 110",
+    "familia": "KIT CADENILLA",
+    "costo": 6345,
+    "precio_venta": 14000,
+    "stock_actual": 1,
+    "imagen_especifica": "/productos/kit-cadenilla-cb-110-/-neo-110.jpg"
+  },
+  {
+    "nombre": "KIT CADENILLA CB 125F",
+    "familia": "KIT CADENILLA",
+    "costo": 7785,
+    "precio_venta": 15000,
+    "stock_actual": 1,
+    "imagen_especifica": "/productos/kit-cadenilla-cb-125f.jpg"
+  },
+  {
+    "nombre": "KIT CADENILLA ECO 100 / ECO DELUXE / AKT 110 / WAVE",
+    "familia": "KIT CADENILLA",
+    "costo": 5587,
+    "precio_venta": 14000,
+    "stock_actual": 560,
+    "imagen_especifica": "/productos/kit-cadenilla-eco-100-/-eco-deluxe-/-akt-110-/-wave.jpg"
+  },
+  {
+    "nombre": "KIT CILINDRO AKT TTR 150",
+    "familia": "KIT CILINDRO",
+    "costo": 38947,
+    "precio_venta": 75000,
+    "stock_actual": 64,
+    "imagen_especifica": "/productos/kit-cilindro-akt-ttr-150.jpg"
+  },
+  {
+    "nombre": "KIT CILINDRO CB 110",
+    "familia": "KIT CILINDRO",
+    "costo": 36859,
+    "precio_venta": 75000,
+    "stock_actual": 311,
+    "imagen_especifica": "/productos/kit-cilindro-cb-110.jpg"
+  },
+  {
+    "nombre": "KIT CILINDRO CB 125F",
+    "familia": "KIT CILINDRO",
+    "costo": 39696,
+    "precio_venta": 88000,
+    "stock_actual": 164,
+    "imagen_especifica": "/productos/kit-cilindro-cb-125f.jpg"
+  },
+  {
+    "nombre": "KIT CILINDRO CBF 150",
+    "familia": "KIT CILINDRO",
+    "costo": 42772,
+    "precio_venta": 88000,
+    "stock_actual": 79,
+    "imagen_especifica": "/productos/kit-cilindro-cbf-150.jpg"
+  },
+  {
+    "nombre": "KIT CILINDRO ECO DELUXE",
+    "familia": "KIT CILINDRO",
+    "costo": 29208,
+    "precio_venta": 58000,
+    "stock_actual": 183,
+    "imagen_especifica": "/productos/kit-cilindro-eco-deluxe.jpg"
+  },
+  {
+    "nombre": "KIT CILINDRO XR 150",
+    "familia": "KIT CILINDRO",
+    "costo": 42422,
+    "precio_venta": 88000,
+    "stock_actual": 95,
+    "imagen_especifica": "/productos/kit-cilindro-xr-150.jpg"
+  },
+  {
+    "nombre": "KIT CILINDRO XTZ 125",
+    "familia": "KIT CILINDRO",
+    "costo": 41380,
+    "precio_venta": 88000,
+    "stock_actual": 84,
+    "imagen_especifica": "/productos/kit-cilindro-xtz-125.jpg"
+  },
+  {
+    "nombre": "KIT CUNAS DIRECCION AKT 125 NKD/CB 125F /ECO 100",
+    "familia": "KIT CUNAS DIRECCION",
+    "costo": 4128,
+    "precio_venta": 8000,
+    "stock_actual": 69,
+    "imagen_especifica": "/productos/kit-cunas-direccion-akt-125-nkd/cb-125f-/eco-100.jpg"
+  },
+  {
+    "nombre": "KIT CUNAS DIRECCION BOXER CT / PALTINO 100 / PULSAR 135-180",
+    "familia": "KIT CUNAS DIRECCION",
+    "costo": 4685,
+    "precio_venta": 8000,
+    "stock_actual": 127,
+    "imagen_especifica": "/productos/kit-cunas-direccion-boxer-ct-/-paltino-100-/-pulsar-135-180.jpg"
+  },
+  {
+    "nombre": "KIT CUNAS DIRECCION DISCOVER 125 ST-150",
+    "familia": "KIT CUNAS DIRECCION",
+    "costo": 4685,
+    "precio_venta": 9500,
+    "stock_actual": 137,
+    "imagen_especifica": "/productos/kit-cunas-direccion-discover-125-st-150.jpg"
+  },
+  {
+    "nombre": "KIT CUNAS DIRECCION DR 150",
+    "familia": "KIT CUNAS DIRECCION",
+    "costo": 6116,
+    "precio_venta": 11500,
+    "stock_actual": 410,
+    "imagen_especifica": "/productos/kit-cunas-direccion-dr-150.jpg"
+  },
+  {
+    "nombre": "KIT CUNAS DIRECCION ECO DELUXE CUNA DIRECCION",
+    "familia": "KIT CUNAS DIRECCION",
+    "costo": 4032,
+    "precio_venta": 8500,
+    "stock_actual": 1,
+    "imagen_especifica": "/productos/kit-cunas-direccion-eco-deluxe-cuna-direccion.jpg"
+  },
+  {
+    "nombre": "KIT CUNAS DIRECCION XR 150",
+    "familia": "KIT CUNAS DIRECCION",
+    "costo": 4685,
+    "precio_venta": 11000,
+    "stock_actual": 94,
+    "imagen_especifica": "/productos/kit-cunas-direccion-xr-150.jpg"
+  },
+  {
+    "nombre": "KIT CUNAS DIRECCION XTZ 125 M/N",
+    "familia": "KIT CUNAS DIRECCION",
+    "costo": 5277,
+    "precio_venta": 10500,
+    "stock_actual": 69,
+    "imagen_especifica": "/productos/kit-cunas-direccion-xtz-125-m/n.jpg"
+  },
+  {
+    "nombre": "MALLA SILLIN XL",
+    "familia": "MALLA SILLIN",
+    "costo": 4171,
+    "precio_venta": 9000,
+    "stock_actual": 1,
+    "imagen_especifica": "/productos/malla-sillin-xl.jpg"
+  },
+  {
+    "nombre": "MALLA SILLIN XXL",
+    "familia": "MALLA SILLIN",
+    "costo": 4315,
+    "precio_venta": 11000,
+    "stock_actual": 491,
+    "imagen_especifica": "/productos/malla-sillin-xxl.jpg"
+  },
+  {
+    "nombre": "MALLA SILLIN XXXL",
+    "familia": "MALLA SILLIN",
+    "costo": 4454,
+    "precio_venta": 13000,
+    "stock_actual": 482,
+    "imagen_especifica": "/productos/malla-sillin-xxxl.jpg"
+  },
+  {
+    "nombre": "MANGO COPA AZUL",
+    "familia": "MANGO COPA",
+    "costo": 0,
+    "precio_venta": 16000,
+    "stock_actual": 134,
+    "imagen_especifica": "/productos/mango-copa-azul.jpg"
+  },
+  {
+    "nombre": "MANGO COPA CROMADO",
+    "familia": "MANGO COPA",
+    "costo": 0,
+    "precio_venta": 16000,
+    "stock_actual": 160,
+    "imagen_especifica": "/productos/mango-copa-cromado.jpg"
+  },
+  {
+    "nombre": "MANGO COPA MORADO",
+    "familia": "MANGO COPA",
+    "costo": 0,
+    "precio_venta": 16000,
+    "stock_actual": 129,
+    "imagen_especifica": "/productos/mango-copa-morado.jpg"
+  },
+  {
+    "nombre": "MANGO COPA NEGRO",
+    "familia": "MANGO COPA",
+    "costo": 0,
+    "precio_venta": 16000,
+    "stock_actual": 143,
+    "imagen_especifica": "/productos/mango-copa-negro.jpg"
+  },
+  {
+    "nombre": "MANGO COPA ROJO",
+    "familia": "MANGO COPA",
+    "costo": 0,
+    "precio_venta": 16000,
+    "stock_actual": 116,
+    "imagen_especifica": "/productos/mango-copa-rojo.jpg"
+  },
+  {
+    "nombre": "MANGO MOXI TOPE AZUL",
+    "familia": "MANGO MOXI TOPE",
+    "costo": 0,
+    "precio_venta": 13000,
+    "stock_actual": 139,
+    "imagen_especifica": "/productos/mango-moxi-tope-azul.jpg"
+  },
+  {
+    "nombre": "MANGO MOXI TOPE CROMADO",
+    "familia": "MANGO MOXI TOPE",
+    "costo": 0,
+    "precio_venta": 13000,
+    "stock_actual": 126,
+    "imagen_especifica": "/productos/mango-moxi-tope-cromado.jpg"
+  },
+  {
+    "nombre": "MANGO MOXI TOPE MORADO",
+    "familia": "MANGO MOXI TOPE",
+    "costo": 0,
+    "precio_venta": 13000,
+    "stock_actual": 130,
+    "imagen_especifica": "/productos/mango-moxi-tope-morado.jpg"
+  },
+  {
+    "nombre": "MANGO MOXI TOPE NEGRO",
+    "familia": "MANGO MOXI TOPE",
+    "costo": 0,
+    "precio_venta": 13000,
+    "stock_actual": 140,
+    "imagen_especifica": "/productos/mango-moxi-tope-negro.jpg"
+  },
+  {
+    "nombre": "MANGO MOXI TOPE ROJO",
+    "familia": "MANGO MOXI TOPE",
+    "costo": 0,
+    "precio_venta": 13000,
+    "stock_actual": 118,
+    "imagen_especifica": "/productos/mango-moxi-tope-rojo.jpg"
+  },
+  {
+    "nombre": "MANIGUETAS CLUTCH DISCOVER ST",
+    "familia": "MANIGUETA CLUTCH",
+    "costo": 1828,
+    "precio_venta": 4500,
+    "stock_actual": 318,
+    "imagen_especifica": "/productos/maniguetas-clutch-discover-st.jpg"
+  },
+  {
+    "nombre": "MANIGUETAS CLUTCH DR 150",
+    "familia": "MANIGUETA CLUTCH",
+    "costo": 2035,
+    "precio_venta": 4500,
+    "stock_actual": 82,
+    "imagen_especifica": "/productos/maniguetas-clutch-dr-150.jpg"
+  },
+  {
+    "nombre": "MANIGUETAS CLUTCH ECO DELUXE",
+    "familia": "MANIGUETA CLUTCH",
+    "costo": 1161,
+    "precio_venta": 3800,
+    "stock_actual": 10,
+    "imagen_especifica": "/productos/maniguetas-clutch-eco-deluxe.jpg"
+  },
+  {
+    "nombre": "MANIGUETAS CLUTCH XTZ 125",
+    "familia": "MANIGUETA CLUTCH",
+    "costo": 2241,
+    "precio_venta": 4500,
+    "stock_actual": 3,
+    "imagen_especifica": "/productos/maniguetas-clutch-xtz-125.jpg"
+  },
+  {
+    "nombre": "MANIGUETAS FRENO DR 150",
+    "familia": "MANIGUETA FRENO",
+    "costo": 2035,
+    "precio_venta": 4500,
+    "stock_actual": 335,
+    "imagen_especifica": "/productos/maniguetas-freno-dr-150.jpg"
+  },
+  {
+    "nombre": "MANIGUETAS FRENO XTZ 125",
+    "familia": "MANIGUETA FRENO",
+    "costo": 1900,
+    "precio_venta": 4500,
+    "stock_actual": 500,
+    "imagen_especifica": "/productos/maniguetas-freno-xtz-125.jpg"
+  },
+  {
+    "nombre": "MORDAZA FRENO DISCO AKT 110S",
+    "familia": "MORDAZA FRENO DISCO",
+    "costo": 16689,
+    "precio_venta": 38000,
+    "stock_actual": 158,
+    "imagen_especifica": "/productos/mordaza-freno-disco-akt-110s.jpg"
+  },
+  {
+    "nombre": "MORDAZA FRENO DISCO AKT NKD 125",
+    "familia": "MORDAZA FRENO DISCO",
+    "costo": 16689,
+    "precio_venta": 38000,
+    "stock_actual": 426,
+    "imagen_especifica": "/productos/mordaza-freno-disco-akt-nkd-125.jpg"
+  },
+  {
+    "nombre": "MORDAZA FRENO DISCO DISCOVER 125 ST",
+    "familia": "MORDAZA FRENO DISCO",
+    "costo": 19473,
+    "precio_venta": 48000,
+    "stock_actual": 408,
+    "imagen_especifica": "/productos/mordaza-freno-disco-discover-125-st.jpg"
+  },
+  {
+    "nombre": "PASTILLA DE FRENO AKT 110 DELANTERO",
+    "familia": "PASTILLA FRENO DELANTERO",
+    "costo": 2433,
+    "precio_venta": 5000,
+    "stock_actual": 1,
+    "imagen_especifica": "/productos/pastilla-de-freno-akt-110-delantero.jpg"
+  },
+  {
+    "nombre": "PASTILLA DE FRENO AKT 125 FLEX DELANTERO",
+    "familia": "PASTILLA FRENO DELANTERO",
+    "costo": 2572,
+    "precio_venta": 5000,
+    "stock_actual": 316,
+    "imagen_especifica": "/productos/pastilla-de-freno-akt-125-flex-delantero.jpg"
+  },
+  {
+    "nombre": "PASTILLA DE FRENO APACHE 180 TRASERO",
+    "familia": "PASTILLA FRENO TRASERO",
+    "costo": 2572,
+    "precio_venta": 6000,
+    "stock_actual": 187,
+    "imagen_especifica": "/productos/pastilla-de-freno-apache-180-trasero.jpg"
+  },
+  {
+    "nombre": "PASTILLA DE FRENO BEST 125 DELANTERO",
+    "familia": "PASTILLA FRENO DELANTERO",
+    "costo": 2433,
+    "precio_venta": 5000,
+    "stock_actual": 301,
+    "imagen_especifica": "/productos/pastilla-de-freno-best-125-delantero.jpg"
+  },
+  {
+    "nombre": "PASTILLA DE FRENO CB 125F DELANTERO",
+    "familia": "PASTILLA FRENO DELANTERO",
+    "costo": 2572,
+    "precio_venta": 5000,
+    "stock_actual": 394,
+    "imagen_especifica": "/productos/pastilla-de-freno-cb-125f-delantero.jpg"
+  },
+  {
+    "nombre": "PASTILLA DE FRENO CBF 150 DELANTERO",
+    "familia": "PASTILLA FRENO DELANTERO",
+    "costo": 2505,
+    "precio_venta": 5000,
+    "stock_actual": 210,
+    "imagen_especifica": "/productos/pastilla-de-freno-cbf-150-delantero.jpg"
+  },
+  {
+    "nombre": "PASTILLA DE FRENO CRYPTON T115 FI DELANTERO",
+    "familia": "PASTILLA FRENO DELANTERO",
+    "costo": 2572,
+    "precio_venta": 5000,
+    "stock_actual": 404,
+    "imagen_especifica": "/productos/pastilla-de-freno-crypton-t115-fi-delantero.jpg"
+  },
+  {
+    "nombre": "PASTILLA DE FRENO DR 150 DELANTERO",
+    "familia": "PASTILLA FRENO DELANTERO",
+    "costo": 2184,
+    "precio_venta": 6000,
+    "stock_actual": 318,
+    "imagen_especifica": "/productos/pastilla-de-freno-dr-150-delantero.jpg"
+  },
+  {
+    "nombre": "PASTILLA DE FRENO INVICTA TRASERO",
+    "familia": "PASTILLA FRENO TRASERO",
+    "costo": 2572,
+    "precio_venta": 6000,
+    "stock_actual": 384,
+    "imagen_especifica": "/productos/pastilla-de-freno-invicta-trasero.jpg"
+  },
+  {
+    "nombre": "PASTILLA DE FRENO PULSAR 135 DELANTERO",
+    "familia": "PASTILLA FRENO DELANTERO",
+    "costo": 2433,
+    "precio_venta": 5000,
+    "stock_actual": 2,
+    "imagen_especifica": "/productos/pastilla-de-freno-pulsar-135-delantero.jpg"
+  },
+  {
+    "nombre": "PASTILLA DE FRENO PULSAR 200NS TRASERO",
+    "familia": "PASTILLA FRENO TRASERO",
+    "costo": 2572,
+    "precio_venta": 6000,
+    "stock_actual": 297,
+    "imagen_especifica": "/productos/pastilla-de-freno-pulsar-200ns-trasero.jpg"
+  },
+  {
+    "nombre": "PASTILLA DE FRENO TRILLER 150 TRASERO",
+    "familia": "PASTILLA FRENO TRASERO",
+    "costo": 2572,
+    "precio_venta": 6000,
+    "stock_actual": 395,
+    "imagen_especifica": "/productos/pastilla-de-freno-triller-150-trasero.jpg"
+  },
+  {
+    "nombre": "PASTILLA DE FRENO VIVAR 115 DELANTERO",
+    "familia": "PASTILLA FRENO DELANTERO",
+    "costo": 2505,
+    "precio_venta": 5000,
+    "stock_actual": 256,
+    "imagen_especifica": "/productos/pastilla-de-freno-vivar-115-delantero.jpg"
+  },
+  {
+    "nombre": "PASTILLA DE FRENO XR 150 DELANTERO",
+    "familia": "PASTILLA FRENO DELANTERO",
+    "costo": 2505,
+    "precio_venta": 5000,
+    "stock_actual": 239,
+    "imagen_especifica": "/productos/pastilla-de-freno-xr-150-delantero.jpg"
+  },
+  {
+    "nombre": "PASTILLA DE FRENO XTZ 125 DELANTERO",
+    "familia": "PASTILLA FRENO DELANTERO",
+    "costo": 2433,
+    "precio_venta": 5000,
+    "stock_actual": 276,
+    "imagen_especifica": "/productos/pastilla-de-freno-xtz-125-delantero.jpg"
+  },
+  {
+    "nombre": "PASTILLA DE FRENO XTZ 150 DELANTERO",
+    "familia": "PASTILLA FRENO DELANTERO",
+    "costo": 2433,
+    "precio_venta": 5000,
+    "stock_actual": 146,
+    "imagen_especifica": "/productos/pastilla-de-freno-xtz-150-delantero.jpg"
+  },
+  {
+    "nombre": "PASTILLA DE FRENO XTZ 250 TRASERO",
+    "familia": "PASTILLA FRENO TRASERO",
+    "costo": 2784,
+    "precio_venta": 7000,
+    "stock_actual": 82,
+    "imagen_especifica": "/productos/pastilla-de-freno-xtz-250-trasero.jpg"
+  },
+  {
+    "nombre": "PASTILLA DE FRENO YBR 125 DELANTERO",
+    "familia": "PASTILLA FRENO DELANTERO",
+    "costo": 2433,
+    "precio_venta": 5000,
+    "stock_actual": 300,
+    "imagen_especifica": "/productos/pastilla-de-freno-ybr-125-delantero.jpg"
+  },
+  {
+    "nombre": "PITOS",
+    "familia": "PITOS",
+    "costo": 3105,
+    "precio_venta": 6000,
+    "stock_actual": 132,
+    "imagen_especifica": "/productos/pitos.jpg"
+  },
+  {
+    "nombre": "PLATO BOBINA AKT NKD 125",
+    "familia": "PLATO BOBINA",
+    "costo": 15926,
+    "precio_venta": 30000,
+    "stock_actual": 169,
+    "imagen_especifica": "/productos/plato-bobina-akt-nkd-125.jpg"
+  },
+  {
+    "nombre": "PRENSA CLUTCH AKT 125 NKD / TTR 125-150",
+    "familia": "PRENSA CLUTCH",
+    "costo": 17951,
+    "precio_venta": 32000,
+    "stock_actual": 41,
+    "imagen_especifica": "/productos/prensa-clutch-akt-125-nkd-/-ttr-125-150.jpg"
+  },
+  {
+    "nombre": "PRENSA CLUTCH CB 110 / NEO 110",
+    "familia": "PRENSA CLUTCH",
+    "costo": 17155,
+    "precio_venta": 33000,
+    "stock_actual": 368,
+    "imagen_especifica": "/productos/prensa-clutch-cb-110-/-neo-110.jpg"
+  },
+  {
+    "nombre": "PRENSA CLUTCH CB125",
+    "familia": "PRENSA CLUTCH",
+    "costo": 17510,
+    "precio_venta": 36000,
+    "stock_actual": 260,
+    "imagen_especifica": "/productos/prensa-clutch-cb125.jpg"
+  },
+  {
+    "nombre": "PRENSA CLUTCH CBF 150 / INVICTA 150 /XR 150",
+    "familia": "PRENSA CLUTCH",
+    "costo": 17736,
+    "precio_venta": 36000,
+    "stock_actual": 27,
+    "imagen_especifica": "/productos/prensa-clutch-cbf-150-/-invicta-150-/xr-150.jpg"
+  },
+  {
+    "nombre": "PRENSA CLUTCH DISCOVER 125 ST",
+    "familia": "PRENSA CLUTCH",
+    "costo": 18000,
+    "precio_venta": 35000,
+    "stock_actual": 62,
+    "imagen_especifica": "/productos/prensa-clutch-discover-125-st.jpg"
+  },
+  {
+    "nombre": "PRENSA CLUTCH DR 150",
+    "familia": "PRENSA CLUTCH",
+    "costo": 17385,
+    "precio_venta": 39000,
+    "stock_actual": 166,
+    "imagen_especifica": "/productos/prensa-clutch-dr-150.jpg"
+  },
+  {
+    "nombre": "PRENSA CLUTCH ECO DELUXE",
+    "familia": "PRENSA CLUTCH",
+    "costo": 17558,
+    "precio_venta": 31000,
+    "stock_actual": 2,
+    "imagen_especifica": "/productos/prensa-clutch-eco-deluxe.jpg"
+  },
+  {
+    "nombre": "PRENSA CLUTCH TVS 100",
+    "familia": "PRENSA CLUTCH",
+    "costo": 15302,
+    "precio_venta": 36000,
+    "stock_actual": 170,
+    "imagen_especifica": "/productos/prensa-clutch-tvs-100.jpg"
+  },
+  {
+    "nombre": "PRENSA CLUTCH XTZ 125",
+    "familia": "PRENSA CLUTCH",
+    "costo": 16444,
+    "precio_venta": 34000,
+    "stock_actual": 287,
+    "imagen_especifica": "/productos/prensa-clutch-xtz-125.jpg"
+  },
+  {
+    "nombre": "REGULADOR AKT 110",
+    "familia": "REGULADOR",
+    "costo": 5736,
+    "precio_venta": 12000,
+    "stock_actual": 361,
+    "imagen_especifica": "/productos/regulador-akt-110.jpg"
+  },
+  {
+    "nombre": "REGULADOR AKT NKD 125",
+    "familia": "REGULADOR",
+    "costo": 5736,
+    "precio_venta": 12000,
+    "stock_actual": 353,
+    "imagen_especifica": "/productos/regulador-akt-nkd-125.jpg"
+  },
+  {
+    "nombre": "RELAY ECO DELUXE",
+    "familia": "RELAY",
+    "costo": 4016,
+    "precio_venta": 8500,
+    "stock_actual": 1,
+    "imagen_especifica": "/productos/relay-eco-deluxe.jpg"
+  },
+  {
+    "nombre": "RELAY UNIVERSAL",
+    "familia": "RELAY",
+    "costo": 5121,
+    "precio_venta": 9500,
+    "stock_actual": 990,
+    "imagen_especifica": "/productos/relay-universal.jpg"
+  },
+  {
+    "nombre": "RELAY XTZ 125 / YBR 125 / LIBERO 125",
+    "familia": "RELAY",
+    "costo": 7824,
+    "precio_venta": 14500,
+    "stock_actual": 1,
+    "imagen_especifica": "/productos/relay-xtz-125-/-ybr-125-/-libero-125.jpg"
+  },
+  {
+    "nombre": "SWITCH ENCENDIDO AKT 125 NKD",
+    "familia": "SWITCH ENCENDIDO",
+    "costo": 5400,
+    "precio_venta": 10500,
+    "stock_actual": 0,
+    "imagen_especifica": "/productos/switch-encendido-akt-125-nkd.jpg"
+  },
+  {
+    "nombre": "SWITCH ENCENDIDO AX 4",
+    "familia": "SWITCH ENCENDIDO",
+    "costo": 13910,
+    "precio_venta": 27000,
+    "stock_actual": 275,
+    "imagen_especifica": "/productos/switch-encendido-ax-4.jpg"
+  },
+  {
+    "nombre": "SWITCH ENCENDIDO BOXER CT / PLATINO 100",
+    "familia": "SWITCH ENCENDIDO",
+    "costo": 9873,
+    "precio_venta": 18500,
+    "stock_actual": 171,
+    "imagen_especifica": "/productos/switch-encendido-boxer-ct-/-platino-100.jpg"
+  },
+  {
+    "nombre": "SWITCH ENCENDIDO CB 110 / NEO 110",
+    "familia": "SWITCH ENCENDIDO",
+    "costo": 9043,
+    "precio_venta": 17000,
+    "stock_actual": 631,
+    "imagen_especifica": "/productos/switch-encendido-cb-110-/-neo-110.jpg"
+  },
+  {
+    "nombre": "SWITCH ENCENDIDO CB 125F",
+    "familia": "SWITCH ENCENDIDO",
+    "costo": 10430,
+    "precio_venta": 22500,
+    "stock_actual": 195,
+    "imagen_especifica": "/productos/switch-encendido-cb-125f.jpg"
+  },
+  {
+    "nombre": "SWITCH ENCENDIDO CRYPTON T-115 FI",
+    "familia": "SWITCH ENCENDIDO",
+    "costo": 13910,
+    "precio_venta": 34000,
+    "stock_actual": 237,
+    "imagen_especifica": "/productos/switch-encendido-crypton-t-115-fi.jpg"
+  },
+  {
+    "nombre": "SWITCH ENCENDIDO DISCOVER 125ST-150",
+    "familia": "SWITCH ENCENDIDO",
+    "costo": 9873,
+    "precio_venta": 19000,
+    "stock_actual": 180,
+    "imagen_especifica": "/productos/switch-encendido-discover-125st-150.jpg"
+  },
+  {
+    "nombre": "SWITCH ENCENDIDO DR 150",
+    "familia": "SWITCH ENCENDIDO",
+    "costo": 12864,
+    "precio_venta": 26000,
+    "stock_actual": 267,
+    "imagen_especifica": "/productos/switch-encendido-dr-150.jpg"
+  },
+  {
+    "nombre": "SWITCH ENCENDIDO ECO DELUXE",
+    "familia": "SWITCH ENCENDIDO",
+    "costo": 10780,
+    "precio_venta": 20000,
+    "stock_actual": 681,
+    "imagen_especifica": "/productos/switch-encendido-eco-deluxe.jpg"
+  },
+  {
+    "nombre": "SWITCH ENCENDIDO TVS 100",
+    "familia": "SWITCH ENCENDIDO",
+    "costo": 13910,
+    "precio_venta": 27000,
+    "stock_actual": 273,
+    "imagen_especifica": "/productos/switch-encendido-tvs-100.jpg"
+  },
+  {
+    "nombre": "SWITCH ENCENDIDO VIVAR 115",
+    "familia": "SWITCH ENCENDIDO",
+    "costo": 18081,
+    "precio_venta": 35000,
+    "stock_actual": 81,
+    "imagen_especifica": "/productos/switch-encendido-vivar-115.jpg"
+  },
+  {
+    "nombre": "SWITCH ENCENDIDO XTZ 125 E",
+    "familia": "SWITCH ENCENDIDO",
+    "costo": 9873,
+    "precio_venta": 18500,
+    "stock_actual": 79,
+    "imagen_especifica": "/productos/switch-encendido-xtz-125-e.jpg"
+  },
+  {
+    "nombre": "SWITCH RUN 2 CABLES",
+    "familia": "SWITCH RUN",
+    "costo": 1483,
+    "precio_venta": 3000,
+    "stock_actual": 1,
+    "imagen_especifica": "/productos/switch-run-2-cables.jpg"
+  },
+  {
+    "nombre": "SWITCH RUN 3 CABLES",
+    "familia": "SWITCH RUN",
+    "costo": 1483,
+    "precio_venta": 3000,
+    "stock_actual": 711,
+    "imagen_especifica": "/productos/switch-run-3-cables.jpg"
+  },
+  {
+    "nombre": "TAPA GASOLINA AKT NKD 125",
+    "familia": "TAPA GASOLINA",
+    "costo": 12744,
+    "precio_venta": 23000,
+    "stock_actual": 254,
+    "imagen_especifica": "/productos/tapa-gasolina-akt-nkd-125.jpg"
+  },
+  {
+    "nombre": "TAPA GASOLINA ECO DELUXE",
+    "familia": "TAPA GASOLINA",
+    "costo": 14136,
+    "precio_venta": 25000,
+    "stock_actual": 165,
+    "imagen_especifica": "/productos/tapa-gasolina-eco-deluxe.jpg"
+  },
+  {
+    "nombre": "TROMPO STOP PAQUETE X10",
+    "familia": "TROMPO STOP",
+    "costo": 840,
+    "precio_venta": 18000,
+    "stock_actual": 951,
+    "imagen_especifica": "/productos/trompo-stop-paquete-x10.jpg"
+  }
+]

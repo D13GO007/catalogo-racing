@@ -4,15 +4,19 @@ import { supabase } from './supabase.js';
 const addModal = document.getElementById('addModal');
 const editModal = document.getElementById('editModal');
 const deleteConfirmModal = document.getElementById('deleteConfirmModal');
-const searchInput = document.getElementById('searchInput') as HTMLInputElement | null;
+const searchInputs = [
+  document.getElementById('searchInput') as HTMLInputElement | null,
+  document.getElementById('inputBuscarInventario') as HTMLInputElement | null,
+].filter(Boolean) as HTMLInputElement[];
 const clearFilterBtn = document.getElementById('clearFilter');
 const familyButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.family-btn'));
 const cards = Array.from(document.querySelectorAll<HTMLElement>('.inventory-card'));
 let currentEditId: string | null = null;
 let currentFamilyFilter: string | null = null;
+let currentSearchTerm = '';
 
 const applyFilters = () => {
-  const searchTerm = searchInput?.value.trim().toLowerCase() || '';
+  const searchTerm = currentSearchTerm;
 
   cards.forEach((card) => {
     const modelo = (card.dataset.modelo || '').toLowerCase();
@@ -45,17 +49,29 @@ const setFamilyFilter = (family: string | null) => {
 };
 
 const resetFilters = () => {
-  if (searchInput) searchInput.value = '';
+  currentSearchTerm = '';
+  searchInputs.forEach((input) => {
+    input.value = '';
+  });
   setFamilyFilter('all');
 };
 
 // --- Buscador ---
-searchInput?.addEventListener('input', () => applyFilters());
-searchInput?.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter') {
-    event.preventDefault();
-    searchInput?.blur();
-  }
+searchInputs.forEach((input) => {
+  input.addEventListener('input', () => {
+    currentSearchTerm = input.value.trim().toLowerCase();
+    searchInputs.forEach((other) => {
+      if (other !== input) other.value = input.value;
+    });
+    applyFilters();
+  });
+
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      input.blur();
+    }
+  });
 });
 
 // --- Filtros por familia ---
@@ -72,9 +88,10 @@ clearFilterBtn?.addEventListener('click', () => resetFilters());
 resetFilters();
 
 // --- Lógica de Abrir/Cerrar Modales ---
-document.getElementById('btnOpenAddModal')?.addEventListener('click', () =>
-  addModal?.classList.remove('hidden')
-);
+(
+  document.getElementById('btnNuevoRepuesto') ||
+  document.getElementById('btnOpenAddModal')
+)?.addEventListener('click', () => addModal?.classList.remove('hidden'));
 document.getElementById('closeAddModal')?.addEventListener('click', () =>
   addModal?.classList.add('hidden')
 );

@@ -104,6 +104,26 @@ const _actualizarTotalesModal = () => {
   _modNewTotal.innerText = formatoPesos(currentItemOriginalSubtotal - val);
 };
 
+const actualizarStockVisualDesdeCarrito = () => {
+  const stockEls = Array.from(document.querySelectorAll<HTMLElement>('[id^="stock-visual-"]'));
+
+  stockEls.forEach((el) => {
+    const idProducto = el.id.replace('stock-visual-', '');
+    const base = parseInt(el.getAttribute('data-stock-base') || el.innerText || '0', 10);
+    const cantidadEnCarrito = carrito
+      .filter((item) => item.id === idProducto)
+      .reduce((acc, item) => acc + item.cantidad, 0);
+
+    const disponible = Math.max(base - cantidadEnCarrito, 0);
+    el.innerText = String(disponible);
+
+    const btnAgregar = document.querySelector<HTMLButtonElement>(`.btn-agregar[data-id="${idProducto}"]`);
+    if (btnAgregar) {
+      btnAgregar.disabled = disponible <= 0;
+    }
+  });
+};
+
 // ── API pública ───────────────────────────────────────────────────────────────
 
 export const vaciarCarrito = () => {
@@ -210,6 +230,31 @@ export const renderCarrito = () => {
       ? `- ${formatoPesos(descuentoGlobalValor)} (${descuentoGlobalPorcentaje}%)`
       : '$0';
   }
+
+  actualizarStockVisualDesdeCarrito();
+
+  // === MAGIA UX PARA CELULARES ===
+  // 1. Contamos cuántos productos hay en total
+  const cantidadTotalRepuestos = carrito.reduce((acc, item) => acc + item.cantidad, 0);
+
+  // 2. Buscamos los elementos del botón flotante
+  const btnMovil = document.getElementById('btnResumenMovil');
+  const txtCantidadMovil = document.getElementById('txtCantidadMovil');
+  const txtTotalMovil = document.getElementById('txtTotalMovil');
+
+  if (btnMovil && txtCantidadMovil && txtTotalMovil) {
+    // 3. Actualizamos los textos
+    txtCantidadMovil.innerText = `${cantidadTotalRepuestos} ${cantidadTotalRepuestos === 1 ? 'repuesto' : 'repuestos'}`;
+    txtTotalMovil.innerText = formatoPesos(totalNeto);
+
+    // 4. Mostramos/ocultamos el botón según el estado del carrito
+    if (cantidadTotalRepuestos > 0) {
+      btnMovil.classList.remove('translate-y-32');
+    } else {
+      btnMovil.classList.add('translate-y-32');
+    }
+  }
+
   asignarEventosCarrito();
 };
 
@@ -233,6 +278,16 @@ export const asignarEventosCarrito = () => {
   document.querySelectorAll('.btn-eliminar-item').forEach(btn => {
     btn.addEventListener('click', e => {
       const index = parseInt((e.target as HTMLElement).getAttribute('data-index') || '0');
+      const itemRemovido = carrito[index];
+
+      if (itemRemovido) {
+        const elementoStock = document.getElementById(`stock-visual-${itemRemovido.id}`);
+        if (elementoStock) {
+          const stockVisualActual = parseInt(elementoStock.innerText || '0', 10) || 0;
+          elementoStock.innerText = String(stockVisualActual + itemRemovido.cantidad);
+        }
+      }
+
       carrito.splice(index, 1);
       renderCarrito();
     });
@@ -254,6 +309,16 @@ export const agregarProductoAlCarrito = (btnElement: HTMLElement) => {
   const familia = btnElement.getAttribute('data-familia') || '';
   const precio = parseFloat(btnElement.getAttribute('data-precio') || '0');
   const stock  = parseInt(btnElement.getAttribute('data-stock') || '0');
+
+  const elementoStock = document.getElementById(`stock-visual-${id}`);
+  if (elementoStock) {
+    const stockVisualActual = parseInt(elementoStock.innerText || '0', 10);
+    if (stockVisualActual <= 0) {
+      alert(`¡No hay más stock disponible para ${modelo}!`);
+      return;
+    }
+    elementoStock.innerText = String(stockVisualActual - 1);
+  }
 
   const existe = carrito.find(item => item.id === id);
   if (existe) {
