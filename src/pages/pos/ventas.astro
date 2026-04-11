@@ -2,7 +2,7 @@
 import '../../styles.css'; 
 import { supabase } from '../../lib/supabase.js';
 
-// Traemos el inventario disponible
+// En POS solo cargamos referencias activas; no dependemos de visibilidad en catalogo.
 const { data: referencias, error } = await supabase
   .from('referencias')
   .select(`id, modelo, precio_venta, stock_actual, imagen_especifica, familias ( nombre )`)
