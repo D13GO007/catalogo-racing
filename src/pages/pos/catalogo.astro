@@ -4,13 +4,10 @@ import { supabase } from '../../lib/supabase.js';
 
 const { data: referencias, error } = await supabase
   .from('referencias')
-  .select(`
-    id,
-    modelo,
-    imagen_especifica,
-    visible_en_catalogo
-  `)
-  .order('modelo');
+  .select('*')
+  .eq('activo', true)
+  .eq('visible_en_catalogo', true)
+  .order('modelo', { ascending: true });
 
 ---
 
