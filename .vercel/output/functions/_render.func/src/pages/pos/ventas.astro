@@ -305,11 +305,11 @@ function limpiarNombreReferencia(nombreFamilia, nombreReferencia) {
                   </div>
                   <div class="flex-1 min-w-0 flex flex-col justify-center">
                     <h3 class="font-black text-sm text-gray-900 leading-tight group-hover:text-orange-600 transition-colors uppercase tracking-wide truncate">
-                      {limpiarNombreReferencia(ref.familias?.nombre, ref.modelo)}
+                      {ref.familias?.nombre || 'SIN CATEGORÍA'}
                     </h3>
                     
                     <p class="text-[11px] font-bold text-gray-500 mt-0.5 line-clamp-2 uppercase">
-                      {ref.familias?.nombre || 'SIN CATEGORÍA'}
+                      Ref: {limpiarNombreReferencia(ref.familias?.nombre, ref.modelo)}
                     </p>
                     
                     <div>
