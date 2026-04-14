@@ -1,0 +1,64 @@
+{
+	"version": 3,
+	"routes": [
+		{
+			"handle": "filesystem"
+		},
+		{
+			"src": "^/_astro/(.*)$",
+			"headers": {
+				"cache-control": "public, max-age=31536000, immutable"
+			},
+			"continue": true
+		},
+		{
+			"src": "^/_server-islands/([^/]+?)/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^/_image/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^/pos/cartera/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^/pos/catalogo/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^/pos/estadisticas/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^/pos/historial/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^/pos/inicio/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^/pos/ventas/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^/pos/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^/$",
+			"dest": "_render"
+		},
+		{
+			"src": "^/404/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^/.*$",
+			"dest": "_render",
+			"status": 404
+		}
+	]
+}

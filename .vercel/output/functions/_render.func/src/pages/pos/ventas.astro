@@ -1,0 +1,1848 @@
+﻿---
+import '../../styles.css'; 
+import { supabase } from '../../lib/supabase.js';
+
+// En POS solo cargamos referencias activas; no dependemos de visibilidad en catalogo.
+const { data: referencias, error } = await supabase
+  .from('referencias')
+  .select(`id, modelo, precio_venta, stock_actual, imagen_especifica, familias ( nombre )`)
+  .eq('activo', true)
+  .order('modelo');
+
+// Extraemos las familias (categorías) únicas para los filtros
+const familias = Array.from(
+  new Set((referencias || []).map(r => r.familias?.nombre).filter(Boolean))
+).sort((a, b) => a.localeCompare(b));
+
+// Traemos los clientes registrados
+const { data: clientesData } = await supabase
+  .from('clientes')
+  .select('*')
+  .order('nombre');
+const clientes = clientesData || [];
+
+// Función para limpiar nombres redundantes
+function limpiarNombreReferencia(nombreFamilia, nombreReferencia) {
+  if (!nombreFamilia || !nombreReferencia) return nombreReferencia;
+  // Convertimos a minúsculas para comparar sin errores
+  const familiaClean = nombreFamilia.toLowerCase().trim();
+  const refClean = nombreReferencia.toLowerCase();
+
+  if (refClean.includes(familiaClean)) {
+    // Si la referencia ya trae el nombre de la familia, se lo quitamos y dejamos solo el modelo
+    // Usamos expresión regular para ignorar mayúsculas/minúsculas
+    const regex = new RegExp(familiaClean, 'i');
+    return nombreReferencia.replace(regex, '').trim();
+  }
+  
+  return nombreReferencia;
+}
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Caja / Ventas - Premium Racing</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#ea580c" />
+    <link rel="apple-touch-icon" href="/icono-192.png" />
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+      body {
+        font-family: 'Inter', sans-serif;
+        background: #e6e7ee;
+        min-height: 100vh;
+        color: #2d3748;
+        overflow-x: hidden;
+      }
+      .page-bg {
+        position: fixed; inset: 0; z-index: -10;
+        background: radial-gradient(circle at top, rgba(255, 107, 53, 0.18), transparent 55%),
+          radial-gradient(circle at 25% 30%, rgba(45, 55, 72, 0.25), transparent 50%),
+          linear-gradient(135deg, #e6e7ee 0%, #f6f7fb 100%);
+      }
+      .neumorphism {
+        background: #e6e7ee;
+        box-shadow: 10px 10px 20px #bebebe, -10px -10px 20px #ffffff;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+      }
+      .neumorphism-inset {
+        background: #e6e7ee;
+        box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff;
+        border-radius: 15px;
+      }
+      .neumorphism-button {
+        background: #e6e7ee;
+        box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+      }
+      .neumorphism-button:hover:not(:disabled) {
+        box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff;
+        transform: translateY(2px);
+      }
+      .search-input {
+        width: 100%;
+        padding: 0.7rem 1rem;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        background: rgba(255, 255, 255, 0.85);
+        box-shadow: inset 4px 4px 8px rgba(0,0,0,0.05);
+        outline: none;
+      }
+      .search-input:focus {
+        border-color: rgba(255, 107, 53, 0.6);
+        box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.15);
+      }
+      /* Ajuste para que la pantalla principal no haga scroll completo, pareciendo una app nativa */
+      .layout-height {
+        height: calc(100vh - 5rem); 
+      }
+
+      /* ========================================== */
+      /* ESTILOS DE IMPRESIÓN (FACTURA)             */
+      /* ========================================== */
+      /* ========================================== */
+      /* ESTILOS DE IMPRESIÓN (FACTURA Y TIRILLA)   */
+      /* ========================================== */
+      @media print {
+        body * { visibility: hidden; }
+        #printSection, #printSection * { visibility: visible; }
+        #printSection {
+          position: absolute; left: 0; top: 0; width: 100%;
+          margin: 0; padding: 0; background: white !important; box-shadow: none !important;
+        }
+        .no-print { display: none !important; }
+      }
+
+      /* COMPORTAMIENTO EXCLUSIVO DE LA TIRILLA (80mm) */
+      .formato-tirilla {
+        width: 80mm !important;
+        max-width: 80mm !important;
+        margin: 0 auto !important;
+        padding: 0 5mm !important; /* Márgenes pequeños para el rollo */
+        font-size: 11px !important;
+        color: black !important;
+      }
+      
+      /* Apilar y centrar el encabezado en la tirilla */
+      .formato-tirilla #invoiceHeader {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        border-bottom: 1px dashed black !important;
+        padding-bottom: 10px !important;
+      }
+      .formato-tirilla #invoiceHeader > div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100% !important;
+        text-align: center !important;
+        margin-bottom: 8px;
+      }
+      .formato-tirilla #invoiceHeader .text-right {
+        text-align: center !important;
+      }
+      
+      /* Ajuste de Cliente en Tirilla */
+      .formato-tirilla .bg-gray-50 {
+        background: transparent !important;
+        border: none !important;
+        border-bottom: 1px dashed black !important;
+        padding: 10px 0 !important;
+        text-align: left !important;
+      }
+      
+      /* Ajuste de Totales en Tirilla (Quitar fondo gris y expandir) */
+      .formato-tirilla .bg-gray-50\/50 {
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+      }
+      
+      /* Reducir padding de la tabla en tirilla */
+      .formato-tirilla th, .formato-tirilla td {
+        padding: 4px 2px !important;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  </head>
+  <body>
+    <div class="page-bg"></div>
+
+    <header class="w-full h-16 bg-gray-900 shadow-lg border-b-4 border-orange-500 relative z-10 flex items-center shrink-0">
+      <div class="w-full max-w-[98%] mx-auto px-4 flex justify-between items-center">
+        
+        <div class="flex items-center space-x-4">
+          <div class="w-12 h-12 bg-black rounded-xl flex items-center justify-center shadow-lg overflow-hidden shrink-0 border border-gray-700">
+            <img src="/logo.png" alt="Premium Racing" class="w-full h-full object-contain p-1" onerror="this.src='https://placehold.co/100x100?text=PR'" />
+          </div>
+          <div class="hidden lg:block">
+            <h1 class="text-xl font-bold text-white tracking-wide leading-tight">Premium Racing</h1>
+            <p class="text-orange-400 text-[10px] font-black uppercase tracking-widest">Sistema de Gestión</p>
+          </div>
+        </div>
+
+        <nav class="flex items-center gap-1 md:gap-2 overflow-x-auto whitespace-nowrap custom-scrollbar pb-1 md:pb-0">
+          <a href="/pos/inicio" data-astro-prefetch class="nav-link px-3 md:px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-gray-300 border border-transparent hover:bg-gray-800 hover:text-white whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            <span class="hidden md:inline">Inicio</span>
+          </a>
+          <a href="/pos/ventas" data-astro-prefetch class="nav-link px-3 md:px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-gray-300 border border-transparent hover:bg-gray-800 hover:text-white whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <span class="hidden md:inline">Ventas</span>
+          </a>
+
+          <a href="/pos/historial" data-astro-prefetch class="nav-link px-3 md:px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-gray-300 border border-transparent hover:bg-gray-800 hover:text-white whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="hidden md:inline">Historial</span>
+          </a>
+          <a href="/pos" data-astro-prefetch class="nav-link px-3 md:px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-gray-300 border border-transparent hover:bg-gray-800 hover:text-white whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+            <span class="hidden md:inline">Inventario</span>
+          </a>
+
+          <a href="/pos/estadisticas" data-astro-prefetch class="nav-link px-3 md:px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-gray-300 border border-transparent hover:bg-gray-800 hover:text-white whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+            <span class="hidden md:inline">Estadísticas</span>
+          </a>
+        </nav>
+        
+        <div class="hidden sm:block ml-2 pl-2 md:ml-4 md:pl-4 border-l border-gray-700 shrink-0">
+           <button class="text-gray-400 hover:text-red-400 transition-colors p-2 rounded-lg hover:bg-gray-800" title="Cerrar Sesión">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+               <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+             </svg>
+           </button>
+        </div>
+
+      </div>
+    </header>
+
+    <main class="max-w-[98%] mx-auto py-4 flex flex-col lg:flex-row gap-4 min-h-[calc(100vh-5rem)] lg:h-[calc(100vh-5rem)]">
+      
+      <aside class="w-full lg:w-60 shrink-0 h-full hidden lg:block">
+        <div class="neumorphism p-4 h-full flex flex-col overflow-hidden">
+          <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-300">
+            <h3 class="text-sm font-bold uppercase tracking-wide text-gray-700">Categorías</h3>
+            <button id="clearFilter" class="text-xs text-orange-600 hover:text-orange-800 font-bold underline" type="button">
+              Limpiar
+            </button>
+          </div>
+          <div class="space-y-2 overflow-y-auto pr-2 pb-4 flex-1">
+            <button
+              type="button"
+              data-family="all"
+              class="family-btn w-full text-left px-3 py-2.5 rounded-lg border border-orange-300 bg-orange-50 text-orange-700 font-bold transition shadow-sm"
+            >
+              TODAS
+            </button>
+            {familias.map(fam => (
+              <button
+                type="button"
+                data-family={fam}
+                class="family-btn w-full text-left px-3 py-2.5 rounded-lg border border-gray-200 bg-white text-gray-700 font-medium hover:bg-orange-50 hover:text-orange-700 transition shadow-sm"
+              >
+                {fam.toUpperCase()}
+              </button>
+            ))}
+          </div>
+        </div>
+      </aside>
+
+      <section class="w-full min-w-0 lg:flex-1 lg:h-full flex flex-col gap-4 overflow-hidden">
+       <div id="bannerEdicion" class="hidden bg-blue-50 border-l-4 border-blue-500 text-blue-800 p-4 mb-1 rounded-r-2xl flex justify-between items-center shadow-sm relative overflow-hidden">
+        <div class="absolute -right-10 -top-10 w-32 h-32 bg-blue-200 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+        <div class="relative z-10">
+          <p class="font-black text-sm uppercase tracking-widest text-blue-600 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+            Modo Edición Activado
+          </p>
+          <p class="text-xs font-medium mt-1 text-blue-800" id="textoBannerEdicion"></p>
+        </div>
+        <button id="btnCancelarEdicion" class="relative z-10 text-blue-600 hover:text-white font-bold text-xs px-4 py-2 bg-blue-200 hover:bg-blue-600 rounded-lg transition-colors shadow-sm">
+          Cancelar Edición
+        </button>
+       </div>
+
+      <div class="neumorphism p-3 shrink-0 flex flex-col sm:flex-row gap-2">
+         <div class="relative flex-1">
+           <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400 pointer-events-none">🔍</span>
+           <input type="text" id="buscarProducto" placeholder="Buscar modelo o repuesto..." class="search-input w-full bg-white/60" style="padding-left: 2.8rem;" />
+         </div>
+          <button id="btnVerPendientes" class="px-4 bg-orange-100 border border-orange-300 text-orange-700 font-bold rounded-full hover:bg-orange-200 transition-colors shadow-sm flex items-center gap-2 text-sm relative">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Pendientes
+          <span id="badgePendientes" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-black hidden">0</span>
+         </button>
+        </div>
+
+        <div class="neumorphism p-4 flex-1 overflow-y-auto">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3" id="listaProductos">
+            {referencias?.map(ref => (
+              <div class="producto-card bg-white rounded-xl p-3 border border-gray-200 shadow-sm flex flex-col justify-between cursor-pointer hover:border-orange-400 hover:shadow-md transition-all group relative" 
+                   data-modelo={ref.modelo.toLowerCase()} 
+                   data-familia={ref.familias?.nombre?.toLowerCase()}>
+                
+                <div class="flex gap-3">
+                  <div class="w-16 h-16 shrink-0 bg-gray-50 rounded-lg border border-gray-100 p-1 flex items-center justify-center">
+                    <img src={ref.imagen_especifica || 'https://placehold.co/100'} class="max-w-full max-h-full object-contain mix-blend-multiply" />
+                  </div>
+                  <div class="flex-1 min-w-0 flex flex-col justify-center">
+                    <h3 class="font-black text-sm text-gray-900 leading-tight group-hover:text-orange-600 transition-colors uppercase tracking-wide truncate">
+                      {limpiarNombreReferencia(ref.familias?.nombre, ref.modelo)}
+                    </h3>
+                    
+                    <p class="text-[11px] font-bold text-gray-500 mt-0.5 line-clamp-2 uppercase">
+                      {ref.familias?.nombre || 'SIN CATEGORÍA'}
+                    </p>
+                    
+                    <div>
+                      <p class="text-[10px] font-bold px-2 py-0.5 rounded-full inline-block mt-1.5 bg-orange-100 text-orange-700">
+                        Stock: <span id={`stock-visual-${ref.id}`} data-stock-base={ref.stock_actual}>{ref.stock_actual}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="mt-3 flex items-center justify-between border-t border-gray-100 pt-2">
+                  <span class="font-black text-gray-900">${ref.precio_venta.toLocaleString('es-CO')}</span>
+                  <button 
+                    class="btn-agregar neumorphism-button px-3 py-1 text-xs font-bold text-orange-600 hover:text-white hover:bg-orange-500 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-orange-600 transition-colors"
+                    data-id={ref.id}
+                    data-modelo={ref.modelo}
+                    data-familia={ref.familias?.nombre || 'VARIOS'}
+                    data-precio={ref.precio_venta}
+                    data-stock={ref.stock_actual}
+                    disabled={ref.stock_actual <= 0}
+                  >
+                    + Añadir
+                  </button>
+                </div>
+              </div>
+            ))}
+            <div id="noResultsMsg" class="hidden col-span-full rounded-lg border border-dashed border-gray-300 bg-white/60 p-6 text-center text-gray-600 font-semibold">
+              No se encontraron productos para esta búsqueda.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside id="seccionCarrito" class="w-full lg:w-[320px] xl:w-[380px] shrink-0 lg:h-full flex flex-col">
+        <div class="neumorphism p-5 flex-1 flex flex-col overflow-hidden">
+          <div class="border-b border-gray-300 pb-3 mb-4 flex justify-between items-end shrink-0">
+            <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+              <span>📋</span> Resumen del Pedido
+            </h2>
+            <button id="btnVaciar" class="text-xs text-red-500 hover:text-red-700 font-semibold underline">Vaciar</button>
+          </div>
+
+          <div class="mb-4 space-y-1 shrink-0">
+            <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider">Cliente / Taller:</label>
+            <div class="flex flex-col sm:flex-row gap-2">
+              <select id="selectCliente" class="search-input w-full text-sm py-2 bg-white/60 font-bold text-gray-700 outline-none focus:border-orange-500 cursor-pointer">
+                <option value="Cliente Mostrador" data-telefono="N/A" data-descuento="0">CLIENTE MOSTRADOR</option>
+                {clientes.map(cli => (
+                  <option value={cli.nombre} data-telefono={cli.telefono || 'Sin teléfono'} data-descuento={String(cli.descuento_general || 0)}>{cli.nombre.toUpperCase()}</option>
+                ))}
+              </select>
+              
+              <button id="btnAbrirModalCliente" class="shrink-0 bg-white border-2 border-gray-200 text-orange-500 hover:text-white hover:bg-orange-500 hover:border-orange-500 w-11 h-11 rounded-xl flex items-center justify-center transition-all shadow-sm group" title="Registrar Nuevo Cliente">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="neumorphism-inset p-2 flex-1 overflow-y-auto mb-4" id="carritoContenedor">
+            <div id="carritoVacio" class="h-full flex flex-col items-center justify-center text-gray-400 opacity-70 mt-10">
+              <span class="text-4xl mb-2">📥</span>
+              <p class="text-sm font-medium">No hay repuestos en el pedido</p>
+            </div>
+          </div>
+
+          <div class="shrink-0">
+            <div class="space-y-2 mb-4 bg-white p-3 rounded-xl border border-gray-200">
+              <div class="flex justify-between text-gray-500 text-sm">
+                <span>Subtotal:</span>
+                <span id="txtSubtotal" class="font-bold text-gray-700">$0</span>
+              </div>
+              <div class="flex justify-between text-gray-500 text-sm">
+                <span>Descuento Cliente:</span>
+                <span id="txtDescuentoGlobalValor" class="font-bold text-red-500">$0</span>
+              </div>
+              <div class="flex justify-between text-gray-900 text-xl border-t border-gray-100 pt-2 mt-1">
+                <span class="font-black">TOTAL:</span>
+                <span id="txtTotal" class="font-black text-green-600">$0</span>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 mb-3">
+              <button id="btnCotizar" class="w-1/2 bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-400 font-bold py-3 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 text-sm group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Cotizar
+              </button>
+
+              <button id="btnGuardar" class="w-1/2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 font-bold py-3 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 text-sm group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                </svg>
+                Guardar
+              </button>
+            </div>
+
+            <button id="btnGenerarPedido" class="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black py-3.5 rounded-xl text-lg flex justify-center items-center gap-2 shadow-[0_8px_15px_rgba(16,185,129,0.3)] hover:shadow-[0_12px_20px_rgba(16,185,129,0.4)] transition-all border border-green-700 hover:-translate-y-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+              </svg>
+              Procesar Pedido
+            </button>
+          </div>
+        </div>
+      </aside>
+
+    </main>
+
+    <div id="editCartItemModal" class="hidden fixed inset-0 bg-neutral-950/80 z-[120] backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="neumorphism w-full max-w-sm p-6 space-y-4 relative border border-white/60">
+        
+        <h3 class="text-lg font-black text-gray-800 border-b border-gray-300 pb-2 leading-tight uppercase" id="modalCartItemName">
+          </h3>
+        
+        <div class="space-y-2">
+           <div class="flex justify-between text-sm text-gray-500 font-bold">
+             <span>Precio Original (Ud):</span>
+             <span id="modalCartItemOriginalPrice">$0</span>
+           </div>
+           <div class="flex justify-between text-sm text-gray-500 font-bold">
+             <span>Cantidad seleccionada:</span>
+             <span id="modalCartItemQuantity">1</span>
+           </div>
+           <div class="flex justify-between text-gray-900 font-black mb-2 text-base">
+             <span>Subtotal Original:</span>
+             <span id="modalCartItemOriginalTotal">$0</span>
+           </div>
+
+           <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-300">
+             <div>
+               <label class="block text-[11px] font-bold text-orange-600 uppercase tracking-wider mb-1">Desc. (%)</label>
+               <input type="number" id="modalCartItemDescPerc" class="search-input w-full text-center font-bold text-lg text-gray-800 bg-white/60" min="0" max="100" placeholder="0" />
+             </div>
+             <div>
+               <label class="block text-[11px] font-bold text-orange-600 uppercase tracking-wider mb-1">Desc. ($)</label>
+               <input type="number" id="modalCartItemDescVal" class="search-input w-full text-center font-bold text-lg text-gray-800 bg-white/60" min="0" placeholder="0" />
+             </div>
+           </div>
+
+           <div class="bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl p-4 border border-orange-200 mt-4 flex justify-between items-center shadow-inner">
+             <span class="text-orange-800 font-bold text-sm uppercase">Nuevo Total:</span>
+             <span id="modalCartItemNewTotal" class="text-orange-600 font-black text-2xl drop-shadow-sm">$0</span>
+           </div>
+        </div>
+
+        <div class="flex flex-col gap-3 pt-4">
+          <button id="btnSaveCartItem" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-black rounded-xl transition-all shadow-[0_4px_10px_rgba(16,185,129,0.3)] flex items-center justify-center gap-2 text-lg border border-green-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            Aplicar Cambios
+          </button>
+          
+          <div class="flex gap-3">
+             <button id="btnRemoveCartItem" class="w-1/2 py-3 bg-white border-2 border-red-100 text-red-600 font-bold rounded-xl hover:bg-red-50 hover:border-red-200 transition-colors text-sm flex items-center justify-center gap-1.5">
+               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+               </svg>
+               Quitar Item
+             </button>
+             
+             <button id="btnCancelCartItem" class="w-1/2 py-3 bg-gray-100 border-2 border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-200 hover:border-gray-300 transition-colors text-sm flex items-center justify-center gap-1.5">
+               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+               </svg>
+               Cancelar
+             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="checkoutModal" class="hidden fixed inset-0 bg-neutral-950/80 z-[150] backdrop-blur-md flex items-center justify-center p-2 md:p-6">
+      <div class="neumorphism w-[95%] md:w-full max-w-6xl bg-[#e6e7ee] rounded-[2rem] flex flex-col overflow-hidden border border-white/50 shadow-2xl scale-95 opacity-0 transition-all duration-300 max-h-[90vh]" id="checkoutContainer">
+        
+        <div class="bg-gray-900 text-white px-6 py-4 flex justify-between items-center border-b-4 border-orange-500 shrink-0">
+          <h2 class="text-xl font-black flex items-center gap-3 tracking-wide">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            Procesar Factura
+          </h2>
+          <button id="closeCheckout" class="text-gray-400 hover:text-white transition-colors bg-gray-800 p-1.5 rounded-xl hover:bg-red-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+
+        <div class="flex flex-col lg:flex-row p-4 lg:p-6 gap-6 overflow-y-auto">
+          
+          <div class="flex-1 space-y-5">
+            
+            <div>
+              <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Estado de la Factura</label>
+              <div class="grid grid-cols-3 gap-2 bg-gray-200/50 p-1.5 rounded-xl border border-gray-300/50">
+                <button class="tipo-venta-btn active bg-white shadow-sm text-gray-800 font-black py-2.5 rounded-lg transition-all text-sm border border-gray-200" data-tipo="todo">Pagar Todo</button>
+                <button class="tipo-venta-btn text-gray-500 hover:text-gray-700 font-bold py-2.5 rounded-lg transition-all text-sm" data-tipo="abono">Abonar</button>
+                <button class="tipo-venta-btn text-gray-500 hover:text-gray-700 font-bold py-2.5 rounded-lg transition-all text-sm" data-tipo="credito">Pagar Después</button>
+              </div>
+            </div>
+
+            <div id="seccionMetodoPago">
+              <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Método de Pago</label>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <button class="pay-method-btn active bg-orange-50 text-orange-700 border-2 border-orange-400 font-bold py-3 rounded-xl transition-all shadow-sm flex flex-col items-center justify-center gap-1" data-method="efectivo">
+                  <span class="text-2xl">💵</span> <span class="text-[10px] uppercase tracking-wider">Efectivo</span>
+                </button>
+                <button class="pay-method-btn bg-white text-gray-500 border-2 border-gray-200 hover:border-[#DA0081] hover:bg-pink-50 hover:text-[#DA0081] font-bold py-3 rounded-xl transition-all shadow-sm flex flex-col items-center justify-center gap-1" data-method="nequi">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-current">
+                    <path d="M5 20V4H10.5L14.5 13V4H19V20H13.5L9.5 11V20H5Z" fill="currentColor"/>
+                  </svg>
+                  <span class="text-[10px] uppercase tracking-wider">Nequi</span>
+                </button>
+                <button class="pay-method-btn bg-white text-gray-500 border-2 border-gray-200 hover:border-orange-400 hover:bg-orange-50 font-bold py-3 rounded-xl transition-all shadow-sm flex flex-col items-center justify-center gap-1" data-method="tarjeta">
+                  <span class="text-2xl">💳</span> <span class="text-[10px] uppercase tracking-wider">Tarjeta</span>
+                </button>
+                <button class="pay-method-btn bg-white text-gray-500 border-2 border-gray-200 hover:border-purple-400 hover:bg-purple-50 font-bold py-3 rounded-xl transition-all shadow-sm flex flex-col items-center justify-center gap-1" data-method="multiple">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-current" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+                  <span class="text-[10px] uppercase tracking-wider">Múltiple</span>
+                </button>
+              </div>
+
+              <div class="flex gap-2 mt-3">
+                <button id="pagoMultipleBtn" class="w-full py-2 bg-white border border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-purple-50 hover:border-purple-300 transition-colors shadow-sm text-sm">
+                  Pago Múltiple
+                </button>
+                <button id="btnEliminarPago" class="w-full py-2 bg-white border border-red-200 text-red-600 font-bold rounded-xl hover:bg-red-50 hover:border-red-300 transition-colors shadow-sm text-sm">
+                  Limpiar Pagos
+                </button>
+              </div>
+            </div>
+
+            <div id="seccionFechaPago" class="hidden mt-4 bg-orange-50 p-3 rounded-lg border border-orange-200">
+              <label class="block text-xs font-bold text-orange-800 uppercase tracking-wider mb-2">
+                Fecha Límite de Pago
+              </label>
+              <input type="date" id="inputFechaPago" class="w-full px-3 py-2 border border-orange-300 rounded-lg text-gray-700 focus:outline-none focus:border-orange-500 bg-white" />
+            </div>
+
+            <div class="neumorphism-inset p-5 rounded-2xl space-y-4" id="contenedorMontoUnico">
+              <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider">Monto Recibido</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-3xl font-black text-gray-400">$</span>
+                <input type="text" id="inputMontoRecibido" class="w-full bg-white border-2 border-gray-200 rounded-2xl py-4 pl-12 pr-4 text-4xl font-black text-gray-800 focus:border-orange-500 focus:outline-none transition-colors shadow-inner text-right" value="0">
+              </div>
+              <div class="grid grid-cols-4 gap-2 pt-2">
+                <button class="quick-cash-btn bg-white border border-gray-300 text-gray-700 font-bold py-2.5 rounded-xl hover:bg-orange-100 hover:text-orange-700 hover:border-orange-400 transition-colors shadow-sm text-sm" data-amount="exacto">Exacto</button>
+                <button class="quick-cash-btn bg-white border border-gray-300 text-gray-700 font-bold py-2.5 rounded-xl hover:bg-orange-100 hover:text-orange-700 hover:border-orange-400 transition-colors shadow-sm text-sm" data-amount="20000">$ 20k</button>
+                <button class="quick-cash-btn bg-white border border-gray-300 text-gray-700 font-bold py-2.5 rounded-xl hover:bg-orange-100 hover:text-orange-700 hover:border-orange-400 transition-colors shadow-sm text-sm" data-amount="50000">$ 50k</button>
+                <button class="quick-cash-btn bg-white border border-gray-300 text-gray-700 font-bold py-2.5 rounded-xl hover:bg-orange-100 hover:text-orange-700 hover:border-orange-400 transition-colors shadow-sm text-sm" data-amount="100000">$ 100k</button>
+              </div>
+            </div>
+
+            <div id="seccionPagoMultiple" class="hidden">
+                <div class="neumorphism-inset p-5 rounded-2xl space-y-4 hidden" id="contenedorMontoMultiple">
+                 <div class="flex justify-between items-center mb-1">
+                   <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider">Dividir Pagos</label>
+                   <span class="text-xs font-bold bg-gray-200 text-gray-600 px-2 py-1 rounded-md transition-colors" id="lblRestanteMulti">Faltan: $0</span>
+                 </div>
+               
+                 <div class="flex items-center gap-3">
+                   <div class="w-11 h-11 bg-white rounded-xl flex items-center justify-center text-2xl shadow-sm border border-gray-200">💵</div>
+                   <div class="relative flex-1">
+                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 font-bold">$</span>
+                     <input type="text" id="multiEfectivo" data-method="efectivo" class="multi-input w-full bg-white border-2 border-gray-200 rounded-xl py-2.5 pl-8 pr-3 text-right text-lg font-black focus:border-orange-500 outline-none transition-colors" placeholder="0">
+                   </div>
+                 </div>
+                 <div class="flex items-center gap-3">
+                   <div class="w-11 h-11 bg-pink-50 rounded-xl flex items-center justify-center text-xl shadow-sm border border-pink-200 text-[#DA0081]">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="text-current"><path d="M5 20V4H10.5L14.5 13V4H19V20H13.5L9.5 11V20H5Z" fill="currentColor"/></svg>
+                   </div>
+                   <div class="relative flex-1">
+                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 font-bold">$</span>
+                     <input type="text" id="multiNequi" data-method="nequi" class="multi-input w-full bg-white border-2 border-gray-200 rounded-xl py-2.5 pl-8 pr-3 text-right text-lg font-black focus:border-[#DA0081] outline-none transition-colors" placeholder="0">
+                   </div>
+                 </div>
+                 <div class="flex items-center gap-3">
+                   <div class="w-11 h-11 bg-white rounded-xl flex items-center justify-center text-2xl shadow-sm border border-gray-200">💳</div>
+                   <div class="relative flex-1">
+                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 font-bold">$</span>
+                     <input type="text" id="multiTarjeta" data-method="tarjeta" class="multi-input w-full bg-white border-2 border-gray-200 rounded-xl py-2.5 pl-8 pr-3 text-right text-lg font-black focus:border-orange-500 outline-none transition-colors" placeholder="0">
+                   </div>
+                 </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="w-full lg:w-[380px] xl:w-[420px] flex flex-col gap-4">
+            <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-200 flex-1 flex flex-col space-y-4">
+              
+              <div class="flex justify-between items-center">
+                <span class="text-gray-500 font-bold text-sm">Subtotal Productos</span>
+                <span id="checkoutSubtotal" class="text-lg font-black text-gray-800">$0</span>
+              </div>
+
+              <div class="bg-gradient-to-r from-orange-50 to-orange-100/50 p-4 rounded-2xl border border-orange-200 flex flex-col gap-3 shadow-inner">
+                <span class="text-orange-800 font-bold text-[11px] uppercase tracking-wider flex items-center gap-1">
+                  <span>🎁</span> Descuento General
+                </span>
+                <div class="flex gap-2">
+                  <div class="relative w-1/3">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-orange-400 text-xs font-black">%</span>
+                    <input type="number" id="globalDescPerc" class="w-full bg-white border-2 border-orange-200/50 rounded-xl py-2 pl-7 pr-2 text-sm text-center font-bold outline-none focus:border-orange-500 text-orange-700" placeholder="0" min="0" max="100">
+                  </div>
+                  <div class="relative w-2/3">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-orange-400 text-xs font-black">$</span>
+                    <input type="text" id="globalDescVal" class="w-full bg-white border-2 border-orange-200/50 rounded-xl py-2 pl-7 pr-3 text-sm text-right font-bold outline-none focus:border-orange-500 text-orange-700" placeholder="0">
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex justify-between items-center border-t border-gray-100 pt-4">
+                <span class="text-gray-900 font-black uppercase tracking-wide text-lg">Total a Pagar</span>
+                <span id="checkoutTotalNeto" class="text-4xl font-black text-orange-600">$0</span>
+              </div>
+              
+              <div class="flex justify-between items-center">
+                <span class="text-gray-500 font-bold uppercase tracking-wide text-xs">Total Recibido</span>
+                <span id="checkoutTotalRecibido" class="text-2xl font-black text-gray-800">$0</span>
+              </div>
+              
+              <div id="cajaCambio" class="flex flex-col justify-center items-center bg-gray-50 p-4 rounded-2xl border border-gray-200 mt-auto transition-colors gap-1">
+                <span id="lblCambio" class="text-gray-500 font-bold uppercase tracking-wide text-[11px]">Estado</span>
+                <span id="checkoutCambio" class="text-3xl font-black text-gray-400">---</span>
+              </div>
+            </div>
+
+            <button id="btnConfirmarPago" class="w-full py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black rounded-2xl transition-all shadow-[0_8px_20px_rgba(16,185,129,0.3)] hover:-translate-y-1 hover:shadow-[0_12px_25px_rgba(16,185,129,0.4)] flex items-center justify-center gap-2 text-xl border border-green-700 disabled:opacity-50 disabled:transform-none disabled:shadow-none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Finalizar Venta
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div id="successModal" class="hidden fixed inset-0 bg-neutral-950/90 z-[200] backdrop-blur-sm flex items-center justify-center p-6 transition-all duration-300 opacity-0">
+      <div class="neumorphism w-full max-w-lg p-10 flex flex-col items-center text-center space-y-6 rounded-[2rem] border border-white/50 scale-95 transition-transform duration-300" id="successContainer">
+        
+        <div class="w-32 h-32 bg-green-100 rounded-full flex items-center justify-center border-4 border-green-200 shadow-[inset_0_4px_10px_rgba(0,0,0,0.05),0_10px_20px_rgba(34,197,94,0.2)]">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 text-green-600 drop-shadow-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+
+        <div class="space-y-1">
+          <h2 class="text-3xl font-black text-green-700 tracking-tighter uppercase">Venta Registrada</h2>
+          <p class="text-xl font-bold text-gray-900 tracking-tight">¡Factura creada exitosamente!</p>
+        </div>
+
+        <div class="w-full neumorphism-inset p-6 rounded-2xl bg-white/50 border border-gray-200 text-sm space-y-3 shadow-inner">
+          <div class="flex justify-between items-center text-gray-600 font-medium">
+            <span>Cliente:</span>
+            <span class="font-bold text-gray-800" id="successClienteName">Cliente Mostrador</span>
+          </div>
+          <div class="flex justify-between items-center text-gray-600 font-medium">
+            <span>Fecha y Hora:</span>
+            <span class="font-bold text-gray-800" id="successFecha">21 Mar 2026, 03:00 PM</span>
+          </div>
+          <div class="flex justify-between items-center text-gray-600 font-medium pt-3 border-t border-gray-200">
+            <span class="text-base font-bold text-gray-900">Total Facturado</span>
+            <span class="text-2xl font-black text-green-600" id="successTotal">$0</span>
+          </div>
+        </div>
+
+        <div class="w-full pt-4 space-y-3">
+          <div class="flex gap-3">
+            <button id="btnImprimirReciboSuccess" class="w-1/2 py-3 bg-gray-100 text-gray-700 border border-gray-300 font-bold rounded-xl hover:bg-gray-200 transition-colors text-sm flex items-center justify-center gap-1.5 shadow-sm">
+               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+               Imprimir
+            </button>
+            
+            <button id="btnDescargarPDF" class="w-1/2 py-3 bg-blue-50 text-blue-700 border border-blue-200 font-bold rounded-xl hover:bg-blue-100 transition-colors text-sm flex items-center justify-center gap-1.5 shadow-sm">
+               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+               Descargar PDF
+            </button>
+          </div>
+          
+          <button id="btnNuevaVenta" class="w-full py-4.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-black rounded-xl transition-all shadow-[0_10px_25px_rgba(249,115,22,0.3)] hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(249,115,22,0.4)] flex items-center justify-center gap-2 text-xl border-b-4 border-orange-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            Iniciar Nueva Venta
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="invoiceModal" class="hidden fixed inset-0 bg-neutral-900/95 z-[300] backdrop-blur-sm flex flex-col items-center p-4 overflow-y-auto">
+      
+      <div class="no-print w-full max-w-4xl flex justify-between items-center mb-6 bg-gray-800 p-4 rounded-2xl sticky top-4 z-10 shadow-lg border border-gray-700">
+        <div class="flex gap-2">
+          <button id="btnFormatCarta" class="px-4 py-2 bg-orange-500 text-white font-bold rounded-lg transition-colors border-2 border-orange-500">
+            📄 Tamaño Carta
+          </button>
+          <button id="btnFormatTirilla" class="px-4 py-2 bg-gray-700 text-gray-300 font-bold rounded-lg hover:bg-gray-600 transition-colors border-2 border-gray-600">
+            🧾 Tirilla (80mm)
+          </button>
+        </div>
+        <div class="flex gap-3">
+          <button id="btnCloseInvoice" class="px-4 py-2 text-gray-300 hover:text-white font-bold transition-colors">Cerrar</button>
+          <button id="btnPrintInvoice" class="px-6 py-2 bg-green-500 hover:bg-green-600 text-white font-black rounded-lg transition-colors flex items-center gap-2 shadow-[0_0_15px_rgba(34,197,94,0.4)]">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+            Imprimir Factura
+          </button>
+        </div>
+      </div>
+
+      <div id="printSection" class="bg-white w-full max-w-3xl p-8 rounded-xl shadow-2xl text-gray-800 transition-all duration-300 origin-top flex flex-col min-h-[80vh] print:min-h-[95vh] print:h-full">
+        
+        <div class="flex justify-between items-start border-b-2 border-gray-800 pb-4 mb-6 shrink-0" id="invoiceHeader">
+          <div class="flex items-center gap-4">
+            <div class="w-20 h-20 shrink-0">
+              <img src="/logo.png" alt="Premium Racing" class="w-full h-full object-contain" onerror="this.style.display='none'" />
+            </div>
+            <div>
+              <h1 class="text-3xl font-black uppercase tracking-tighter text-gray-900 leading-none mb-1">Premium Racing</h1>
+              <p class="text-sm font-bold text-gray-600">Venta de Repuestos y Accesorios</p>
+              <p class="text-xs text-gray-500 mt-1">NIT: 900.000.000-1</p>
+              <p class="text-xs text-gray-500">Cali, Valle del Cauca - Colombia</p>
+              <p class="text-xs text-gray-500">Tel: +57 300 000 0000</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <h2 class="text-2xl font-black text-gray-400 uppercase tracking-widest">Factura</h2>
+            <p class="text-lg font-bold text-red-600">N° <span id="invNumber">00001</span></p>
+            <p class="text-xs text-gray-500 font-bold mt-2">Fecha: <span id="invDate" class="font-normal"></span></p>
+            <p class="text-xs text-gray-500 font-bold">Estado: <span id="invStatus" class="font-normal uppercase"></span></p>
+          </div>
+        </div>
+
+        <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200 shrink-0">
+          <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Facturar a:</p>
+          <p class="text-base font-black text-gray-800 uppercase" id="invClientName">Cliente General</p>
+          <p class="text-sm font-bold text-gray-600 mt-0.5" id="invClientPhone">TEL: N/A</p>
+        </div>
+
+        <div class="flex-1">
+          <table class="w-full mb-6 text-sm text-left">
+            <thead class="border-b border-gray-300 text-gray-400 uppercase text-xs">
+              <tr>
+                <th class="py-2 px-1 text-center font-black text-gray-500 uppercase tracking-wider text-[10px]">ID</th>
+                <th class="py-2 px-3 w-16 text-center font-bold">Cant.</th>
+                <th class="py-2 px-3 font-bold">Descripción / Referencia</th>
+                <th class="py-2 px-3 text-right font-bold hidden-tirilla">V. Unitario</th>
+                <th class="py-2 px-3 text-right font-bold text-red-400 hidden-tirilla">Desc.</th>
+                <th class="py-2 px-3 text-right font-bold">Total</th>
+              </tr>
+            </thead>
+            <tbody id="invItemsTable" class="">
+              </tbody>
+          </table>
+
+          <div class="flex justify-start mb-8">
+            <div class="w-full max-w-sm space-y-2 text-sm bg-gray-50/50 p-4 rounded-lg border border-gray-100">
+              <div class="flex justify-between items-center text-gray-600">
+                <span class="font-bold">Subtotal:</span>
+                <span id="invSubtotal">$0</span>
+              </div>
+              <div class="flex justify-between items-center text-red-500">
+                <span class="font-bold">Desc. Global de Factura:</span>
+                <span id="invDescuento">-$0</span>
+              </div>
+              <div class="flex justify-between items-center text-xl border-t-2 border-gray-800 pt-2 mt-2">
+                <span class="font-black text-gray-900 uppercase">Total a Pagar:</span>
+                <span id="invTotalNeto" class="font-black text-gray-900">$0</span>
+              </div>
+              
+              <div id="invDetalleSaldo" class="hidden border-t border-gray-200 pt-3 mt-3 space-y-1 text-xs text-gray-500">
+                <div class="flex justify-between">
+                  <span>Abono:</span>
+                  <span id="invAbono" class="font-medium text-gray-700">$0</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-bold text-gray-700">Saldo Pendiente:</span>
+                  <span id="invSaldoPendiente" class="font-black text-gray-900">$0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-auto shrink-0 text-center text-xs text-gray-500 border-t border-gray-300 pt-4 pb-2 print:pb-0">
+          <p class="font-bold text-gray-700 mb-1 uppercase tracking-wide">¡Gracias por su compra en Premium Racing!</p>
+          <p>Esta es una factura de venta que sirve como comprobante de pago.</p>
+          <p class="text-[10px] mt-2 opacity-50">Generado por POS System</p>
+        </div>
+        
+      </div>
+    </div>
+
+    <div id="modalNuevoCliente" class="hidden fixed inset-0 bg-neutral-950/80 z-[400] backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+      <div class="neumorphism w-full max-w-md p-6 relative border border-white/60 rounded-[2rem] scale-95 opacity-0 transition-all duration-300 my-8" id="containerNuevoCliente">
+        
+        <h3 class="text-xl font-black text-gray-800 border-b border-gray-300 pb-3 mb-4 uppercase flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+          Nuevo Cliente
+        </h3>
+        
+        <form id="formNuevoCliente" class="space-y-4">
+          <div class="space-y-4 bg-orange-50/50 p-4 rounded-xl border border-orange-100">
+            <div>
+              <label class="block text-[11px] font-bold text-orange-700 uppercase tracking-wider mb-1">Nombre o Razón Social *</label>
+              <input type="text" id="addCliNombre" required class="search-input w-full bg-white uppercase focus:border-orange-500 border-orange-200" placeholder="Ej: Diego Rodríguez" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-orange-700 uppercase tracking-wider mb-1">Teléfono / WhatsApp *</label>
+              <input type="tel" id="addCliTel" required class="search-input w-full bg-white focus:border-orange-500 border-orange-200" placeholder="Ej: 300 123 4567" />
+            </div>
+          </div>
+
+          <button type="button" id="btnToggleOpcionales" class="w-full flex justify-between items-center text-xs text-gray-500 font-bold mt-2 pt-2 border-t border-gray-300 hover:text-orange-500 transition-colors py-2">
+            <span class="flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              Añadir más datos (Facturación, Envío, etc.)
+            </span>
+            <svg id="iconChevronOpcionales" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+          </button>
+
+          <div id="seccionOpcionales" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
+            <div>
+              <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Tipo Doc.</label>
+              <select id="addCliTipoDoc" class="search-input w-full text-xs bg-white focus:border-orange-500 py-2.5">
+                <option value="CC">Cédula (CC)</option>
+                <option value="NIT">NIT</option>
+                <option value="CE">Cédula Extranjería</option>
+                <option value="PAS">Pasaporte</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Número de Documento</label>
+              <input type="text" id="addCliDoc" class="search-input w-full text-xs bg-white focus:border-orange-500 py-2.5" placeholder="Ej: 1144000000" />
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Correo Electrónico</label>
+              <input type="email" id="addCliCorreo" class="search-input w-full text-xs bg-white focus:border-orange-500 py-2.5" placeholder="ejemplo@correo.com" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Ciudad</label>
+              <input type="text" id="addCliCiudad" class="search-input w-full text-xs bg-white focus:border-orange-500 py-2.5" placeholder="Ej: Cali" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Cumpleaños</label>
+              <input type="date" id="addCliCumple" class="search-input w-full text-xs bg-white focus:border-orange-500 py-2.5 text-gray-500" />
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Dirección Completa</label>
+              <input type="text" id="addCliDir" class="search-input w-full text-xs bg-white focus:border-orange-500 py-2.5" placeholder="Ej: Cra. 1 #2-3 Barrio Centro" />
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Descuento General (%)</label>
+              <input type="number" id="addCliDescuento" min="0" max="100" step="0.1" class="search-input w-full text-xs bg-white focus:border-orange-500 py-2.5" placeholder="Ej: 5" />
+            </div>
+          </div>
+          
+          <div class="flex gap-2 pt-3">
+            <button type="button" id="btnCerrarCliente" class="w-1/2 py-3 bg-gray-200 border border-gray-300 text-gray-700 font-bold rounded-xl hover:bg-gray-300 transition-colors text-sm">Cancelar</button>
+            <button type="submit" class="w-1/2 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-black rounded-xl transition-colors shadow-md text-sm flex justify-center items-center gap-2 border border-orange-700">
+               Guardar Cliente
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+
+    <script>
+      import { supabase }                  from '../../lib/supabase.js';
+      import { initFiltros }               from '../../pos/ventas/filtros';
+      import {
+        carrito, initCarrito, renderCarrito,
+        agregarProductoAlCarrito, vaciarCarrito, setDescuentoGlobal, inyectarProductosAlCarrito,
+      }                                    from '../../pos/ventas/carrito';
+      import {
+        initCheckout, actualizarCheckout, resetCheckoutUI,
+        setTotalBruto, getRecibidoFinal, getDescuentoGlobal,
+        tipoVenta, metodoPago, totalBrutoVenta, totalNetoVenta,
+      }                                    from '../../pos/ventas/checkout';
+      import { renderFactura, initFacturaModal } from '../../pos/ventas/factura';
+      import { generarFacturaPDF }         from '../../pos/ventas/pdf';
+      import { initClienteModal }          from '../../pos/ventas/clientes';
+      import { formatoPesos, limpiarMoneda, obtenerNumeroComprobanteDesdeVentaId } from '../../pos/ventas/utils';
+      import type { VentaSnapshot }        from '../../pos/ventas/types';
+
+      // ── Refs del DOM ─────────────────────────────────────────────────────────
+      const buscador         = document.getElementById('buscarProducto')          as HTMLInputElement;
+      const tarjetasProducto = Array.from(document.querySelectorAll<HTMLElement>('.producto-card'));
+      const botonesAgregar   = document.querySelectorAll<HTMLElement>('.btn-agregar');
+      const carritoContenedor = document.getElementById('carritoContenedor')      as HTMLElement;
+      const carritoVacio      = document.getElementById('carritoVacio')           as HTMLElement;
+      const txtSubtotal       = document.getElementById('txtSubtotal')            as HTMLElement;
+      const txtTotal          = document.getElementById('txtTotal')               as HTMLElement;
+      const btnVaciar         = document.getElementById('btnVaciar')              as HTMLElement;
+      const familyButtons     = document.querySelectorAll('.family-btn');
+      const clearFilter       = document.getElementById('clearFilter')            as HTMLElement;
+      const noResultsMsg      = document.getElementById('noResultsMsg')           as HTMLElement;
+
+      const checkoutModal      = document.getElementById('checkoutModal')         as HTMLElement;
+      const checkoutContainer  = document.getElementById('checkoutContainer')     as HTMLElement;
+      const inputMontoRecibido = document.getElementById('inputMontoRecibido')    as HTMLInputElement;
+      const globalDescVal      = document.getElementById('globalDescVal')         as HTMLInputElement;
+
+      const successModal       = document.getElementById('successModal')          as HTMLElement;
+      const successContainer   = document.getElementById('successContainer')      as HTMLElement;
+      const successClienteName = document.getElementById('successClienteName')    as HTMLElement;
+      const successFecha       = document.getElementById('successFecha')          as HTMLElement;
+      const successTotal       = document.getElementById('successTotal')          as HTMLElement;
+      const btnNuevaVenta      = document.getElementById('btnNuevaVenta')         as HTMLElement;
+
+      const invoiceModal       = document.getElementById('invoiceModal')          as HTMLElement;
+      const printSection       = document.getElementById('printSection')          as HTMLElement;
+      const btnImprimirReciboSuccess = document.getElementById('btnImprimirReciboSuccess') as HTMLElement;
+      const btnDescargarPDF    = document.getElementById('btnDescargarPDF')       as HTMLButtonElement | null;
+      const btnPrintInvoice    = document.getElementById('btnPrintInvoice')       as HTMLButtonElement | null;
+      const btnCotizar         = document.getElementById('btnCotizar')            as HTMLButtonElement | null;
+      const btnGuardar         = document.getElementById('btnGuardar')            as HTMLButtonElement | null;
+      const btnVerPendientes   = document.getElementById('btnVerPendientes')      as HTMLButtonElement | null;
+      const badgePendientes    = document.getElementById('badgePendientes')       as HTMLElement;
+      const modalPendientes    = document.getElementById('modalPendientes')       as HTMLElement;
+      const closePendientes    = document.getElementById('closePendientes')       as HTMLButtonElement | null;
+      const listaPendientes    = document.getElementById('listaPendientes')       as HTMLElement;
+      const actionSuccessModal = document.getElementById('actionSuccessModal')    as HTMLElement;
+      const actionTitle        = document.getElementById('actionTitle')           as HTMLElement;
+      const actionSubtitle     = document.getElementById('actionSubtitle')        as HTMLElement;
+      const actionIcon         = document.getElementById('actionIcon')            as HTMLElement;
+      const actionPdfButtons   = document.getElementById('actionPdfButtons')      as HTMLElement;
+      const btnActionImprimir  = document.getElementById('btnActionImprimir')     as HTMLButtonElement | null;
+      const btnActionDescargar = document.getElementById('btnActionDescargar')    as HTMLButtonElement | null;
+      const btnActionNuevaVenta = document.getElementById('btnActionNuevaVenta')  as HTMLButtonElement | null;
+
+      // ── Estado compartido ──────────────────────────────────────────────────
+      let ultimaVenta: VentaSnapshot | null = null;
+      let ultimaCotizacion: VentaSnapshot | null = null;
+      let pedidosGuardados: Array<{
+        id: number;
+        cliente: string;
+        telefono: string;
+        hora: string;
+        items: typeof carrito;
+      }> = [];
+
+      const mostrarToast = (mensaje: string, tipo: 'error' | 'success' | 'info' = 'error') => {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        const bgClass = tipo === 'error'
+          ? 'bg-red-50 border-red-200 text-red-700'
+          : tipo === 'success'
+          ? 'bg-green-50 border-green-200 text-green-700'
+          : 'bg-blue-50 border-blue-200 text-blue-700';
+
+        const icon = tipo === 'error'
+          ? '<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>'
+          : tipo === 'success'
+          ? '<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>'
+          : '<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+
+        toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border shadow-lg font-bold text-sm transform transition-all duration-300 translate-x-full opacity-0 ${bgClass}`;
+        toast.innerHTML = `${icon} <span>${mensaje}</span>`;
+        container.appendChild(toast);
+
+        requestAnimationFrame(() => {
+          toast.classList.remove('translate-x-full', 'opacity-0');
+        });
+
+        setTimeout(() => {
+          toast.classList.add('translate-x-full', 'opacity-0');
+          setTimeout(() => toast.remove(), 300);
+        }, 3500);
+      };
+
+      const confirmarAccion = (titulo: string, mensaje: string): Promise<boolean> => {
+        return new Promise(resolve => {
+          const modal = document.getElementById('customConfirmModal') as HTMLElement;
+          const box = document.getElementById('confirmBox') as HTMLElement;
+          const btnCancel = document.getElementById('btnCancelConfirm') as HTMLButtonElement;
+          const btnAccept = document.getElementById('btnAcceptConfirm') as HTMLButtonElement;
+
+          (document.getElementById('confirmTitle') as HTMLElement).innerText = titulo;
+          (document.getElementById('confirmMessage') as HTMLElement).innerText = mensaje;
+
+          modal.classList.remove('hidden');
+          requestAnimationFrame(() => {
+            modal.classList.remove('opacity-0');
+            box.classList.remove('scale-95');
+          });
+
+          const limpiarYResolver = (resultado: boolean) => {
+            modal.classList.add('opacity-0');
+            box.classList.add('scale-95');
+            setTimeout(() => {
+              modal.classList.add('hidden');
+              resolve(resultado);
+            }, 200);
+
+            btnCancel.removeEventListener('click', onCancel);
+            btnAccept.removeEventListener('click', onAccept);
+          };
+
+          const onCancel = () => limpiarYResolver(false);
+          const onAccept = () => limpiarYResolver(true);
+
+          btnCancel.addEventListener('click', onCancel);
+          btnAccept.addEventListener('click', onAccept);
+        });
+      };
+
+      // ── Inicializar módulos ────────────────────────────────────────────────
+      initFiltros({
+        buscador,
+        tarjetasProducto,
+        familyButtons,
+        clearFilter,
+        noResultsMsg,
+      });
+
+      initCarrito({
+        contenedor:    carritoContenedor,
+        vacioEl:       carritoVacio,
+        txtSubtotal,
+        txtTotal,
+        modalDescuento: document.getElementById('editCartItemModal')        as HTMLElement,
+        modName:        document.getElementById('modalCartItemName')        as HTMLElement,
+        modOrigPrice:   document.getElementById('modalCartItemOriginalPrice') as HTMLElement,
+        modQty:         document.getElementById('modalCartItemQuantity')    as HTMLElement,
+        modOrigTotal:   document.getElementById('modalCartItemOriginalTotal') as HTMLElement,
+        modDescPerc:    document.getElementById('modalCartItemDescPerc')    as HTMLInputElement,
+        modDescVal:     document.getElementById('modalCartItemDescVal')     as HTMLInputElement,
+        modNewTotal:    document.getElementById('modalCartItemNewTotal')    as HTMLElement,
+      });
+
+      initCheckout({
+        checkoutSubtotal:      document.getElementById('checkoutSubtotal')      as HTMLElement,
+        globalDescPerc:        document.getElementById('globalDescPerc')        as HTMLInputElement,
+        globalDescVal:         document.getElementById('globalDescVal')         as HTMLInputElement,
+        checkoutTotalNeto:     document.getElementById('checkoutTotalNeto')     as HTMLElement,
+        checkoutTotalRecibido: document.getElementById('checkoutTotalRecibido') as HTMLElement,
+        cajaCambio:            document.getElementById('cajaCambio')            as HTMLElement,
+        lblCambio:             document.getElementById('lblCambio')             as HTMLElement,
+        checkoutCambio:        document.getElementById('checkoutCambio')        as HTMLElement,
+        btnConfirmarPago:      document.getElementById('btnConfirmarPago')      as HTMLButtonElement,
+        seccionMetodoPago:     document.getElementById('seccionMetodoPago')     as HTMLElement,
+        seccionPagoMultiple:   document.getElementById('seccionPagoMultiple')   as HTMLElement,
+        contMontoUnico:        document.getElementById('contenedorMontoUnico')  as HTMLElement,
+        inputMontoRecibido,
+        contMontoMultiple:     document.getElementById('contenedorMontoMultiple') as HTMLElement,
+        lblRestanteMulti:      document.getElementById('lblRestanteMulti')      as HTMLElement,
+        multiEfectivo:         document.getElementById('multiEfectivo')         as HTMLInputElement,
+        multiNequi:            document.getElementById('multiNequi')            as HTMLInputElement,
+        multiTarjeta:          document.getElementById('multiTarjeta')          as HTMLInputElement,
+        seccionFechaPago:      document.getElementById('seccionFechaPago')      as HTMLElement,
+        inputFechaPago:        document.getElementById('inputFechaPago')        as HTMLInputElement,
+      });
+
+      initFacturaModal(invoiceModal, printSection);
+
+      initClienteModal(document.getElementById('selectCliente') as HTMLSelectElement);
+
+      const selectClienteGlobalDesc = document.getElementById('selectCliente') as HTMLSelectElement | null;
+      const aplicarDescuentoCliente = () => {
+        const inputDescuentoPorcentaje = document.getElementById('globalDescPerc') as HTMLInputElement | null;
+
+        if (!selectClienteGlobalDesc || selectClienteGlobalDesc.selectedIndex < 0) {
+          setDescuentoGlobal(0);
+          if (inputDescuentoPorcentaje) {
+            inputDescuentoPorcentaje.value = '';
+            inputDescuentoPorcentaje.dispatchEvent(new Event('input'));
+          }
+          return;
+        }
+
+        const selectedOption = selectClienteGlobalDesc.options[selectClienteGlobalDesc.selectedIndex];
+        const descuento = parseFloat(selectedOption.getAttribute('data-descuento') || '0') || 0;
+
+        setDescuentoGlobal(descuento);
+
+        if (inputDescuentoPorcentaje) {
+          inputDescuentoPorcentaje.value = descuento > 0 ? String(descuento) : '';
+          inputDescuentoPorcentaje.dispatchEvent(new Event('input'));
+        }
+      };
+
+      selectClienteGlobalDesc?.addEventListener('change', aplicarDescuentoCliente);
+      aplicarDescuentoCliente();
+
+      // ── Botones de Tipo de Venta (Pagar Todo / Abonar / Pagar Después) ────
+      const botonestipoVenta = document.querySelectorAll('.tipo-venta-btn');
+      botonestipoVenta.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tipoSeleccionado = (btn as HTMLElement).getAttribute('data-tipo') || 'todo';
+          
+          // Si se selecciona "Abonar", vaciar y dar foco al input de monto
+          if (tipoSeleccionado === 'abono') {
+            inputMontoRecibido.value = '';
+            setTimeout(() => {
+              inputMontoRecibido.focus();
+            }, 50);
+          }
+          
+          // Si se selecciona "Pagar Todo", prellenar con el total neto
+          if (tipoSeleccionado === 'todo') {
+            inputMontoRecibido.value = totalNetoVenta.toLocaleString('es-CO');
+          }
+        });
+      });
+
+      // ── Eventos del carrito ────────────────────────────────────────────────
+      botonesAgregar.forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          agregarProductoAlCarrito(btn);
+        });
+      });
+
+      tarjetasProducto.forEach(tarjeta => {
+        tarjeta.addEventListener('click', () => {
+          agregarProductoAlCarrito(tarjeta.querySelector('.btn-agregar') as HTMLElement);
+        });
+      });
+
+      btnVaciar.addEventListener('click', async () => {
+        if (carrito.length === 0) return;
+        const confirmado = await confirmarAccion('¿Vaciar pedido?', 'Se eliminarán todos los repuestos del carrito actual.');
+        if (!confirmado) return;
+        vaciarCarrito();
+        renderCarrito();
+        mostrarToast('Pedido vaciado correctamente.', 'info');
+      });
+
+      const obtenerClienteActual = () => {
+        const clienteSelect = document.getElementById('selectCliente') as HTMLSelectElement;
+        const cliente = clienteSelect?.value || 'Cliente Mostrador';
+        const telefono = clienteSelect && clienteSelect.selectedIndex > -1
+          ? clienteSelect.options[clienteSelect.selectedIndex].getAttribute('data-telefono') || 'N/A'
+          : 'N/A';
+        return { clienteSelect, cliente, telefono };
+      };
+
+      const limpiarVistaVenta = () => {
+        const { clienteSelect } = obtenerClienteActual();
+        vaciarCarrito();
+        if (clienteSelect) clienteSelect.value = 'Cliente Mostrador';
+        renderCarrito();
+      };
+
+      const actualizarBadgePendientes = () => {
+        if (pedidosGuardados.length > 0) {
+          badgePendientes.innerText = String(pedidosGuardados.length);
+          badgePendientes.classList.remove('hidden');
+        } else {
+          badgePendientes.classList.add('hidden');
+        }
+      };
+
+      const cargarFacturaEnEdicion = () => {
+        const facturaGuardada = localStorage.getItem('facturaEnEdicion');
+        if (!facturaGuardada) return;
+
+        try {
+          const factura = JSON.parse(facturaGuardada);
+
+          const banner = document.getElementById('bannerEdicion');
+          const textoBanner = document.getElementById('textoBannerEdicion');
+          const idCorto = factura?.id?.split('-')?.pop()?.substring(6)?.toUpperCase() || 'N/A';
+          if (banner && textoBanner) {
+            banner.classList.remove('hidden');
+            textoBanner.innerText = `Estás modificando la orden #${idCorto} a nombre de ${factura?.cliente_nombre || 'Cliente Mostrador'}.`;
+          }
+
+          const rawItems = Array.isArray(factura?.productos_venta)
+            ? factura.productos_venta
+            : (typeof factura?.snapshot_carrito === 'string'
+              ? JSON.parse(factura.snapshot_carrito || '[]')
+              : (factura?.snapshot_carrito || factura?.items || []));
+
+          if (Array.isArray(rawItems) && rawItems.length > 0) {
+            inyectarProductosAlCarrito(rawItems);
+          }
+
+          const clienteSelect = document.getElementById('selectCliente') as HTMLSelectElement | null;
+          if (clienteSelect && factura?.cliente_nombre) {
+            const clienteObjetivo = String(factura.cliente_nombre);
+            const existe = Array.from(clienteSelect.options).some(opt => opt.value === clienteObjetivo);
+
+            if (!existe) {
+              const opt = document.createElement('option');
+              opt.value = clienteObjetivo;
+              opt.text = clienteObjetivo.toUpperCase();
+              opt.setAttribute('data-telefono', String(factura?.cliente_telefono || 'N/A'));
+              opt.setAttribute('data-descuento', String(factura?.descuento_global || 0));
+              clienteSelect.appendChild(opt);
+            }
+
+            clienteSelect.value = clienteObjetivo;
+            clienteSelect.dispatchEvent(new Event('change'));
+          }
+
+          const btnCobrar = document.getElementById('btnGenerarPedido') as HTMLButtonElement | null;
+          if (btnCobrar) {
+            btnCobrar.innerHTML = 'Actualizar Factura';
+            btnCobrar.classList.remove('from-emerald-500', 'to-green-600', 'hover:from-emerald-600', 'hover:to-green-700', 'border-green-700');
+            btnCobrar.classList.add('from-blue-500', 'to-blue-600', 'hover:from-blue-600', 'hover:to-blue-700', 'border-blue-700');
+          }
+
+          const btnCancelarEdicion = document.getElementById('btnCancelarEdicion');
+          if (btnCancelarEdicion) {
+            btnCancelarEdicion.addEventListener('click', () => {
+              localStorage.removeItem('facturaEnEdicion');
+              window.location.reload();
+            });
+          }
+        } catch (error) {
+          console.error('No se pudo cargar factura en edición:', error);
+          localStorage.removeItem('facturaEnEdicion');
+        }
+      };
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', cargarFacturaEnEdicion);
+      } else {
+        cargarFacturaEnEdicion();
+      }
+
+      const renderizarPendientes = () => {
+        listaPendientes.innerHTML = '';
+        if (pedidosGuardados.length === 0) {
+          listaPendientes.innerHTML = '<p class="text-center text-gray-500 text-sm mt-4">No hay órdenes pendientes.</p>';
+          return;
+        }
+
+        pedidosGuardados.forEach(pedido => {
+          const div = document.createElement('div');
+          div.className = 'bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex justify-between items-center hover:border-orange-400 cursor-pointer transition-colors';
+          div.innerHTML = `
+            <div>
+              <h4 class="font-black text-gray-800 uppercase text-sm">${pedido.cliente}</h4>
+              <p class="text-xs text-gray-500 font-bold">Guardado a las ${pedido.hora} • ${pedido.items.length} repuestos</p>
+            </div>
+            <button class="bg-orange-100 text-orange-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-orange-200">
+              Continuar ➡️
+            </button>
+          `;
+
+          div.addEventListener('click', async () => {
+            if (carrito.length > 0) {
+              const confirmado = await confirmarAccion('¿Reemplazar carrito?', 'Se reemplazará el carrito actual con esta orden pendiente.');
+              if (!confirmado) return;
+            }
+
+            carrito.splice(0, carrito.length, ...JSON.parse(JSON.stringify(pedido.items)));
+            const clienteSelect = document.getElementById('selectCliente') as HTMLSelectElement;
+            if (clienteSelect) clienteSelect.value = pedido.cliente;
+
+            pedidosGuardados = pedidosGuardados.filter(p => p.id !== pedido.id);
+            actualizarBadgePendientes();
+            renderCarrito();
+            modalPendientes.classList.add('hidden');
+            mostrarToast('Orden pendiente restaurada.', 'success');
+          });
+
+          listaPendientes.appendChild(div);
+        });
+      };
+
+      // ── Abrir / cerrar checkout ────────────────────────────────────────────
+      document.getElementById('btnGenerarPedido')?.addEventListener('click', () => {
+        if (carrito.length === 0) {
+          mostrarToast('El carrito está vacío.', 'error');
+          return;
+        }
+
+        const totalBruto = carrito.reduce(
+          (sum, item) => sum + (item.precio * item.cantidad - (item.descuentoTotal || 0)),
+          0
+        );
+        setTotalBruto(totalBruto);
+        resetCheckoutUI();
+        inputMontoRecibido.value = totalBruto.toLocaleString('es-CO');
+        actualizarCheckout();
+
+        checkoutModal.classList.remove('hidden');
+        setTimeout(() => {
+          checkoutContainer.classList.remove('scale-95', 'opacity-0');
+          checkoutContainer.classList.add('scale-100', 'opacity-100');
+        }, 10);
+      });
+
+      document.getElementById('closeCheckout')?.addEventListener('click', () => {
+        checkoutContainer.classList.remove('scale-100', 'opacity-100');
+        checkoutContainer.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+          checkoutModal.classList.add('hidden');
+          resetCheckoutUI();
+        }, 300);
+      });
+
+      // ── Confirmar pago ─────────────────────────────────────────────────────
+      document.getElementById('btnConfirmarPago')?.addEventListener('click', async () => {
+        if (carrito.length === 0) {
+          mostrarToast('No hay productos para guardar.', 'error');
+          return;
+        }
+
+        const btnConfirmar = document.getElementById('btnConfirmarPago') as HTMLButtonElement | null;
+        const textoOriginalBtn = btnConfirmar?.innerHTML || '';
+
+        if (btnConfirmar) {
+          btnConfirmar.disabled = true;
+          btnConfirmar.innerHTML = `
+            <svg class="animate-spin h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Guardando venta...
+          `;
+        }
+
+        try {
+          const { clienteSelect, cliente, telefono } = obtenerClienteActual();
+          const ahora = new Date();
+          const recibidoFinal = getRecibidoFinal();
+          const fechaPagoInput = document.getElementById('inputFechaPago') as HTMLInputElement | null;
+          const fechaVencimiento = fechaPagoInput?.value?.trim() ? fechaPagoInput.value : null;
+          const facturaGuardada = localStorage.getItem('facturaEnEdicion');
+
+          const estadoDB =
+            tipoVenta === 'cotizacion'
+              ? 'cotizacion'
+              : tipoVenta === 'credito' || tipoVenta === 'abono'
+              ? 'pendiente'
+              : 'completada';
+
+          const snapshotItems = JSON.parse(JSON.stringify(carrito));
+          const payloadVenta = {
+            cliente_nombre: cliente,
+            cliente_telefono: telefono,
+            subtotal: totalBrutoVenta,
+            descuento_global: limpiarMoneda(globalDescVal.value),
+            total_neto: totalNetoVenta,
+            monto_recibido: recibidoFinal,
+            tipo_venta: tipoVenta,
+            metodo_pago: metodoPago,
+            estado: estadoDB,
+            fecha_vencimiento: fechaVencimiento,
+            snapshot_carrito: carrito,
+          };
+
+          let ventaData: { id: string; fecha: string } | null = null;
+
+          if (facturaGuardada) {
+            // Si venimos de Historial, actualizamos la misma venta/cotización.
+            const facturaAntigua = JSON.parse(facturaGuardada);
+            const { data, error } = await supabase
+              .from('ventas')
+              .update(payloadVenta)
+              .eq('id', facturaAntigua.id)
+              .select('id, fecha')
+              .single();
+
+            if (error || !data) {
+              throw new Error(error?.message || 'No se pudo actualizar la venta en edición.');
+            }
+
+            ventaData = data as { id: string; fecha: string };
+          } else {
+            // Flujo normal: insert de una venta nueva.
+            const { data, error } = await supabase
+              .from('ventas')
+              .insert([payloadVenta])
+              .select('id, fecha')
+              .single();
+
+            if (error || !data) {
+              throw new Error(error?.message || 'No se pudo guardar la venta.');
+            }
+
+            ventaData = data as { id: string; fecha: string };
+          }
+
+          if (!ventaData) {
+            throw new Error('No se obtuvo respuesta de la venta.');
+          }
+
+          const ventaId = ventaData.id;
+          const numeroComprobante = obtenerNumeroComprobanteDesdeVentaId(ventaId);
+
+          if (facturaGuardada) {
+            const { error: borrarDetallesError } = await supabase
+              .from('detalle_ventas')
+              .delete()
+              .eq('venta_id', ventaId);
+
+            if (borrarDetallesError) {
+              throw borrarDetallesError;
+            }
+          }
+
+          // PASO 2: Preparar e insertar en 'detalle_ventas'
+          const detallesParaInsertar = carrito.map(item => {
+            const descTotal = item.descuentoTotal || 0;
+            const subTotalCalculado = (item.precio * item.cantidad) - descTotal;
+
+            return {
+              venta_id: ventaId,
+              referencia_id: item.id,
+              cantidad: item.cantidad,
+              precio_unitario: item.precio,
+              subtotal: subTotalCalculado,
+              modelo_snapshot: item.modelo,
+              familia_snapshot: item.familia,
+              descuento_linea: descTotal,
+              subtotal_linea: subTotalCalculado,
+            };
+          });
+
+          const { error: detallesError } = await supabase
+            .from('detalle_ventas')
+            .insert(detallesParaInsertar);
+
+          if (detallesError) throw detallesError;
+
+          const fechaVenta = ventaData.fecha ? new Date(ventaData.fecha) : ahora;
+          const fechaFormateada =
+            fechaVenta.toLocaleDateString('es-CO', { day: '2-digit', month: 'short' }) + ', ' +
+            fechaVenta.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+          ultimaVenta = {
+            cliente,
+            telefono,
+            fecha: fechaFormateada,
+            numeroComprobante,
+            items: snapshotItems,
+            subtotal: totalBrutoVenta,
+            descuentoGlobal: limpiarMoneda(globalDescVal.value),
+            totalNeto: totalNetoVenta,
+            recibido: recibidoFinal,
+            tipoVenta,
+            metodoPago,
+          };
+
+          successClienteName.innerText = cliente.toUpperCase();
+          successFecha.innerText = fechaFormateada;
+          successTotal.innerText = '$' + Math.round(totalNetoVenta).toLocaleString('es-CO');
+
+          vaciarCarrito();
+          if (clienteSelect) clienteSelect.value = 'Cliente Mostrador';
+          renderCarrito();
+
+          checkoutContainer.classList.remove('scale-100', 'opacity-100');
+          checkoutContainer.classList.add('scale-95', 'opacity-0');
+          setTimeout(() => checkoutModal.classList.add('hidden'), 150);
+
+          setTimeout(() => {
+            successModal.classList.remove('hidden');
+            void successModal.offsetWidth;
+            successModal.classList.remove('opacity-0');
+            successContainer.classList.remove('scale-95');
+            successContainer.classList.add('scale-100');
+          }, 200);
+
+          mostrarToast('Venta guardada correctamente.', 'success');
+
+          // Salir de modo edición después de confirmar la venta
+          localStorage.removeItem('facturaEnEdicion');
+
+          const bannerEdicion = document.getElementById('bannerEdicion');
+          if (bannerEdicion) {
+            bannerEdicion.classList.add('hidden');
+          }
+
+          const btnCobrar = document.getElementById('btnGenerarPedido') as HTMLButtonElement | null;
+          if (btnCobrar) {
+            btnCobrar.innerHTML = 'Procesar Pedido';
+            btnCobrar.classList.remove('from-blue-500', 'to-blue-600', 'hover:from-blue-600', 'hover:to-blue-700', 'border-blue-700');
+            btnCobrar.classList.add('from-emerald-500', 'to-green-600', 'hover:from-emerald-600', 'hover:to-green-700', 'border-green-700');
+          }
+        } catch (error: any) {
+          console.error('Error guardando venta en Supabase:', error);
+          mostrarToast(error?.message || 'No se pudo guardar la venta.', 'error');
+        } finally {
+          if (btnConfirmar) {
+            btnConfirmar.disabled = false;
+            btnConfirmar.innerHTML = textoOriginalBtn;
+          }
+        }
+      });
+
+      // ── Botones de acciones PDF con estado de carga ────────────────────────
+      const ejecutarConCarga = async (
+        btn: HTMLButtonElement,
+        venta: VentaSnapshot | null,
+        accion: 'descargar' | 'imprimir'
+      ) => {
+        if (!venta) return;
+
+        const textoOriginal = btn.innerHTML;
+        btn.innerHTML = `
+          <svg class="animate-spin h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Procesando...
+        `;
+        btn.disabled = true;
+        btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+        try {
+          await generarFacturaPDF(venta, accion);
+        } finally {
+          btn.innerHTML = textoOriginal;
+          btn.disabled = false;
+          btn.classList.remove('opacity-75', 'cursor-not-allowed');
+        }
+      };
+
+      // -----------------------------------------------------
+      // LÓGICA DE COTIZAR (Conectado a Supabase)
+      // -----------------------------------------------------
+      document.getElementById('btnCotizar')?.addEventListener('click', async () => {
+        if (carrito.length === 0) {
+          mostrarToast("El carrito está vacío. Agrega repuestos para generar una cotización.", "error");
+          return;
+        }
+
+        const btnCotizar = document.getElementById('btnCotizar') as HTMLButtonElement;
+        const textoOriginal = btnCotizar.innerHTML;
+        
+        // Animación de carga
+        btnCotizar.innerHTML = `<svg class="animate-spin h-5 w-5 text-current mr-2 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Creando...`;
+        btnCotizar.disabled = true;
+
+        try {
+          const clienteSelect = document.getElementById('selectCliente') as HTMLSelectElement;
+          const cliente = clienteSelect ? clienteSelect.value : 'Cliente Mostrador';
+          const telefono = clienteSelect && clienteSelect.selectedIndex > -1 
+            ? clienteSelect.options[clienteSelect.selectedIndex].getAttribute('data-telefono') || 'N/A' 
+            : 'N/A';
+
+          const subtotalCotizacion = carrito.reduce((sum, item) => sum + ((item.precio * item.cantidad) - (item.descuentoTotal || 0)), 0);
+
+          // PASO 1: Guardar la Cotización en Supabase ('ventas')
+          const { data: cotizacionData, error: cotizacionError } = await supabase
+            .from('ventas')
+            .insert([{
+              cliente_nombre: cliente,
+              cliente_telefono: telefono,
+              subtotal: subtotalCotizacion,
+              descuento_global: 0,
+              total_neto: subtotalCotizacion, 
+              monto_recibido: 0,
+              tipo_venta: 'cotizacion',
+              metodo_pago: 'N/A',
+              estado: 'cotizacion',
+              snapshot_carrito: carrito 
+            }])
+            .select('id, fecha')
+            .single();
+
+          if (cotizacionError) throw cotizacionError;
+
+          const ventaId = cotizacionData.id;
+
+          // PASO 2: Guardar los repuestos en 'detalle_ventas'
+          const detallesParaInsertar = carrito.map(item => {
+            const descTotal = item.descuentoTotal || 0;
+            const subTotalCalculado = (item.precio * item.cantidad) - descTotal;
+
+            return {
+              venta_id: ventaId,
+              referencia_id: item.id, 
+              cantidad: item.cantidad,
+              precio_unitario: item.precio,
+              subtotal: subTotalCalculado,
+              modelo_snapshot: item.modelo,
+              familia_snapshot: item.familia,
+              descuento_linea: descTotal,
+              subtotal_linea: subTotalCalculado
+            };
+          });
+
+          const { error: detallesError } = await supabase
+            .from('detalle_ventas')
+            .insert(detallesParaInsertar);
+
+          if (detallesError) throw detallesError;
+
+          // Preparamos la variable global para los botones PDF del modal
+          ultimaCotizacion = {
+            cliente: cliente,
+            telefono: telefono,
+            fecha: new Date(cotizacionData.fecha).toLocaleDateString('es-CO') + ' (Cotización)',
+            numeroComprobante: obtenerNumeroComprobanteDesdeVentaId(cotizacionData.id),
+            items: JSON.parse(JSON.stringify(carrito)),
+            subtotal: subtotalCotizacion,
+            descuentoGlobal: 0,
+            totalNeto: subtotalCotizacion,
+            recibido: 0,
+            tipoVenta: 'cotizacion',
+            metodoPago: 'N/A'
+          };
+
+          // Configurar Modal para Cotización Exitosa
+          actionIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>`;
+          actionIcon.className = 'w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center border-4 border-blue-200 text-5xl';
+          actionTitle.innerText = 'Cotización Exitosa';
+          actionTitle.className = 'text-2xl font-black text-blue-700 tracking-tighter uppercase';
+          actionSubtitle.innerText = `Total cotizado: ${formatoPesos(subtotalCotizacion)}`;
+          actionPdfButtons.classList.remove('hidden');
+
+          // Limpiar vista y mostrar modal
+          vaciarCarrito();
+          actionSuccessModal.classList.remove('hidden');
+          mostrarToast("Cotización guardada correctamente.", "success");
+
+        } catch (error: any) {
+          console.error("Error al cotizar:", error);
+          mostrarToast("Hubo un error al guardar la cotización.", "error");
+        } finally {
+          btnCotizar.innerHTML = textoOriginal;
+          btnCotizar.disabled = false;
+        }
+      });
+
+      if (btnActionDescargar) {
+        btnActionDescargar.addEventListener('click', () => {
+          void ejecutarConCarga(btnActionDescargar, ultimaCotizacion, 'descargar');
+        });
+      }
+
+      if (btnActionImprimir) {
+        btnActionImprimir.addEventListener('click', () => {
+          void ejecutarConCarga(btnActionImprimir, ultimaCotizacion, 'imprimir');
+        });
+      }
+
+      // ── Lógica de guardar pedido ───────────────────────────────────────────
+      if (btnGuardar) {
+        btnGuardar.addEventListener('click', () => {
+          if (carrito.length === 0) {
+            mostrarToast('No hay repuestos para guardar.', 'error');
+            return;
+          }
+
+          const { cliente, telefono } = obtenerClienteActual();
+
+          pedidosGuardados.push({
+            id: Date.now(),
+            cliente,
+            telefono,
+            hora: new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }),
+            items: JSON.parse(JSON.stringify(carrito)),
+          });
+
+          actualizarBadgePendientes();
+
+          actionIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>`;
+          actionIcon.className = 'w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center border-4 border-gray-300 text-5xl';
+          actionTitle.innerText = 'Orden Guardada';
+          actionTitle.className = 'text-2xl font-black text-gray-800 tracking-tighter uppercase';
+          actionSubtitle.innerText = 'Puedes recuperarla desde el botón "Pendientes".';
+          actionPdfButtons.classList.add('hidden');
+
+          limpiarVistaVenta();
+          actionSuccessModal.classList.remove('hidden');
+          mostrarToast('Orden guardada en pendientes.', 'success');
+        });
+      }
+
+      // ── Botones del modal de éxito ─────────────────────────────────────────
+      if (btnImprimirReciboSuccess) {
+        btnImprimirReciboSuccess.addEventListener('click', () => {
+          void ejecutarConCarga(btnImprimirReciboSuccess, ultimaVenta, 'imprimir');
+        });
+      }
+
+      btnNuevaVenta?.addEventListener('click', () => {
+        successModal.classList.add('opacity-0');
+        successContainer.classList.remove('scale-100');
+        successContainer.classList.add('scale-95');
+        setTimeout(() => successModal.classList.add('hidden'), 300);
+      });
+
+      if (btnActionNuevaVenta) {
+        btnActionNuevaVenta.addEventListener('click', () => {
+          actionSuccessModal.classList.add('hidden');
+        });
+      }
+
+      // ── Descarga de PDF ────────────────────────────────────────────────────
+      if (btnDescargarPDF) {
+        btnDescargarPDF.addEventListener('click', () => {
+          void ejecutarConCarga(btnDescargarPDF, ultimaVenta, 'descargar');
+        });
+      }
+
+      // ── Botón imprimir de la vista previa ─────────────────────────────────
+      if (btnPrintInvoice) {
+        btnPrintInvoice.addEventListener('click', () => {
+          void ejecutarConCarga(btnPrintInvoice, ultimaVenta, 'imprimir');
+        });
+      }
+
+      // ── Pendientes ─────────────────────────────────────────────────────────
+      if (btnVerPendientes) {
+        btnVerPendientes.addEventListener('click', () => {
+          renderizarPendientes();
+          modalPendientes.classList.remove('hidden');
+        });
+      }
+
+      if (closePendientes) {
+        closePendientes.addEventListener('click', () => {
+          modalPendientes.classList.add('hidden');
+        });
+      }
+
+      // Deslizar al carrito cuando tocan el botón flotante en el celular
+      const btnResumenMovil = document.getElementById('btnResumenMovil');
+      if (btnResumenMovil) {
+        btnResumenMovil.addEventListener('click', () => {
+          document.getElementById('seccionCarrito')?.scrollIntoView({ behavior: 'smooth' });
+        });
+      }
+
+      // ── Arranque inicial ───────────────────────────────────────────────────
+      actualizarBadgePendientes();
+      actualizarCheckout();
+
+      // Lógica modularizada en src/pos/ventas/:
+      // carrito.ts · checkout.ts · factura.ts · pdf.ts · filtros.ts · clientes.ts · utils.ts · types.ts
+
+    </script>
+
+    <div id="modalPendientes" class="hidden fixed inset-0 bg-neutral-950/80 z-[200] backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="neumorphism w-full max-w-lg p-6 bg-[#e6e7ee] rounded-[2rem] border border-white/50 flex flex-col max-h-[80vh]">
+        <div class="flex justify-between items-center border-b border-gray-300 pb-3 mb-4 shrink-0">
+          <h3 class="text-xl font-black text-gray-800 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Órdenes Guardadas
+          </h3>
+          <button id="closePendientes" class="text-gray-500 hover:text-red-500 font-bold">Cerrar</button>
+        </div>
+        <div id="listaPendientes" class="flex-1 overflow-y-auto space-y-3">
+          <p class="text-center text-gray-500 text-sm mt-4">No hay órdenes pendientes.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="actionSuccessModal" class="hidden fixed inset-0 bg-neutral-950/90 z-[250] backdrop-blur-sm flex items-center justify-center p-6">
+      <div class="neumorphism w-full max-w-md p-8 flex flex-col items-center text-center space-y-6 rounded-[2rem] border border-white/50">
+
+        <div id="actionIcon" class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center border-4 border-blue-200 text-5xl">
+          📄
+        </div>
+
+        <div class="space-y-1">
+          <h2 id="actionTitle" class="text-2xl font-black text-gray-800 tracking-tighter uppercase">Acción Exitosa</h2>
+          <p id="actionSubtitle" class="text-gray-600 font-medium text-sm">El documento ha sido procesado.</p>
+        </div>
+
+        <div id="actionPdfButtons" class="w-full flex gap-3 hidden">
+          <button id="btnActionImprimir" class="w-1/2 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 border border-gray-300 flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            Imprimir
+          </button>
+          <button id="btnActionDescargar" class="w-1/2 py-3 bg-blue-50 text-blue-700 font-bold rounded-xl hover:bg-blue-100 border border-blue-200 flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Descargar
+          </button>
+        </div>
+
+        <button id="btnActionNuevaVenta" class="w-full py-4 bg-gradient-to-r from-gray-700 to-gray-900 text-white font-black rounded-xl hover:-translate-y-1 transition-all shadow-lg">
+          Iniciar Nueva Venta
+        </button>
+      </div>
+    </div>
+
+    <div id="toastContainer" class="fixed top-5 right-5 z-[500] flex flex-col gap-3 pointer-events-none"></div>
+
+    <div id="customConfirmModal" class="hidden fixed inset-0 bg-neutral-950/80 z-[600] backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity duration-200">
+      <div class="neumorphism w-full max-w-sm p-6 bg-[#e6e7ee] rounded-[2rem] border border-white/50 text-center scale-95 transition-transform duration-200" id="confirmBox">
+        <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-orange-200 text-orange-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+        </div>
+        <h3 class="text-lg font-black text-gray-800 mb-2" id="confirmTitle">¿Estás seguro?</h3>
+        <p class="text-sm font-medium text-gray-500 mb-6" id="confirmMessage">Esta acción no se puede deshacer.</p>
+        <div class="flex gap-3">
+          <button id="btnCancelConfirm" class="w-1/2 py-3 bg-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-300 transition-colors">Cancelar</button>
+          <button id="btnAcceptConfirm" class="w-1/2 py-3 bg-orange-500 text-white font-black rounded-xl hover:bg-orange-600 transition-colors shadow-md">Aceptar</button>
+        </div>
+      </div>
+    </div>
+
+    <button id="btnResumenMovil" class="fixed bottom-4 left-4 right-4 z-50 bg-orange-600 text-white p-4 rounded-2xl shadow-[0_10px_40px_rgba(234,88,12,0.5)] flex justify-between items-center lg:hidden font-black transform translate-y-32 transition-transform duration-300">
+      <div class="flex items-center gap-3">
+        <div class="bg-white/20 p-2 rounded-xl">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+        </div>
+        <div class="flex flex-col text-left">
+          <span class="text-[10px] uppercase tracking-wider text-orange-200">En Carrito</span>
+          <span id="txtCantidadMovil" class="text-sm">0 repuestos</span>
+        </div>
+      </div>
+      <span id="txtTotalMovil" class="text-xl tracking-tight">$0</span>
+    </button>
+    <script>
+      (function() {
+        const currentPath = window.location.pathname.replace(/\/$/, ""); 
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        navLinks.forEach(link => {
+          const href = link.getAttribute('href')?.replace(/\/$/, ""); 
+          const isMatch = (href === '/pos') ? (currentPath === '/pos') : (href && currentPath.includes(href));
+
+          if (isMatch) {
+            link.classList.remove('text-gray-300', 'border-transparent', 'hover:bg-gray-800', 'hover:text-white');
+            link.classList.add('bg-gray-800', 'text-orange-400', 'border-gray-700', 'shadow-inner');
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

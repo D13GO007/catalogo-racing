@@ -1,6 +1,21 @@
 import type { VentaSnapshot } from './types';
 import { formatoPesos } from './utils';
 
+interface GenerarFacturaPDFOpciones {
+  abonoReciente?: number;
+  historialAbonos?: Array<{
+    monto: number;
+    fecha: string;
+    metodoPago?: string | null;
+  }>;
+}
+
+type HistorialAbonoPDF = {
+  monto: number;
+  fecha?: string;
+  metodoPago?: string | null;
+};
+
 // ── Logo ──────────────────────────────────────────────────────────────────────
 
 export function loadLogoDataUrl(): Promise<string | null> {
@@ -84,7 +99,8 @@ export async function descargarFacturaDesdeVistaHTML(
 
 export async function generarFacturaPDF(
   venta: VentaSnapshot,
-  accion: 'descargar' | 'imprimir' = 'descargar'
+  accion: 'descargar' | 'imprimir' = 'descargar',
+  opcionesOHistorial: GenerarFacturaPDFOpciones | HistorialAbonoPDF[] = {}
 ): Promise<void> {
   const jsPDFCtor = (window as any).jspdf?.jsPDF;
   if (!jsPDFCtor) throw new Error('No se pudo cargar jsPDF');
@@ -101,14 +117,35 @@ export async function generarFacturaPDF(
   const totalNeto         = Number(venta.totalNeto      || 0);
   const recibido          = Number(venta.recibido       || 0);
 
+  const opciones: GenerarFacturaPDFOpciones = Array.isArray(opcionesOHistorial)
+    ? { historialAbonos: opcionesOHistorial }
+    : opcionesOHistorial;
+
+  const abonoReciente     = Math.max(0, Number(opciones.abonoReciente || 0));
+  const historialAbonos   = (opciones.historialAbonos || [])
+    .map(abonoItem => {
+      const montoNumerico = Number(abonoItem.monto);
+      return {
+      monto: Number.isFinite(montoNumerico) && montoNumerico > 0 ? montoNumerico : 0,
+      fecha: abonoItem.fecha || '',
+      metodoPago: abonoItem.metodoPago || null,
+      };
+    })
+    .filter(abonoItem => abonoItem.monto > 0);
+  const abono             = Math.max(0, Math.min(recibido, totalNeto));
+  const totalAbonado      = historialAbonos.length > 0
+    ? Math.max(0, Math.min(historialAbonos.reduce((acc, curr) => acc + (Number(curr.monto) || 0), 0), totalNeto))
+    : abono;
+  const saldoPendiente    = Math.max(0, totalNeto - totalAbonado);
+
   const logoDataUrl = await loadLogoDataUrl();
 
   // ── Header ────────────────────────────────────────────────────────────────
-  const headTop = 10;
+  const headTop = 7;
   const logoX   = margin;
-  const logoY   = headTop + 2;
-  const logoW   = 22;
-  const logoH   = 22;
+  const logoY   = headTop + 1.5;
+  const logoW   = 18;
+  const logoH   = 18;
 
   if (logoDataUrl) {
     pdf.addImage(logoDataUrl, 'PNG', logoX, logoY, logoW, logoH);
@@ -119,64 +156,68 @@ export async function generarFacturaPDF(
 
   pdf.setTextColor(20, 30, 50);
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(16);
-  pdf.text('PREMIUM RACING', margin + 26, headTop + 9);
-
-  pdf.setFontSize(10.5);
-  pdf.setTextColor(60, 70, 85);
-  pdf.text('Venta de Repuestos y Accesorios', margin + 26, headTop + 14);
+  pdf.setFontSize(14);
+  pdf.text('PREMIUM RACING', margin + 22, headTop + 7);
 
   pdf.setFontSize(9.2);
+  pdf.setTextColor(60, 70, 85);
+  pdf.text('Venta de Repuestos y Accesorios', margin + 22, headTop + 11.5);
+
+  pdf.setFontSize(8.1);
   pdf.setTextColor(65, 65, 65);
-  pdf.text('Cali, Valle del Cauca - Colombia', margin + 26, headTop + 24);
-  pdf.text('Tel: +57 3132240559',              margin + 26, headTop + 28.5);
+  pdf.text('Cali, Valle del Cauca - Colombia', margin + 22, headTop + 17.5);
+  pdf.text('Tel: +57 3132240559',              margin + 22, headTop + 21.5);
 
   const esCotizacion = venta.tipoVenta === 'cotizacion';
-  const tituloDocumento = esCotizacion ? 'COTIZACION' : 'FACTURA';
+  const tituloDocumento = esCotizacion
+    ? 'COTIZACION'
+    : abonoReciente > 0
+    ? 'RECIBO DE ABONO'
+    : 'FACTURA';
   const numeroBase = String(numeroComprobante).replace(/^COT-?/i, '');
   const numeroTitulo = esCotizacion ? `COT-${numeroBase}` : `N° ${numeroBase}`;
 
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(14);
+  pdf.setFontSize(12.5);
   pdf.setTextColor(130, 130, 130);
-  pdf.text(tituloDocumento, pageWidth - margin, headTop + 9, { align: 'right' });
+  pdf.text(tituloDocumento, pageWidth - margin, headTop + 7, { align: 'right' });
 
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(12);
+  pdf.setFontSize(10.5);
   pdf.setTextColor(220, 20, 20);
-  pdf.text(numeroTitulo, pageWidth - margin, headTop + 16, { align: 'right' });
+  pdf.text(numeroTitulo, pageWidth - margin, headTop + 12.5, { align: 'right' });
 
-  pdf.setFontSize(9.6);
+  pdf.setFontSize(8.4);
   pdf.setTextColor(55, 55, 55);
-  pdf.text(`Fecha: ${venta.fecha || 'N/A'}`,                               pageWidth - margin, headTop + 24, { align: 'right' });
+  pdf.text(`Fecha: ${venta.fecha || 'N/A'}`,                               pageWidth - margin, headTop + 18, { align: 'right' });
   let textoEstado = 'PAGADO';
   if (venta.tipoVenta === 'cotizacion') textoEstado = 'COTIZACION';
   if (venta.tipoVenta === 'pendiente') textoEstado = 'PENDIENTE';
   if (venta.tipoVenta === 'credito') textoEstado = 'CREDITO';
   if (venta.tipoVenta === 'abono') textoEstado = 'ABONO PARCIAL';
 
-  pdf.text(`Estado: ${textoEstado}`, pageWidth - margin, headTop + 29, { align: 'right' });
+  pdf.text(`Estado: ${textoEstado}`, pageWidth - margin, headTop + 22, { align: 'right' });
 
   pdf.setDrawColor(45, 55, 72);
   pdf.setLineWidth(0.5);
-  pdf.line(margin, headTop + 34, pageWidth - margin, headTop + 34);
+  pdf.line(margin, headTop + 26, pageWidth - margin, headTop + 26);
 
   // ── Caja cliente ──────────────────────────────────────────────────────────
-  const infoY = headTop + 40;
+  const infoY = headTop + 30;
   pdf.setDrawColor(225, 228, 234);
   pdf.setLineWidth(0.3);
-  pdf.roundedRect(margin, infoY, pageWidth - margin * 2, 24, 2, 2, 'S');
+  pdf.roundedRect(margin, infoY, pageWidth - margin * 2, 18, 2, 2, 'S');
 
   pdf.setTextColor(70, 70, 80);
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(9);
-  pdf.text('FACTURAR A :', margin + 4, infoY + 7);
+  pdf.setFontSize(8.2);
+  pdf.text('FACTURAR A :', margin + 4, infoY + 5.5);
 
   pdf.setTextColor(34, 44, 60);
-  pdf.setFontSize(12);
-  pdf.text((venta.cliente || 'Cliente Mostrador').toUpperCase(), margin + 4, infoY + 14);
-  pdf.setFontSize(11);
-  pdf.text(`TEL: ${(venta.telefono || 'N/A').toUpperCase()}`, margin + 4, infoY + 20);
+  pdf.setFontSize(10.5);
+  pdf.text((venta.cliente || 'Cliente Mostrador').toUpperCase(), margin + 4, infoY + 11);
+  pdf.setFontSize(9.2);
+  pdf.text(`TEL: ${(venta.telefono || 'N/A').toUpperCase()}`, margin + 4, infoY + 15.5);
 
   // ── Tabla de items ────────────────────────────────────────────────────────
   const breakLongTokens = (text: string, chunkSize = 10): string => {
@@ -234,7 +275,7 @@ export async function generarFacturaPDF(
 
   try {
     (pdf as any).autoTable({
-      startY: infoY + 30,
+      startY: infoY + 22,
       margin: { left: margin, right: margin },
       tableWidth: pageWidth - margin * 2,
       // AQUÍ AGREGAMOS "ID" COMO PRIMERA COLUMNA
@@ -243,10 +284,10 @@ export async function generarFacturaPDF(
       theme: 'plain',
       styles: {
         font: 'helvetica',
-        fontSize: 9,
+        fontSize: 8,
         minCellWidth: 0,
         overflow: 'linebreak',
-        cellPadding: { top: 2.4, right: 0.8, bottom: 2.4, left: 0.8 },
+        cellPadding: { top: 1.4, right: 0.7, bottom: 1.4, left: 0.7 },
         textColor: [34, 45, 61],
         valign: 'middle',
         lineColor: [221, 225, 230],
@@ -254,7 +295,7 @@ export async function generarFacturaPDF(
       },
       headStyles: {
         fillColor: [255, 255, 255],
-        fontSize: 9,
+        fontSize: 8,
         textColor: [105, 115, 128],
         fontStyle: 'bold',
         lineWidth: 0,
@@ -265,10 +306,10 @@ export async function generarFacturaPDF(
       columnStyles: {
         0: { cellWidth: 18, minCellWidth: 0, halign: 'center', fontStyle: 'bold', textColor: [220, 90, 30] }, // ID
         1: { cellWidth: 12, minCellWidth: 0, halign: 'center' }, // Cant
-        2: { cellWidth: 70, minCellWidth: 0, halign: 'left', overflow: 'linebreak' }, // Desc
-        3: { cellWidth: 26, minCellWidth: 0, halign: 'right' }, // VU
-        4: { cellWidth: 23, minCellWidth: 0, halign: 'right', textColor: [245, 70, 70] }, // Desc.
-        5: { cellWidth: 24, minCellWidth: 0, halign: 'right', fontStyle: 'bold' }, // Total
+        2: { cellWidth: 72, minCellWidth: 0, halign: 'left', overflow: 'linebreak' }, // Desc
+        3: { cellWidth: 24, minCellWidth: 0, halign: 'right' }, // VU
+        4: { cellWidth: 20, minCellWidth: 0, halign: 'right', textColor: [245, 70, 70] }, // Desc.
+        5: { cellWidth: 22, minCellWidth: 0, halign: 'right', fontStyle: 'bold' }, // Total
       },
       didParseCell: (data: any) => {
         if (data.section === 'head') {
@@ -295,14 +336,19 @@ export async function generarFacturaPDF(
   // ── Bloque de totales ─────────────────────────────────────────────────────
   const tableFinalY = (pdf as any).lastAutoTable?.finalY || infoY + 42;
   let summaryY = tableFinalY + 8;
-  if (summaryY + 44 > pageHeight - margin) {
+  if (summaryY + 55 > pageHeight - margin) {
     pdf.addPage();
     summaryY = margin;
   }
 
+  const tieneAbonos = historialAbonos.length > 0 || venta.tipoVenta === 'credito' || venta.tipoVenta === 'abono';
+  const totalPagado = historialAbonos.length > 0
+    ? historialAbonos.reduce((acc, curr) => acc + (Number(curr.monto) || 0), 0)
+    : recibido;
+  const saldoPendienteCalc = Math.max(0, totalNeto - totalPagado);
+
   const boxW = 98;
-  const boxH = 42;
-  // Calculamos la posición X para que el borde derecho de la caja toque el margen derecho
+  const boxH = tieneAbonos ? 54 : 44;
   const boxX = pageWidth - margin - boxW;
   pdf.setDrawColor(225, 228, 234);
   pdf.setLineWidth(0.3);
@@ -317,7 +363,7 @@ export async function generarFacturaPDF(
   pdf.text(formatoPesos(subtotal),    valX,      summaryY + 8, { align: 'right' });
 
   pdf.setTextColor(245, 70, 70);
-  pdf.text('Desc. Global de Factura:',           boxX + 4, summaryY + 15);
+  pdf.text('Desc. Global:',           boxX + 4, summaryY + 15);
   pdf.text(`-${formatoPesos(descuentoGlobal)}`,  valX,      summaryY + 15, { align: 'right' });
 
   pdf.setDrawColor(45, 55, 72);
@@ -325,45 +371,57 @@ export async function generarFacturaPDF(
   pdf.line(boxX + 4, summaryY + 18, valX, summaryY + 18);
 
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(16);
+  pdf.setFontSize(15);
   pdf.setTextColor(25, 35, 52);
-  pdf.text('TOTAL A PAGAR:',        boxX + 4, summaryY + 26);
-  pdf.text(formatoPesos(totalNeto), valX,      summaryY + 26, { align: 'right' });
+  pdf.text('TOTAL A PAGAR:',        boxX + 4, summaryY + 25);
+  pdf.text(formatoPesos(totalNeto), valX,      summaryY + 25, { align: 'right' });
 
   pdf.setDrawColor(230, 233, 238);
   pdf.setLineWidth(0.3);
-  pdf.line(boxX + 4, summaryY + 29.2, valX, summaryY + 29.2);
+  pdf.line(boxX + 4, summaryY + 29, valX, summaryY + 29);
 
-  pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(11);
   pdf.setTextColor(75, 75, 85);
-  pdf.text('Método de Pago:', boxX + 4, summaryY + 34);
-  pdf.text(String(venta.metodoPago || 'N/A').toUpperCase(), valX, summaryY + 34, { align: 'right' });
+  pdf.text('Método de Pago:', boxX + 4, summaryY + 35);
+  pdf.text(String(venta.metodoPago || 'N/A').toUpperCase(), valX, summaryY + 35, { align: 'right' });
 
-  pdf.text('Total Recibido:',    boxX + 4, summaryY + 39);
-  pdf.text(formatoPesos(recibido), valX,    summaryY + 39, { align: 'right' });
+  if (tieneAbonos) {
+    pdf.setTextColor(34, 139, 34);
+    pdf.text('TOTAL ABONADO:', boxX + 4, summaryY + 42);
+    pdf.text(formatoPesos(totalPagado), valX, summaryY + 42, { align: 'right' });
+
+    pdf.setFontSize(12);
+    pdf.setTextColor(220, 20, 20);
+    pdf.text('SALDO PENDIENTE:', boxX + 4, summaryY + 49);
+    pdf.text(formatoPesos(saldoPendienteCalc), valX, summaryY + 49, { align: 'right' });
+  } else {
+    pdf.text('Total Recibido:', boxX + 4, summaryY + 41);
+    pdf.text(formatoPesos(recibido), valX, summaryY + 41, { align: 'right' });
+  }
 
   // ── Footer ────────────────────────────────────────────────────────────────
   const footerY = pageHeight - 26;
+
   pdf.setDrawColor(225, 228, 234);
   pdf.setLineWidth(0.4);
   pdf.line(margin, footerY, pageWidth - margin, footerY);
 
   pdf.setTextColor(60, 70, 85);
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(11.6);
-  pdf.text('¡GRACIAS POR SU COMPRA EN PREMIUM RACING!', pageWidth / 2, footerY + 7, { align: 'center' });
-
   pdf.setFontSize(10.1);
-  pdf.text('Esta es una factura de venta que sirve como comprobante de pago.', pageWidth / 2, footerY + 12, { align: 'center' });
+  pdf.text('¡GRACIAS POR SU COMPRA EN PREMIUM RACING!', pageWidth / 2, footerY + 5.5, { align: 'center' });
+
+  pdf.setFontSize(8.7);
+  pdf.text('Esta es una factura de venta que sirve como comprobante de pago.', pageWidth / 2, footerY + 9.5, { align: 'center' });
 
   pdf.setFont('helvetica', 'normal');
   pdf.setTextColor(150, 150, 150);
-  pdf.setFontSize(7);
-  pdf.text('Generado por POS System', pageWidth / 2, footerY + 17, { align: 'center' });
+  pdf.setFontSize(6.5);
+  pdf.text('Generado por POS System', pageWidth / 2, footerY + 13.5, { align: 'center' });
 
   if (accion === 'descargar') {
-    pdf.save(`Caja_Ventas_Premium_Racing_${safeCliente}.pdf`);
+    const prefijoArchivo = abonoReciente > 0 ? 'Recibo_Abono' : 'Caja_Ventas_Premium_Racing';
+    pdf.save(`${prefijoArchivo}_${safeCliente}.pdf`);
     return Promise.resolve();
   } else if (accion === 'imprimir') {
     return new Promise(resolve => {

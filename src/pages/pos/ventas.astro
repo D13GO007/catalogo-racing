@@ -20,6 +20,23 @@ const { data: clientesData } = await supabase
   .select('*')
   .order('nombre');
 const clientes = clientesData || [];
+
+// Función para limpiar nombres redundantes
+function limpiarNombreReferencia(nombreFamilia, nombreReferencia) {
+  if (!nombreFamilia || !nombreReferencia) return nombreReferencia;
+  // Convertimos a minúsculas para comparar sin errores
+  const familiaClean = nombreFamilia.toLowerCase().trim();
+  const refClean = nombreReferencia.toLowerCase();
+
+  if (refClean.includes(familiaClean)) {
+    // Si la referencia ya trae el nombre de la familia, se lo quitamos y dejamos solo el modelo
+    // Usamos expresión regular para ignorar mayúsculas/minúsculas
+    const regex = new RegExp(familiaClean, 'i');
+    return nombreReferencia.replace(regex, '').trim();
+  }
+  
+  return nombreReferencia;
+}
 ---
 
 <html lang="es">
@@ -292,7 +309,7 @@ const clientes = clientesData || [];
                     </h3>
                     
                     <p class="text-[11px] font-bold text-gray-500 mt-0.5 line-clamp-2 uppercase">
-                      Ref: {ref.modelo}
+                      Ref: {limpiarNombreReferencia(ref.familias?.nombre, ref.modelo)}
                     </p>
                     
                     <div>
@@ -767,14 +784,14 @@ const clientes = clientesData || [];
                 <span id="invTotalNeto" class="font-black text-gray-900">$0</span>
               </div>
               
-              <div class="border-t border-gray-200 pt-3 mt-3 space-y-1 text-xs text-gray-500">
+              <div id="invDetalleSaldo" class="hidden border-t border-gray-200 pt-3 mt-3 space-y-1 text-xs text-gray-500">
                 <div class="flex justify-between">
-                  <span>Método de Pago:</span>
-                  <span id="invMetodo" class="font-bold uppercase text-gray-800"></span>
+                  <span>Abono:</span>
+                  <span id="invAbono" class="font-medium text-gray-700">$0</span>
                 </div>
                 <div class="flex justify-between">
-                  <span>Total Recibido:</span>
-                  <span id="invRecibido" class="font-bold text-gray-800"></span>
+                  <span class="font-bold text-gray-700">Saldo Pendiente:</span>
+                  <span id="invSaldoPendiente" class="font-black text-gray-900">$0</span>
                 </div>
               </div>
             </div>
