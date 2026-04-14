@@ -4,8 +4,7 @@ node_modules
 .env.local
 .DS_Store
 dist
-*.csv
-*.json
+
 limpiar_datos.js
 limpiar_excel.js
 generar_maestro.js
