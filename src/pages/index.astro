@@ -1,4 +1,406 @@
 ---
+
+import '../styles.css';
+import BotonDescargaPDF from '../components/CatalogoPDF.jsx';
+import { supabase } from '../lib/supabase.js';
+// 🗑️ Ya no importamos CatalogoWeb porque todo se hará nativamente aquí
+
+// 🔗 Supabase
+const { data: familiasBD, error } = await supabase
+  .from('familias')
+  .select('id, nombre, referencias(id, modelo, precio_venta, imagen_especifica)')
+  .eq('referencias.activo', true)                // <-- CANDADO 1: Oculta los eliminados
+  .eq('referencias.visible_en_catalogo', true)   // <-- CANDADO 2: Oculta los recién agregados
+  .order('nombre');
+
+let errorCarga = '';
+
+if (error) {
+  console.error('❌ Error al consultar familias en Supabase:', error);
+  errorCarga = 'No pudimos cargar la lista.';
+}
+
+const productosAgrupados: any = (familiasBD ?? []).map((familia: any) => {      
+  const referencias = (familia.referencias ?? []).map((ref: any) => ({
+    Modelo: ref.modelo,
+    Precio: ref.precio_venta,
+    Imagen: ref.imagen_especifica,
+
+    // Mantener compatibilidad con la estructura previa
+    modelo: ref.modelo,
+    precio: ref.precio_venta,
+    imagenEspecifica: ref.imagen_especifica,
+  }));
+
+  return {
+    Familia: familia.nombre,
+    Referencias: referencias,
+
+    // Propiedades usadas por el template existente
+    id: familia.id,
+    nombre: familia.nombre,
+    imagenDefault: referencias[0]?.Imagen ?? '',
+    referencias,
+  };
+});
+
+/*
+  const response = await fetch(SHEET_URL);
+  if (!response.ok) throw new Error('Error al conectar con Google Sheets');     
+  const data = await response.text();
+  const filas = data.split('\n');
+  const grupos: Record<string, ProductoAgrupado> = {};
+
+  filas.slice(1).forEach((fila, index) => {
+    if (!fila.trim()) return;
+    const col = fila.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+    if (col.length < 3) return;
+
+    const nombreFamilia = col[0]?.replace(/^"|"$/g, '').trim().toUpperCase();   
+    const modeloReferencia = col[1]?.replace(/^"|"$/g, '').trim();
+    const precioTexto = col[2]?.replace(/[^0-9]/g, '');
+    let imagenRaw = col[3]?.replace(/^"|"$/g, '').trim() || '';
+    const id = `prod-${index}`;
+
+    if (!nombreFamilia || !precioTexto) return;
+
+    if (imagenRaw.startsWith('/public')) {
+        imagenRaw = imagenRaw.replace('/public', '');
+    }
+
+    const imagenFinal = imagenRaw !== '' ? imagenRaw : IMAGEN_SIN_FOTO;
+
+    if (!grupos[nombreFamilia]) {
+      grupos[nombreFamilia] = {
+        id,
+        nombre: nombreFamilia,
+        imagenDefault: imagenFinal,
+        referencias: []
+      };
+    }
+    const imagenVariante = imagenRaw !== '' ? imagenRaw : grupos[nombreFamilia].imagenDefault;
+
+    grupos[nombreFamilia].referencias.push({
+      modelo: modeloReferencia || 'Estándar',
+      precio: Number(precioTexto),
+      imagenEspecifica: imagenVariante
+    });
+  });
+
+  productosAgrupados = Object.values(grupos).sort((a, b) => {
+    if (a.nombre < b.nombre) return -1;
+    if (a.nombre > b.nombre) return 1;
+    return 0;
+  });
+
+*/
+
+const formatoPeso = (v: number) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(v);
+const fechaHoy = new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Catálogo Premium Racing</title>
+    <style>
+        /* 🎨 NUESTRO COLOR ZAPOTE DEFINIDO GLOBALMENTE */
+        :root {
+            --zapote: #FF6600;
+        }
+
+        body {
+            background-color: #E8ECEF; /* Fondo gris claro de base */
+            position: relative;
+            min-height: 100vh;
+        }
+
+                /* MARCA DE AGUA SVG INVISIBLE Y PERFECTAMENTE NÍTIDA */        
+        body::before {
+            content: "";
+            position: fixed; /* Se queda fija para que no se estire de más al bajar */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('/fondo_partes.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            /* Opacidad baja (5%) para ocultar el pixelado en monitores grandes */
+            opacity: 1.0;
+            z-index: -1;
+            pointer-events: none;
+            /* No se aplica filtro de escala de grises para mantener los colores originales */
+        }
+
+        /* DISEÑO BRUTALISTA PARA EL BUSCADOR */
+        .buscador-brutal {
+            border: 3px solid #000;
+            box-shadow: 4px 4px 0px #000;
+            transition: all 0.2s;
+        }
+        .buscador-brutal:focus {
+            box-shadow: 6px 6px 0px var(--zapote);
+            border-color: var(--zapote);
+            transform: translate(-2px, -2px);
+        }
+
+        @media (max-width: 768px) {
+            .header-layout { flex-direction: row !important; align-items: center; gap: 10px; }
+            .header-logo-container { width: 50px; padding: 0 !important; background: transparent !important; border: none !important; box-shadow: none !important; transform: none !important; }
+            .header-logo-img { height: 40px !important; }
+            .header-title-text { display: none; }
+            .header-search-container { flex: 1; }
+        }
+
+        /* ESTILOS DE IMPRESIÓN CONSERVADOS INTACTOS */
+        @media print {
+            @page { margin: 1cm; size: A4; }
+            body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background: white; }
+            body * { visibility: hidden; }
+            header, .bg-carbon, footer, #btn-print, #search-input, main { display: none !important; }
+            #printable-area, #printable-area * { visibility: visible !important; }
+            #printable-area { position: absolute; left: 0; top: 0; width: 100%; font-family: 'Arial Black', Arial, sans-serif; color: #000; }
+            .print-cover-page { height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center; page-break-after: always; border: 8px solid var(--zapote); padding: 2cm; box-sizing: border-box; background-color: #f9f9f9 !important; }
+            .cover-header { text-align: center; margin-bottom: 50px; }
+            .main-logo { max-width: 300px; margin-bottom: 20px; }
+            .cover-header h1 { font-size: 24pt; font-weight: 900; background: #000 !important; color: #fff !important; padding: 10px 20px; text-transform: uppercase; }
+            .cover-header p { font-size: 14pt; font-family: Arial, sans-serif; font-weight: bold; color: var(--zapote); }
+            .brands-grid { display: flex; gap: 15px; width: 100%; justify-content: center; margin-top: 30px;}
+            .brand-box { border: 2px solid #ccc; padding: 15px 25px; font-size: 10pt; font-weight: bold; color: #666; background: #fff !important; }
+            .editorial-block { width: 100%; margin-bottom: 20px; border: 2px solid #000; page-break-inside: avoid; }
+            .editorial-title { background-color: var(--zapote) !important; border-bottom: 3px solid #000; padding: 8px; }
+            .editorial-title h2 { margin: 0; color: #fff !important; font-size: 14pt; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }       
+            .editorial-grid { display: table; width: 100%; }
+            .editorial-img-cell { display: table-cell; width: 25%; vertical-align: middle; text-align: center; border-right: 2px solid #000; padding: 10px; background: #fff !important; }
+            .editorial-img-cell img { max-width: 100%; max-height: 120px; object-fit: contain; }
+            .editorial-table-cell { display: table-cell; width: 75%; vertical-align: top; }
+            .heavy-table { width: 100%; border-collapse: collapse; }
+            .heavy-table th { background-color: #111 !important; color: #fff !important; font-size: 9pt; padding: 6px; text-align: left; }
+            .heavy-table .col-precio { text-align: right; width: 30%; color: #FFCC00 !important; }
+            .heavy-table td { padding: 5px 6px; border-bottom: 1px solid #999; font-family: Arial, sans-serif; font-size: 8.5pt; }
+            .heavy-table tr:nth-child(even) td { background-color: #f2f2f2 !important; }
+            .celda-texto { font-weight: bold; color: #000; text-transform: uppercase; }
+            .celda-numero { text-align: right; font-weight: 900; color: #000 !important; }
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased">
+    <header class="bg-black pt-16 pb-32 md:py-12 px-4 w-full relative mb-24 md:mb-32 shadow-xl">
+
+        <div class="max-w-7xl mx-auto flex flex-col items-center md:items-end md:pr-12">
+            <h1 class="flex flex-col md:flex-row gap-1 md:gap-4 text-3xl md:text-5xl lg:text-7xl font-black uppercase tracking-widest text-center md:text-right italic">
+                <span class="text-white drop-shadow-[2px_2px_0px_#333]">        
+                    Importadora
+                </span>
+                <span class="bg-gradient-to-r from-[#FF6600] via-[#FF9900] to-[#FFD700] text-transparent bg-clip-text drop-shadow-sm">
+                    Premium
+                </span>
+            </h1>
+        </div>
+
+        <div class="absolute -bottom-20 left-1/2 -translate-x-1/2 md:translate-x-0 md:-bottom-24 md:left-12 w-44 h-44 md:w-56 md:h-56 bg-black rounded-full border-[6px] border-white shadow-2xl flex items-center justify-center z-50 overflow-hidden">
+            <img
+                src="/logo.png"
+                alt="Logo"
+                class="w-3/4 h-3/4 object-contain"
+                onerror="this.src='https://placehold.co/250x250/000/fff?text=LOGO'"
+            />
+        </div>
+
+    </header>
+    <main class="max-w-7xl mx-auto px-4 min-h-screen pb-32">
+
+        {errorCarga && <div class="bg-red-600 text-white p-4 font-bold text-center mb-6 shadow-lg border-2 border-black rounded">{errorCarga}</div>}
+
+        <div class="flex flex-col md:flex-row justify-end items-center gap-4 mb-10 w-full">
+
+            <div class="w-full md:max-w-xl relative group">
+                <input
+                    type="search"
+                    id="search-input"
+                    placeholder="BUSCAR REPUESTO O MOTO..."
+                    class="w-full py-4 px-5 pl-14 bg-white text-black font-black uppercase tracking-wide outline-none text-sm md:text-base border-4 border-black shadow-[6px_6px_0px_#FF6600] focus:shadow-[2px_2px_0px_#FF6600] transition-all rounded-none"
+                />
+                <span class="absolute left-5 top-4 text-[#FF6600] text-2xl font-black">🔍</span>
+            </div>
+
+            <div class="w-full md:w-auto flex justify-center md:justify-end">   
+                <BotonDescargaPDF client:only="react" productos={productosAgrupados} fechaHoy={fechaHoy} />
+            </div>
+
+        </div>
+
+        <div id="product-grid" class="columns-1 lg:columns-2 gap-8">
+            {productosAgrupados.map((item: any) => (
+                <article
+                    class="producto-card mb-8 inline-block w-full break-inside-avoid bg-white rounded-md border-2 border-black shadow-[6px_6px_0px_#000000] overflow-hidden transition-transform hover:-translate-y-1"
+                    data-nombre={item.nombre.toLowerCase()}
+                    data-referencias={JSON.stringify(item.referencias).toLowerCase()}
+                    data-all-images={JSON.stringify(item.referencias.map((r: any) => r.imagenEspecifica))}
+                >
+                    <div class="bg-[#FF6600] p-3 border-b-2 border-black flex justify-between items-center">
+                        <h3 class="texto-buscable m-0 text-white text-lg md:text-xl font-black uppercase tracking-wider">
+                            {item.nombre}
+                        </h3>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row w-full">
+
+                        <div class="w-full md:w-5/12 bg-[#F8F9FA] p-4 flex flex-col items-center justify-center border-b-2 md:border-b-0 md:border-r-2 border-black relative group min-h-[220px]">
+                            <img
+                                id={`img-${item.id}`}
+                                src={item.imagenDefault}
+                                alt={item.nombre}
+                                loading="lazy"
+                                class="main-image max-w-full max-h-40 object-contain transition-transform duration-300 group-hover:scale-105"
+                                onerror="this.src='https://placehold.co/500x500/f0f0f0/FF6600?text=SIN+FOTO'"
+                            />
+                            <p class="text-[10px] text-gray-400 font-bold uppercase mt-4">
+                                {item.referencias.length} Referencias
+                            </p>
+                        </div>
+
+                        <div class="w-full md:w-7/12 flex flex-col bg-white">   
+                            <div class="bg-[#111111] text-white text-[10px] md:text-xs uppercase font-bold px-4 py-2 flex justify-between items-center shadow-sm z-10">
+                                <span>Ref / Aplicación</span>
+                                <span>Precio Unitario</span>
+                            </div>
+
+                            <div class="flex-1 w-full">
+                                <table class="w-full text-xs md:text-sm text-left">
+                                    <tbody class="divide-y divide-gray-200">    
+                                        {item.referencias.map((ref: any, i: number) => (
+                                            <tr
+                                                class={`hover:bg-[#FFF0E5] transition-colors cursor-pointer ref-row group/row ${i % 2 === 0 ? 'bg-white' : 'bg-[#FAFAFA]'}`}
+                                                data-img={ref.imagenEspecifica} 
+                                                data-target={`img-${item.id}`}  
+                                            >
+                                                <td class="texto-buscable px-4 py-3 font-bold text-black uppercase transition-colors">
+                                                    {ref.modelo}
+                                                </td>
+                                                <td class="px-4 py-3 text-right whitespace-nowrap">
+                                                    <span class="font-black text-sm md:text-base text-black group-hover/row:text-[#FF6600] transition-colors">  
+                                                        {formatoPeso(ref.precio)}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="p-4 bg-gray-50 mt-auto border-t border-gray-200">
+                                <a
+                                    href={`https://wa.me/573132240559?text=Hola,%20me%20interesa%20el%20producto:%20${item.nombre}`}
+                                    target="_blank"
+                                    class="w-full flex items-center justify-center gap-2 bg-[#FF6600] hover:bg-black text-white py-3 rounded uppercase font-black tracking-widest active:scale-95 transition-all text-sm group border-2 border-black shadow-[3px_3px_0px_#000000]"
+                                >
+                                    <span>SOLICITAR</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                </article>
+            ))}
+        </div>
+
+        <div id="no-results" class="hidden py-24 text-center">
+            <h3 class="text-2xl font-black uppercase text-[#FF6600]">No se encontraron resultados</h3>
+            <p class="text-gray-500 font-bold mt-2">Intenta buscar con otra referencia o modelo.</p>
+        </div>
+    </main>
+
+    <footer class="bg-[#111] text-white py-8 md:py-12 mt-8 border-t-8 border-[#FF6600] relative overflow-hidden">
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-6xl md:text-9xl font-black opacity-[0.03] italic whitespace-nowrap pointer-events-none select-none">PREMIUM RACING</div>
+        <div class="max-w-7xl mx-auto px-4 text-center relative z-10">
+            <h2 class="font-black text-2xl md:text-3xl uppercase text-[#FF6600] mb-2">Premium Racing</h2>
+            <p class="text-gray-400 text-xs md:text-sm uppercase tracking-widest">Catálogo Oficial • Colombia</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const input = document.getElementById('search-input');
+            const cards = document.querySelectorAll<HTMLElement>('.producto-card');
+            const noResults = document.getElementById('no-results');
+            const elementosBuscables = document.querySelectorAll<HTMLElement>('.texto-buscable');
+
+            setTimeout(() => {
+                const uniqueImages = new Set<string>();
+                cards.forEach(card => {
+                    try {
+                        const images: string[] = JSON.parse(card.dataset.allImages || '[]');
+                        images.forEach((img: string) => {
+                            if (img && img !== '' && !img.includes('placehold.co')) uniqueImages.add(img);
+                        });
+                    } catch (e) {}
+                });
+
+                const imageArray = Array.from(uniqueImages);
+                let imgIndex = 0;
+
+                const preloadNextImage = () => {
+                    if (imgIndex >= imageArray.length) return;
+
+                    const img = new Image();
+                    img.src = imageArray[imgIndex] as string;
+                    img.onload = () => { imgIndex++; preloadNextImage(); };     
+                    img.onerror = () => { imgIndex++; preloadNextImage(); };    
+                };
+
+                preloadNextImage();
+            }, 3500);
+
+            elementosBuscables.forEach(el => {
+                el.dataset.textoOriginal = (el as HTMLElement).innerText.toLowerCase();
+            });
+
+            if(input) {
+                input.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        input.blur();
+                    }
+                });
+
+                input.addEventListener('input', (e) => {
+                    const term = (e.target as HTMLInputElement).value.toLowerCase().trim();
+                    let visibleCount = 0;
+
+                    cards.forEach(card => {
+                        const nombre = (card as HTMLElement).dataset.nombre || '';
+                        const referencias = (card as HTMLElement).dataset.referencias || '';
+
+                        if(nombre.includes(term) || referencias.includes(term)) {
+                            (card as HTMLElement).style.display = 'inline-block';
+                            visibleCount++;
+                        } else {
+                            (card as HTMLElement).style.display = 'none';       
+                        }
+                    });
+
+                    if(noResults) noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+
+                    elementosBuscables.forEach(el => {
+                        const texto = (el as HTMLElement).dataset.textoOriginal || '';
+                        if(term && texto.includes(term)) {
+                            el.classList.add('casilla-resaltada');
+                        } else {
+                            el.classList.remove('casilla-resaltada');
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>---
 // Redirección instantánea desde el servidor al POS
 return Astro.redirect('/pos/inicio');
 ---
