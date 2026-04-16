@@ -1,0 +1,16 @@
+node_modules
+.git
+.env
+.env.local
+.DS_Store
+dist
+
+limpiar_datos.js
+limpiar_excel.js
+generar_maestro.js
+migrar.js
+finalizar_referencias.js
+preparar_familias.js
+preparar_importacion.js
+vincular_imagenes_reales.js
+ya.js

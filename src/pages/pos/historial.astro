@@ -463,6 +463,68 @@ const formatearHora = (isoString) => {
 
       const formatoPesos = (num: number) => '$' + Math.round(num).toLocaleString('es-CO');
       const mostrarToast = (mensaje: string) => { alert(mensaje); };
+      const consultarHistorialAbonos = async (ventaId: string, abonoFallback?: { monto: number; fecha: string; metodoPago?: string | null }) => {
+        let data: any[] | null = null;
+        let error: any = null;
+
+        ({ data, error } = await supabase
+          .from('historial_abonos')
+          .select('monto, fecha, metodo_pago')
+          .eq('venta_id', ventaId)
+          .order('fecha', { ascending: true }));
+
+        // Compatibilidad con esquemas que no tienen la columna metodo_pago.
+        if (error && String(error.message || '').toLowerCase().includes('metodo')) {
+          ({ data, error } = await supabase
+            .from('historial_abonos')
+            .select('monto, fecha')
+            .eq('venta_id', ventaId)
+            .order('fecha', { ascending: true }));
+        }
+
+        if (error) {
+          console.warn('No fue posible consultar el historial de abonos:', error);
+          return abonoFallback ? [abonoFallback] : [];
+        }
+
+        const historial = (data || []).map((abonoItem: any) => ({
+          monto: Number(abonoItem.monto || 0),
+          fecha: abonoItem.fecha,
+          metodoPago: abonoItem.metodo_pago || abonoFallback?.metodoPago || null,
+        }));
+
+        return historial.length > 0 ? historial : (abonoFallback ? [abonoFallback] : []);
+      };
+      const construirSnapshotVenta = (orden: any, overrides: Record<string, any> = {}) => {
+        const montoRecibido = Number(overrides.monto_recibido ?? orden.monto_recibido ?? 0);
+        const totalNeto = Number(overrides.total_neto ?? orden.total_neto ?? 0);
+        const idCorto = String(orden.id || '').split('-').pop()?.toUpperCase() || 'N/A';
+        const itemsCarrito = typeof orden.snapshot_carrito === 'string'
+          ? JSON.parse(orden.snapshot_carrito)
+          : (orden.snapshot_carrito || []);
+
+        const itemsNormalizados = itemsCarrito.map((item: any) => ({
+          cantidad: Number(item.cantidad || 1),
+          precio: Number(item.precio || item.precio_venta || 0),
+          descuentoTotal: Number(item.descuentoTotal || 0),
+          familia: item.familia || 'REPUESTOS',
+          modelo: item.modelo || item.descripcion || 'GENÉRICO'
+        }));
+
+        return {
+          cliente: orden.cliente_nombre,
+          telefono: orden.cliente_telefono && orden.cliente_telefono !== 'N/A' ? orden.cliente_telefono : '',
+          fecha: new Date(orden.fecha).toLocaleDateString('es-CO') + ' ' + new Date(orden.fecha).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true }),
+          items: itemsNormalizados,
+          subtotal: Number(orden.subtotal || 0),
+          descuentoGlobal: Number(orden.descuento_global || 0),
+          totalNeto,
+          recibido: montoRecibido,
+          tipoVenta: orden.estado === 'cotizacion' ? 'cotizacion' : (overrides.tipo_venta || orden.tipo_venta || 'contado'),
+          metodoPago: overrides.metodo_pago || orden.metodo_pago || 'efectivo',
+          numeroComprobante: idCorto
+        };
+      };
 
       // ==========================================
       // LÓGICA DE PESTAÑAS
@@ -682,30 +744,7 @@ const formatearHora = (isoString) => {
         saldoPendienteGlobal = totalNetoGlobal - montoRecibidoGlobal;
 
         const idCorto = orden.id.split('-').pop().toUpperCase();
-        const itemsCarrito = typeof orden.snapshot_carrito === 'string' ? JSON.parse(orden.snapshot_carrito) : (orden.snapshot_carrito || []);
-
-        // EL SECRETO PARA EL PDF ESTÁ AQUÍ: Construir el VentaSnapshot exacto
-        const itemsNormalizados = itemsCarrito.map((item: any) => ({
-          cantidad: Number(item.cantidad || 1),
-          precio: Number(item.precio || item.precio_venta || 0),
-          descuentoTotal: Number(item.descuentoTotal || 0),
-          familia: item.familia || 'REPUESTOS',
-          modelo: item.modelo || item.descripcion || 'GENÉRICO'
-        }));
-
-        ordenActualSnapshot = {
-          cliente: orden.cliente_nombre,
-          telefono: orden.cliente_telefono && orden.cliente_telefono !== 'N/A' ? orden.cliente_telefono : '',
-          fecha: new Date(orden.fecha).toLocaleDateString('es-CO') + ' ' + new Date(orden.fecha).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true }),
-          items: itemsNormalizados,
-          subtotal: Number(orden.subtotal || 0),
-          descuentoGlobal: Number(orden.descuento_global || 0),
-          totalNeto: totalNetoGlobal,
-          recibido: montoRecibidoGlobal,
-          tipoVenta: orden.estado === 'cotizacion' ? 'cotizacion' : (orden.tipo_venta || 'contado'),
-          metodoPago: orden.metodo_pago || 'efectivo',
-          numeroComprobante: idCorto
-        };
+        ordenActualSnapshot = construirSnapshotVenta(orden);
 
         document.getElementById('detIdOrden')!.innerText = `REF: ${idCorto}`;
         document.getElementById('detCliente')!.innerText = orden.cliente_nombre;
@@ -739,6 +778,7 @@ const formatearHora = (isoString) => {
         }
 
         const tbody = document.getElementById('detItemsTbody')!; tbody.innerHTML = '';
+      const itemsNormalizados = ordenActualSnapshot.items || [];
         if(itemsNormalizados.length === 0) {
            tbody.innerHTML = '<tr><td colspan="4" class="py-4 text-center text-gray-400 text-xs">Sin detalle</td></tr>';
         } else {
@@ -766,6 +806,7 @@ const formatearHora = (isoString) => {
       // ==========================================
       const modalAbono = document.getElementById('modalAbono'); const modalAbonoBox = document.getElementById('modalAbonoBox');
       const inputMontoAbono = document.getElementById('inputMontoAbono') as HTMLInputElement;
+      const selectMetodoAbono = document.getElementById('selectMetodoAbono') as HTMLSelectElement;
 
       inputMontoAbono?.addEventListener('input', function(e) {
         let valorRaw = this.value.replace(/\D/g, ''); if (!valorRaw) { this.value = ''; return; }
@@ -774,6 +815,7 @@ const formatearHora = (isoString) => {
 
       document.getElementById('btnRegistrarAbono')?.addEventListener('click', () => {
         document.getElementById('abonoSaldoFaltante')!.innerText = formatoPesos(saldoPendienteGlobal); inputMontoAbono.value = ''; 
+        if (selectMetodoAbono) selectMetodoAbono.value = 'efectivo';
         modalAbono?.classList.remove('hidden');
         requestAnimationFrame(() => { modalAbono?.classList.remove('opacity-0'); modalAbonoBox?.classList.remove('scale-95'); });
       });
@@ -786,6 +828,7 @@ const formatearHora = (isoString) => {
 
       document.getElementById('btnConfirmarAbono')?.addEventListener('click', async () => {
         const montoIngresado = Number(inputMontoAbono.value.replace(/\D/g, ''));
+        const metodoAbono = selectMetodoAbono?.value || 'efectivo';
         if (montoIngresado <= 0) return alert('Ingresa un monto válido mayor a cero.');
         if (montoIngresado > saldoPendienteGlobal) return alert('El monto no puede ser mayor al saldo pendiente.');
 
@@ -794,10 +837,66 @@ const formatearHora = (isoString) => {
 
         const nuevoMontoRecibido = montoRecibidoGlobal + montoIngresado;
         const nuevoEstado = (nuevoMontoRecibido >= totalNetoGlobal) ? 'completada' : 'pendiente';
+        const nuevoTipoVenta = nuevoMontoRecibido >= totalNetoGlobal ? 'contado' : 'abono';
+        const fechaAbono = new Date().toISOString();
 
         try {
-          const { error } = await supabase.from('ventas').update({ monto_recibido: nuevoMontoRecibido, estado: nuevoEstado }).eq('id', ordenSeleccionadaId);
-          if (error) throw error; window.location.reload();
+          const { error } = await supabase
+            .from('ventas')
+            .update({
+              monto_recibido: nuevoMontoRecibido,
+              estado: nuevoEstado,
+              tipo_venta: nuevoTipoVenta,
+            })
+            .eq('id', ordenSeleccionadaId);
+
+          if (error) throw error;
+
+          let { error: errorInsertAbono } = await supabase
+            .from('historial_abonos')
+            .insert({
+              venta_id: ordenSeleccionadaId,
+              monto: montoIngresado,
+              fecha: fechaAbono,
+              metodo_pago: metodoAbono,
+            });
+
+          if (errorInsertAbono && String(errorInsertAbono.message || '').toLowerCase().includes('metodo')) {
+            ({ error: errorInsertAbono } = await supabase
+              .from('historial_abonos')
+              .insert({
+                venta_id: ordenSeleccionadaId,
+                monto: montoIngresado,
+                fecha: fechaAbono,
+              }));
+          }
+
+          if (errorInsertAbono) {
+            console.warn('No fue posible guardar el abono en historial_abonos:', errorInsertAbono);
+          }
+
+          const { data: ordenActualizada, error: errorVenta } = await supabase
+            .from('ventas')
+            .select('*')
+            .eq('id', ordenSeleccionadaId)
+            .single();
+
+          if (errorVenta) throw errorVenta;
+
+          ordenActual = ordenActualizada;
+          ordenActualSnapshot = construirSnapshotVenta(ordenActualizada, {
+            metodo_pago: metodoAbono,
+          });
+          montoRecibidoGlobal = Number(ordenActualizada.monto_recibido || 0);
+          totalNetoGlobal = Number(ordenActualizada.total_neto || 0);
+          saldoPendienteGlobal = Math.max(0, totalNetoGlobal - montoRecibidoGlobal);
+
+          btn.innerHTML = textoOriginal;
+          btn.disabled = false;
+          modalAbono?.classList.add('opacity-0'); modalAbonoBox?.classList.add('scale-95');
+          setTimeout(() => modalAbono?.classList.add('hidden'), 200);
+
+          window.location.reload();
         } catch (error) { alert("Error al procesar el pago."); btn.innerHTML = textoOriginal; btn.disabled = false; }
       });
 
@@ -816,7 +915,10 @@ const formatearHora = (isoString) => {
         btn.disabled = true;
         
         try {
-          await generarFacturaPDF(ordenActualSnapshot, accion);
+          const historialAbonos = ordenSeleccionadaId
+            ? await consultarHistorialAbonos(ordenSeleccionadaId)
+            : [];
+          await generarFacturaPDF(ordenActualSnapshot, accion, { historialAbonos });
         } catch (error) {
           console.error("Error al generar PDF:", error);
           alert("Error interno al cargar la librería de PDF.");

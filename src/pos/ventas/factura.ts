@@ -4,6 +4,10 @@ import { formatoPesos } from './utils';
 // ── Render de datos en la factura HTML ────────────────────────────────────────
 
 export function renderFactura(venta: VentaSnapshot): void {
+  const abono = Math.max(0, Math.min(Number(venta.recibido || 0), Number(venta.totalNeto || 0)));
+  const saldoPendiente = Math.max(0, Number(venta.totalNeto || 0) - abono);
+  const mostrarDetalleSaldo = venta.tipoVenta === 'credito' || saldoPendiente > 0;
+
   (document.getElementById('invNumber') as HTMLElement).innerText =
     venta.numeroComprobante;
   (document.getElementById('invDate') as HTMLElement).innerText =
@@ -56,8 +60,16 @@ export function renderFactura(venta: VentaSnapshot): void {
   (document.getElementById('invSubtotal') as HTMLElement).innerText  = formatoPesos(venta.subtotal);
   (document.getElementById('invDescuento') as HTMLElement).innerText = '-' + formatoPesos(venta.descuentoGlobal);
   (document.getElementById('invTotalNeto') as HTMLElement).innerText = formatoPesos(venta.totalNeto);
-  (document.getElementById('invMetodo') as HTMLElement).innerText    = venta.metodoPago;
-  (document.getElementById('invRecibido') as HTMLElement).innerText  = formatoPesos(venta.recibido);
+
+  const detalleSaldo = document.getElementById('invDetalleSaldo') as HTMLElement | null;
+  const invAbono = document.getElementById('invAbono') as HTMLElement | null;
+  const invSaldoPendiente = document.getElementById('invSaldoPendiente') as HTMLElement | null;
+
+  if (detalleSaldo && invAbono && invSaldoPendiente) {
+    detalleSaldo.classList.toggle('hidden', !mostrarDetalleSaldo);
+    invAbono.innerText = formatoPesos(abono);
+    invSaldoPendiente.innerText = formatoPesos(saldoPendiente);
+  }
 }
 
 // ── Modal de factura: toggles formato Carta / Tirilla y botones ───────────────
