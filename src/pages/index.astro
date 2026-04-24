@@ -5,7 +5,7 @@ import BotonDescargaPDF from '../components/CatalogoPDF.jsx';
 import { supabase } from '../lib/supabase.js';
 // 🗑️ Ya no importamos CatalogoWeb porque todo se hará nativamente aquí
 
-// 🔗 Supabase
+// 🔗 Supabases
 const { data: familiasBD, error } = await supabase
   .from('familias')
   .select('id, nombre, referencias(id, modelo, precio_venta, imagen_especifica)')
