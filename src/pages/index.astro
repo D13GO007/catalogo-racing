@@ -20,29 +20,31 @@ if (error) {
   errorCarga = 'No pudimos cargar la lista.';
 }
 
-const productosAgrupados: any = (familiasBD ?? []).map((familia: any) => {      
-  const referencias = (familia.referencias ?? []).map((ref: any) => ({
-    Modelo: ref.modelo,
-    Precio: ref.precio_venta,
-    Imagen: ref.imagen_especifica,
+const productosAgrupados: any = (familiasBD ?? [])
+  .map((familia: any) => {      
+    const referencias = (familia.referencias ?? []).map((ref: any) => ({
+      Modelo: ref.modelo,
+      Precio: ref.precio_venta,
+      Imagen: ref.imagen_especifica,
 
-    // Mantener compatibilidad con la estructura previa
-    modelo: ref.modelo,
-    precio: ref.precio_venta,
-    imagenEspecifica: ref.imagen_especifica,
-  }));
+      // Mantener compatibilidad con la estructura previa
+      modelo: ref.modelo,
+      precio: ref.precio_venta,
+      imagenEspecifica: ref.imagen_especifica,
+    }));
 
-  return {
-    Familia: familia.nombre,
-    Referencias: referencias,
+    return {
+      Familia: familia.nombre,
+      Referencias: referencias,
 
-    // Propiedades usadas por el template existente
-    id: familia.id,
-    nombre: familia.nombre,
-    imagenDefault: referencias[0]?.Imagen ?? '',
-    referencias,
-  };
-});
+      // Propiedades usadas por el template existente
+      id: familia.id,
+      nombre: familia.nombre,
+      imagenDefault: referencias[0]?.Imagen ?? '',
+      referencias,
+    };
+  })
+  .filter((item: any) => item.referencias.length > 0); // 👈 Descartar familias sin referencias activas
 
 /*
   const response = await fetch(SHEET_URL);
@@ -401,6 +403,3 @@ const fechaHoy = new Date().toLocaleDateString('es-CO', { year: 'numeric', month
     </script>
 </body>
 </html>---
-// Redirección instantánea desde el servidor al POS
-return Astro.redirect('/pos/inicio');
----
