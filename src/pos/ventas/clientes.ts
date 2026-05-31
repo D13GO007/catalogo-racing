@@ -62,6 +62,7 @@ export function initClienteModal(selectCliente: HTMLSelectElement) {
     option.text  = nombre;
     option.setAttribute('data-telefono', telefono);
     option.setAttribute('data-descuento', String(descuento_general));
+    option.setAttribute('data-direccion', direccion);
     selectCliente.appendChild(option);
     selectCliente.value = nombre;
     selectCliente.dispatchEvent(new Event('change'));

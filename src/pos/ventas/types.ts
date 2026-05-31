@@ -11,6 +11,7 @@ export interface CartItem {
 export interface VentaSnapshot {
   cliente: string;
   telefono: string;
+  direccion?: string;
   fecha: string;
   numeroComprobante: string;
   items: CartItem[];

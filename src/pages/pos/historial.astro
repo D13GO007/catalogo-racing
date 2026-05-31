@@ -1,6 +1,10 @@
 ---
 import '../../styles.css';
 import { supabase } from '../../lib/supabase.js';
+import { formatNumeroFactura } from '../../pos/ventas/utils';
+
+const role    = Astro.cookies.get('pr_session')?.value || 'empleado';
+const isAdmin = role === 'admin';
 
 // Obtenemos las órdenes ordenadas desde la más reciente
 const { data: ordenesData, error } = await supabase
@@ -13,7 +17,7 @@ const ordenes = ordenesData || [];
 // 1. LÓGICA DE AGRUPACIÓN POR FECHA
 const ordenesAgrupadas = ordenes.reduce((acc, orden) => {
   const fechaObj = new Date(orden.fecha);
-  const diaStr = fechaObj.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
+  const diaStr = fechaObj.toLocaleDateString('es-CO', { timeZone: 'America/Bogota', weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
   const clave = diaStr.charAt(0).toUpperCase() + diaStr.slice(1); 
   
   if (!acc[clave]) acc[clave] = [];
@@ -24,7 +28,7 @@ const ordenesAgrupadas = ordenes.reduce((acc, orden) => {
 const formatoPesos = (num) => '$' + Math.round(num).toLocaleString('es-CO');
 const formatearHora = (isoString) => {
   if (!isoString) return '--:--';
-  return new Date(isoString).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true });
+  return new Date(isoString).toLocaleTimeString('es-CO', { timeZone: 'America/Bogota', hour: '2-digit', minute: '2-digit', hour12: true });
 };
 ---
 
@@ -127,18 +131,24 @@ const formatearHora = (isoString) => {
             <span class="hidden md:inline">Inventario</span>
           </a>
 
-          <a href="/pos/estadisticas" data-astro-prefetch class="nav-link px-3 md:px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-gray-300 border border-transparent hover:bg-gray-800 hover:text-white whitespace-nowrap">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-            <span class="hidden md:inline">Estadísticas</span>
+          {isAdmin && (
+            <a href="/pos/estadisticas" data-astro-prefetch class="nav-link px-3 md:px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-gray-300 border border-transparent hover:bg-gray-800 hover:text-white whitespace-nowrap">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+              <span class="hidden md:inline">Estadísticas</span>
+            </a>
+          )}
+          <a href="/pos/clientes" data-astro-prefetch class="nav-link px-3 md:px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-gray-300 border border-transparent hover:bg-gray-800 hover:text-white whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            <span class="hidden md:inline">Clientes</span>
           </a>
         </nav>
 
         <div class="hidden sm:block ml-2 pl-2 md:ml-4 md:pl-4 border-l border-gray-700 shrink-0">
-           <button class="text-gray-400 hover:text-red-400 transition-colors p-2 rounded-lg hover:bg-gray-800" title="Cerrar Sesión">
+           <a href="/pos/logout" class="text-gray-400 hover:text-red-400 transition-colors p-2 rounded-lg hover:bg-gray-800 flex items-center" title="Cerrar Sesión">
              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
              </svg>
-           </button>
+           </a>
         </div>
       </div>
     </header>
@@ -210,12 +220,15 @@ const formatearHora = (isoString) => {
                     
                     if (orden.estado === 'completada') badgeClass = "bg-green-100 text-green-700 border-green-200";
                     else if (orden.estado === 'cotizacion') badgeClass = "bg-blue-100 text-blue-700 border-blue-200";
+                    else if (orden.estado === 'anulada') { badgeClass = "bg-red-100 text-red-700 border-red-200"; estadoTexto = 'ANULADA'; }
                     else if (orden.estado === 'pendiente' || orden.tipo_venta === 'credito') {
                       badgeClass = "bg-orange-100 text-orange-700 border-orange-200";
                       if(orden.tipo_venta === 'credito') estadoTexto = 'CRÉDITO';
                     }
 
-                    const idCorto = orden.id ? orden.id.split('-').pop().substring(6).toUpperCase() : 'N/A';
+                    const idCorto = orden.numero_factura != null
+                      ? formatNumeroFactura(Number(orden.numero_factura))
+                      : (orden.id ? orden.id.split('-').pop().substring(6).toUpperCase() : 'N/A');
                     const timestampObj = new Date(orden.fecha).getTime();
 
                     filas.push(
@@ -405,11 +418,19 @@ const formatearHora = (isoString) => {
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
             PDF
           </button>
-          <button id="btnEditarFactura" class="flex-1 min-w-[180px] bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2">
+          {isAdmin && (
+            <button id="btnEditarFactura" class="flex-1 min-w-[180px] bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Modificar / Facturar
+            </button>
+          )}
+          <button id="btnAnularFactura" class="hidden flex-1 min-w-[140px] py-3 bg-red-600 hover:bg-red-700 text-white font-black rounded-xl transition-colors shadow-lg shadow-red-600/30 items-center justify-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
             </svg>
-            Modificar / Facturar
+            Anular
           </button>
           <button id="btnRegistrarAbono" class="hidden flex w-full md:w-auto flex-1 min-w-[180px] py-3 bg-gradient-to-r from-green-500 to-green-600 border border-green-700 text-white hover:from-green-600 hover:to-green-700 font-black rounded-xl transition-all shadow-md items-center justify-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -460,6 +481,7 @@ const formatearHora = (isoString) => {
     <script>
       import { supabase } from '../../lib/supabase.js';
       import { generarFacturaPDF } from '../../pos/ventas/pdf.js';
+      import { formatNumeroFactura } from '../../pos/ventas/utils';
 
       const formatoPesos = (num: number) => '$' + Math.round(num).toLocaleString('es-CO');
       const mostrarToast = (mensaje: string) => { alert(mensaje); };
@@ -498,7 +520,9 @@ const formatearHora = (isoString) => {
       const construirSnapshotVenta = (orden: any, overrides: Record<string, any> = {}) => {
         const montoRecibido = Number(overrides.monto_recibido ?? orden.monto_recibido ?? 0);
         const totalNeto = Number(overrides.total_neto ?? orden.total_neto ?? 0);
-        const idCorto = String(orden.id || '').split('-').pop()?.toUpperCase() || 'N/A';
+        const idCorto = orden.numero_factura != null
+          ? formatNumeroFactura(Number(orden.numero_factura))
+          : (String(orden.id || '').split('-').pop()?.toUpperCase() || 'N/A');
         const itemsCarrito = typeof orden.snapshot_carrito === 'string'
           ? JSON.parse(orden.snapshot_carrito)
           : (orden.snapshot_carrito || []);
@@ -514,7 +538,7 @@ const formatearHora = (isoString) => {
         return {
           cliente: orden.cliente_nombre,
           telefono: orden.cliente_telefono && orden.cliente_telefono !== 'N/A' ? orden.cliente_telefono : '',
-          fecha: new Date(orden.fecha).toLocaleDateString('es-CO') + ' ' + new Date(orden.fecha).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true }),
+          fecha: new Date(orden.fecha).toLocaleDateString('es-CO', { timeZone: 'America/Bogota' }) + ' ' + new Date(orden.fecha).toLocaleTimeString('es-CO', { timeZone: 'America/Bogota', hour: '2-digit', minute: '2-digit', hour12: true }),
           items: itemsNormalizados,
           subtotal: Number(orden.subtotal || 0),
           descuentoGlobal: Number(orden.descuento_global || 0),
@@ -632,8 +656,10 @@ const formatearHora = (isoString) => {
                 badgeClass = "bg-orange-100 text-orange-700 border-orange-200"; estadoTexto = 'CRÉDITO';
               }
 
-              const idCorto = orden.id ? orden.id.split('-').pop().substring(6).toUpperCase() : 'N/A';
-              const fechaStr = new Date(orden.fecha).toLocaleDateString('es-CO') + ' ' + new Date(orden.fecha).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true });
+              const idCorto = orden.numero_factura != null
+                ? formatNumeroFactura(Number(orden.numero_factura))
+                : (orden.id ? orden.id.split('-').pop().substring(6).toUpperCase() : 'N/A');
+              const fechaStr = new Date(orden.fecha).toLocaleDateString('es-CO', { timeZone: 'America/Bogota' }) + ' ' + new Date(orden.fecha).toLocaleTimeString('es-CO', { timeZone: 'America/Bogota', hour: '2-digit', minute: '2-digit', hour12: true });
 
               filasHTML.push(`
                 <tr class="orden-row-cartera fila-cartera hover:bg-orange-50/50 transition-colors cursor-pointer border-b border-gray-100" data-id="${orden.id}">
@@ -743,7 +769,9 @@ const formatearHora = (isoString) => {
         montoRecibidoGlobal = Number(orden.monto_recibido) || 0;
         saldoPendienteGlobal = totalNetoGlobal - montoRecibidoGlobal;
 
-        const idCorto = orden.id.split('-').pop().toUpperCase();
+        const idCorto = orden.numero_factura != null
+          ? formatNumeroFactura(Number(orden.numero_factura))
+          : orden.id.split('-').pop().toUpperCase();
         ordenActualSnapshot = construirSnapshotVenta(orden);
 
         document.getElementById('detIdOrden')!.innerText = `REF: ${idCorto}`;
@@ -795,6 +823,14 @@ const formatearHora = (isoString) => {
                 <td class="py-2 px-3 text-right font-black text-gray-900 align-top">${formatoPesos(subtotalLinea)}</td>
               </tr>`;
           });
+        }
+
+        // Mostrar/ocultar botón Anular según estado
+        const btnAnular = document.getElementById('btnAnularFactura');
+        if (btnAnular) {
+          const esAnulable = orden.estado !== 'anulada' && orden.estado !== 'cotizacion';
+          btnAnular.classList.toggle('hidden', !esAnulable);
+          btnAnular.classList.toggle('flex', esAnulable);
         }
 
         modalDetalle?.classList.remove('hidden');
@@ -918,7 +954,16 @@ const formatearHora = (isoString) => {
           const historialAbonos = ordenSeleccionadaId
             ? await consultarHistorialAbonos(ordenSeleccionadaId)
             : [];
-          await generarFacturaPDF(ordenActualSnapshot, accion, { historialAbonos });
+          let snapshotFinal = ordenActualSnapshot;
+          if (ordenActual?.cliente_nombre) {
+            const { data: cliDir } = await supabase
+              .from('clientes')
+              .select('direccion')
+              .ilike('nombre', ordenActual.cliente_nombre)
+              .maybeSingle();
+            if (cliDir?.direccion) snapshotFinal = { ...ordenActualSnapshot, direccion: cliDir.direccion };
+          }
+          await generarFacturaPDF(snapshotFinal, accion, { historialAbonos });
         } catch (error) {
           console.error("Error al generar PDF:", error);
           alert("Error interno al cargar la librería de PDF.");
@@ -939,7 +984,9 @@ const formatearHora = (isoString) => {
           return;
         }
 
-        const idCorto = ordenActual.id?.split('-').pop()?.substring(6)?.toUpperCase() || 'N/A';
+        const idCorto = ordenActual.numero_factura != null
+          ? formatNumeroFactura(Number(ordenActual.numero_factura))
+          : (ordenActual.id?.split('-').pop()?.substring(6)?.toUpperCase() || 'N/A');
         const confirmar = confirm(`¿Estás seguro de marcar la orden #${idCorto} como totalmente PAGADA?`);
         if (!confirmar) return;
 
@@ -996,6 +1043,70 @@ const formatearHora = (isoString) => {
           }
         });
       }
+
+      // ── Anular factura ────────────────────────────────────────────────────
+      document.getElementById('btnAnularFactura')?.addEventListener('click', async (e) => {
+        const btn = e.currentTarget as HTMLButtonElement;
+        if (!ordenActual?.id) return;
+
+        const idCorto = ordenActual.numero_factura != null
+          ? formatNumeroFactura(Number(ordenActual.numero_factura))
+          : (ordenActual.id.split('-').pop()?.substring(6)?.toUpperCase() || 'N/A');
+
+        const confirmar = confirm(
+          `¿Seguro que deseas ANULAR la factura #${idCorto}?\n\nEsto devolverá todos los productos al inventario y no se puede deshacer.`
+        );
+        if (!confirmar) return;
+
+        const htmlOriginal = btn.innerHTML;
+        btn.innerHTML = '<svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Anulando...';
+        btn.disabled = true;
+
+        try {
+          // 1. Restaurar stock solo si no era cotización (cotizaciones no descontaron stock)
+          if (ordenActual.estado !== 'cotizacion') {
+            const itemsRaw = typeof ordenActual.snapshot_carrito === 'string'
+              ? JSON.parse(ordenActual.snapshot_carrito || '[]')
+              : (ordenActual.snapshot_carrito || []);
+
+            const cantidades: Record<string, number> = {};
+            for (const item of itemsRaw) {
+              const id = String(item.id || item.referencia_id || '');
+              if (id) cantidades[id] = (cantidades[id] || 0) + Number(item.cantidad || 0);
+            }
+
+            const ids = Object.keys(cantidades);
+            if (ids.length > 0) {
+              const { data: stocks } = await supabase
+                .from('referencias').select('id, stock_actual').in('id', ids);
+              const stockMap: Record<string, number> = Object.fromEntries(
+                (stocks || []).map((r: any) => [r.id, r.stock_actual])
+              );
+              await Promise.all(
+                ids.map(id => {
+                  const nuevoStock = (stockMap[id] ?? 0) + cantidades[id];
+                  return supabase.from('referencias').update({ stock_actual: nuevoStock }).eq('id', id);
+                })
+              );
+            }
+          }
+
+          // 2. Marcar la venta como anulada
+          const { error } = await supabase
+            .from('ventas')
+            .update({ estado: 'anulada' })
+            .eq('id', ordenActual.id);
+
+          if (error) throw error;
+
+          alert(`Factura #${idCorto} anulada correctamente. El stock fue restaurado.`);
+          window.location.reload();
+        } catch (err: any) {
+          alert('Error al anular: ' + err.message);
+          btn.innerHTML = htmlOriginal;
+          btn.disabled = false;
+        }
+      });
 
       // Compatibilidad con IDs alternos usados en otros modales.
       const btnImprimir = document.getElementById('btnImprimir') as HTMLButtonElement | null;

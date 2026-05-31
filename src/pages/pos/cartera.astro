@@ -1,6 +1,10 @@
 ---
 import '../../styles.css';
 import { supabase } from '../../lib/supabase.js';
+import { formatNumeroFactura } from '../../pos/ventas/utils';
+
+const role    = Astro.cookies.get('pr_session')?.value || 'empleado';
+const isAdmin = role === 'admin';
 
 // Consultamos estrictamente las ventas clasificadas como crédito o con estado pendiente
 const { data: carteraData, error } = await supabase
@@ -30,7 +34,9 @@ const formatearFecha = (isoString: string | null) => {
 };
 
 const carteraRender = cartera.map((orden: any) => {
-  const idCorto = orden.id ? String(orden.id).split('-').pop()?.substring(6).toUpperCase() : 'N/A';
+  const idCorto = orden.numero_factura != null
+    ? formatNumeroFactura(Number(orden.numero_factura))
+    : (orden.id ? String(orden.id).split('-').pop()?.substring(6).toUpperCase() : 'N/A');
 
   // 1. Cálculo real del saldo
   const dineroAbonado = Number(orden.abono ?? orden.monto_recibido ?? 0);
@@ -137,11 +143,16 @@ const carteraRender = cartera.map((orden: any) => {
           <a href="/pos/ventas" class="nav-link px-3 md:px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-gray-300 hover:bg-gray-800 hover:text-white"><span class="hidden md:inline">Ventas</span></a>
           <a href="/pos/historial" class="nav-link px-3 md:px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-gray-300 hover:bg-gray-800 hover:text-white"><span class="hidden md:inline">Historial</span></a>
           <a href="/pos" class="nav-link px-3 md:px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-gray-300 hover:bg-gray-800 hover:text-white"><span class="hidden md:inline">Inventario</span></a>
-          <a href="/pos/estadisticas" class="nav-link px-3 md:px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-gray-300 hover:bg-gray-800 hover:text-white"><span class="hidden md:inline">Estadísticas</span></a>
+          {isAdmin && <a href="/pos/estadisticas" class="nav-link px-3 md:px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-gray-300 hover:bg-gray-800 hover:text-white"><span class="hidden md:inline">Estadísticas</span></a>}
+          <a href="/pos/clientes" class="nav-link px-3 md:px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-gray-300 hover:bg-gray-800 hover:text-white"><span class="hidden md:inline">Clientes</span></a>
         </nav>
-        
+
         <div class="hidden sm:block ml-2 pl-2 md:ml-4 border-l border-gray-700 shrink-0">
-           <button class="text-gray-400 hover:text-red-400 transition-colors p-2 rounded-lg hover:bg-gray-800" title="Cerrar Sesion">Cerrar</button>
+          <a href="/pos/logout" class="text-gray-400 hover:text-red-400 transition-colors p-2 rounded-lg hover:bg-gray-800 flex items-center" title="Cerrar Sesión">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+          </a>
         </div>
       </div>
     </header>
@@ -398,8 +409,9 @@ const carteraRender = cartera.map((orden: any) => {
     </div>
 
     <script>
-      import { generarFacturaPDF } from '../../pos/ventas/pdf.ts';
+      import { generarFacturaPDF, generarReciboAbonoPDF } from '../../pos/ventas/pdf.ts';
       import { supabase } from '../../lib/supabase.js';
+      import { formatNumeroFactura } from '../../pos/ventas/utils';
 
       const formatoPesos = (num: number) => '$' + Math.round(num || 0).toLocaleString('es-CO');
       const consultarHistorialAbonos = async (ventaId: string, abonoFallback?: { monto: number; fecha: string; metodoPago?: string | null }) => {
@@ -439,7 +451,7 @@ const carteraRender = cartera.map((orden: any) => {
         const telefono = venta.cliente_telefono && venta.cliente_telefono !== 'N/A'
           ? venta.cliente_telefono
           : '';
-        const fechaStr = new Date(venta.fecha).toLocaleDateString('es-CO') + ' ' + new Date(venta.fecha).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true });
+        const fechaStr = new Date(venta.fecha).toLocaleDateString('es-CO', { timeZone: 'America/Bogota' }) + ' ' + new Date(venta.fecha).toLocaleTimeString('es-CO', { timeZone: 'America/Bogota', hour: '2-digit', minute: '2-digit', hour12: true });
         const recibido = Number(overrides.abono ?? overrides.monto_recibido ?? venta.abono ?? venta.monto_recibido ?? 0);
         const totalNeto = Number(overrides.total_neto ?? (venta.total_neto || 0));
 
@@ -466,7 +478,9 @@ const carteraRender = cartera.map((orden: any) => {
           recibido,
           tipoVenta: overrides.tipo_venta || venta.tipo_venta || 'credito',
           metodoPago: overrides.metodo_pago || venta.metodo_pago || 'efectivo',
-          numeroComprobante: venta.id?.split('-').pop()?.substring(6)?.toUpperCase() || 'N/A',
+          numeroComprobante: venta.numero_factura != null
+            ? formatNumeroFactura(Number(venta.numero_factura))
+            : (venta.id?.split('-').pop()?.substring(6)?.toUpperCase() || 'N/A'),
         };
       };
 
@@ -724,7 +738,9 @@ const carteraRender = cartera.map((orden: any) => {
           fechaActualPDF.setHours(0, 0, 0, 0);
 
           const tablaDatos = reporteFiltrado.map((orden) => {
-            const idFactura = '#' + (orden.id ? String(orden.id).split('-').pop()?.substring(6).toUpperCase() : 'N/A');
+            const idFactura = '#' + (orden.numero_factura != null
+              ? formatNumeroFactura(Number(orden.numero_factura))
+              : (orden.id ? String(orden.id).split('-').pop()?.substring(6).toUpperCase() : 'N/A'));
             const saldo = Number(orden.total_neto || 0) - Number(orden.abono || 0);
             sumaTotalCartera += saldo;
 
@@ -885,6 +901,16 @@ const carteraRender = cartera.map((orden: any) => {
         return Math.max(0, total - recibido);
       };
 
+      const obtenerDireccionCliente = async (nombreCliente: string): Promise<string> => {
+        if (!nombreCliente) return '';
+        const { data } = await supabase
+          .from('clientes')
+          .select('direccion')
+          .ilike('nombre', nombreCliente)
+          .maybeSingle();
+        return data?.direccion || '';
+      };
+
       document.getElementById('btnHistorialDescargar')?.addEventListener('click', async (e) => {
         const btn = e.currentTarget;
         if (!(btn instanceof HTMLButtonElement)) return;
@@ -894,7 +920,9 @@ const carteraRender = cartera.map((orden: any) => {
           const historialAbonos = ventaSeleccionada?.id
             ? await consultarHistorialAbonos(ventaSeleccionada.id)
             : [];
-          await generarFacturaPDF(snapshotActual, 'descargar', { historialAbonos });
+          const dir = await obtenerDireccionCliente(ventaSeleccionada?.cliente_nombre || '');
+          const snap = dir ? { ...snapshotActual, direccion: dir } : snapshotActual;
+          await generarFacturaPDF(snap, 'descargar', { historialAbonos });
         });
       });
 
@@ -907,7 +935,9 @@ const carteraRender = cartera.map((orden: any) => {
           const historialAbonos = ventaSeleccionada?.id
             ? await consultarHistorialAbonos(ventaSeleccionada.id)
             : [];
-          await generarFacturaPDF(snapshotActual, 'imprimir', { historialAbonos });
+          const dir = await obtenerDireccionCliente(ventaSeleccionada?.cliente_nombre || '');
+          const snap = dir ? { ...snapshotActual, direccion: dir } : snapshotActual;
+          await generarFacturaPDF(snap, 'imprimir', { historialAbonos });
         });
       });
 
@@ -922,7 +952,9 @@ const carteraRender = cartera.map((orden: any) => {
           return;
         }
 
-        const idCorto = ventaSeleccionada.id?.split('-').pop()?.substring(6)?.toUpperCase() || 'N/A';
+        const idCorto = ventaSeleccionada.numero_factura != null
+          ? formatNumeroFactura(Number(ventaSeleccionada.numero_factura))
+          : (ventaSeleccionada.id?.split('-').pop()?.substring(6)?.toUpperCase() || 'N/A');
         const confirmar = await preguntar({
           title: 'Confirmar pago total',
           message: `¿Deseas saldar por completo la deuda #${idCorto}? Esta acción marcará la venta como completada.`,
@@ -1130,6 +1162,21 @@ const carteraRender = cartera.map((orden: any) => {
 
             ventaSeleccionada = ventaActualizada;
             snapshotActual = construirSnapshotVenta(ventaActualizada);
+
+            const dirAbono = await obtenerDireccionCliente(ventaActualizada.cliente_nombre || '');
+
+            await generarReciboAbonoPDF({
+              cliente: ventaActualizada.cliente_nombre || 'CLIENTE MOSTRADOR',
+              telefono: ventaActualizada.cliente_telefono || '',
+              direccion: dirAbono || undefined,
+              fechaAbono,
+              numeroComprobante: snapshotActual.numeroComprobante,
+              montoAbono,
+              metodoPago: metodoAbono,
+              totalVenta: totalNeto,
+              totalAbonado: nuevoRecibido,
+              saldoPendiente: Math.max(0, totalNeto - nuevoRecibido),
+            }, 'descargar');
 
             cerrarAbono();
 

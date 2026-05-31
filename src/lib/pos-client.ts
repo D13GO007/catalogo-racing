@@ -154,8 +154,13 @@ const limpiarPrecio = (valorConFormato: string) => {
   return parseInt(valorConFormato.replace(/\./g, ''), 10);
 };
 
-// --- Abrir Editar al clickear tarjeta ---
+// --- Abrir Editar al clickear tarjeta (solo admin) ---
+const isAdminMode = document.body.dataset.admin === 'true';
+if (!isAdminMode) {
+  cards.forEach(card => card.style.cursor = 'default');
+}
 cards.forEach((card) => {
+  if (!isAdminMode) return;
   card.addEventListener('click', (e) => {
     const targetCard = e.currentTarget as HTMLElement;
     currentEditId = targetCard.dataset.id || null;
@@ -202,18 +207,35 @@ async function uploadImage(file: File) {
 
 // --- 1. AGREGAR NUEVO PRODUCTO ---
 document.getElementById('btnGuardarNuevo')?.addEventListener('click', async (e) => {
-  const btn = e.target as HTMLButtonElement;
-  btn.innerText = 'Guardando...';
+  const btn = e.currentTarget as HTMLButtonElement;
+  const htmlOriginal = btn.innerHTML;
+  btn.innerHTML = 'Guardando...';
   btn.disabled = true;
 
   try {
+    const modelo = (document.getElementById('addModelo') as HTMLInputElement).value.trim();
+    const stockRaw = (document.getElementById('addStockActual') as HTMLInputElement).value.trim();
+
+    if (!modelo) {
+      alert('El modelo no puede estar vacío.');
+      btn.innerHTML = htmlOriginal;
+      btn.disabled = false;
+      return;
+    }
+    if (stockRaw === '' || isNaN(Number(stockRaw))) {
+      alert('Ingresa un stock válido (número entero).');
+      btn.innerHTML = htmlOriginal;
+      btn.disabled = false;
+      return;
+    }
+
     let imageUrl = null;
     const fileInput = document.getElementById('addProductImage') as HTMLInputElement;
     const file = fileInput.files?.[0];
     if (file) imageUrl = await uploadImage(file);
 
     const nuevoProducto = {
-      modelo: (document.getElementById('addModelo') as HTMLInputElement).value.trim(),
+      modelo,
       familia_id: (document.getElementById('addFamiliaId') as HTMLSelectElement).value,
       precio_venta: limpiarPrecio(
         (document.getElementById('addPrecioVenta') as HTMLInputElement).value
@@ -221,11 +243,9 @@ document.getElementById('btnGuardarNuevo')?.addEventListener('click', async (e) 
       precio_costo: limpiarPrecio(
         (document.getElementById('addPrecioCosto') as HTMLInputElement).value
       ),
-      stock_actual: parseInt(
-        (document.getElementById('addStockActual') as HTMLInputElement).value
-      ),
+      stock_actual: parseInt(stockRaw, 10),
       imagen_especifica: imageUrl,
-      visible_en_catalogo: false, // Regla para no afectar web
+      visible_en_catalogo: false,
       activo: true,
     };
 
@@ -234,25 +254,42 @@ document.getElementById('btnGuardarNuevo')?.addEventListener('click', async (e) 
     window.location.reload();
   } catch (err: any) {
     alert('Error al agregar: ' + err.message);
-    btn.innerText = '💾 Guardar Producto';
+    btn.innerHTML = htmlOriginal;
     btn.disabled = false;
   }
 });
 
 // --- 2. EDITAR PRODUCTO ---
 document.getElementById('btnGuardarCambios')?.addEventListener('click', async (e) => {
-  const btn = e.target as HTMLButtonElement;
-  btn.innerText = 'Actualizando...';
+  const btn = e.currentTarget as HTMLButtonElement;
+  const htmlOriginal = btn.innerHTML;
+  btn.innerHTML = 'Actualizando...';
   btn.disabled = true;
 
   try {
+    const modelo = (document.getElementById('editModelo') as HTMLInputElement).value.trim();
+    const stockRaw = (document.getElementById('editStockActual') as HTMLInputElement).value.trim();
+
+    if (!modelo) {
+      alert('El modelo no puede estar vacío.');
+      btn.innerHTML = htmlOriginal;
+      btn.disabled = false;
+      return;
+    }
+    if (stockRaw === '' || isNaN(Number(stockRaw))) {
+      alert('Ingresa un stock válido (número entero).');
+      btn.innerHTML = htmlOriginal;
+      btn.disabled = false;
+      return;
+    }
+
     let imageUrl = (document.getElementById('editProductOriginalImage') as HTMLInputElement).value;
     const fileInput = document.getElementById('editProductImage') as HTMLInputElement;
     const file = fileInput.files?.[0];
     if (file) imageUrl = await uploadImage(file);
 
     const productoActualizado = {
-      modelo: (document.getElementById('editModelo') as HTMLInputElement).value.trim(),
+      modelo,
       familia_id: (document.getElementById('editFamiliaId') as HTMLSelectElement).value,
       precio_venta: limpiarPrecio(
         (document.getElementById('editPrecioVenta') as HTMLInputElement).value
@@ -260,9 +297,7 @@ document.getElementById('btnGuardarCambios')?.addEventListener('click', async (e
       precio_costo: limpiarPrecio(
         (document.getElementById('editPrecioCosto') as HTMLInputElement).value
       ),
-      stock_actual: parseInt(
-        (document.getElementById('editStockActual') as HTMLInputElement).value
-      ),
+      stock_actual: parseInt(stockRaw, 10),
       imagen_especifica: imageUrl,
     };
 
@@ -274,7 +309,7 @@ document.getElementById('btnGuardarCambios')?.addEventListener('click', async (e
     window.location.reload();
   } catch (err: any) {
     alert('Error al editar: ' + err.message);
-    btn.innerText = '💾 Guardar';
+    btn.innerHTML = htmlOriginal;
     btn.disabled = false;
   }
 });
@@ -285,8 +320,10 @@ document.getElementById('btnEliminar')?.addEventListener('click', () => {
 });
 
 document.getElementById('btnConfirmDelete')?.addEventListener('click', async (e) => {
-  const btn = e.target as HTMLButtonElement;
-  btn.innerText = 'Eliminando...';
+  const btn = e.currentTarget as HTMLButtonElement;
+  const htmlOriginal = btn.innerHTML;
+  btn.innerHTML = 'Eliminando...';
+  btn.disabled = true;
 
   try {
     const { error } = await supabase
@@ -297,6 +334,7 @@ document.getElementById('btnConfirmDelete')?.addEventListener('click', async (e)
     window.location.reload();
   } catch (err: any) {
     alert('Error al eliminar: ' + err.message);
-    btn.innerText = 'Sí, Eliminar';
+    btn.innerHTML = htmlOriginal;
+    btn.disabled = false;
   }
 });

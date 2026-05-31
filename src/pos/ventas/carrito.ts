@@ -121,6 +121,30 @@ const actualizarStockVisualDesdeCarrito = () => {
     if (btnAgregar) {
       btnAgregar.disabled = disponible <= 0;
     }
+
+    // Badge de cantidad en carrito sobre la tarjeta
+    const badge = document.getElementById(`cart-badge-${idProducto}`);
+    if (badge) {
+      if (cantidadEnCarrito > 0) {
+        const eraVisible = !badge.classList.contains('hidden');
+        const textoAnterior = badge.textContent;
+        badge.textContent = String(cantidadEnCarrito);
+        badge.classList.remove('hidden');
+        badge.style.display = 'flex';
+
+        // Animación: aparición si antes estaba oculto, bump si solo cambió el número
+        badge.classList.remove('cart-badge-appear', 'cart-badge-bump');
+        void badge.offsetWidth; // forzar reflow para reiniciar animación
+        badge.classList.add(eraVisible && textoAnterior !== String(cantidadEnCarrito)
+          ? 'cart-badge-bump'
+          : 'cart-badge-appear');
+      } else {
+        badge.classList.add('hidden');
+        badge.style.display = '';
+        badge.textContent = '';
+        badge.classList.remove('cart-badge-appear', 'cart-badge-bump');
+      }
+    }
   });
 };
 

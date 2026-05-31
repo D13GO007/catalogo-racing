@@ -1,6 +1,9 @@
 ﻿---
-import '../../styles.css'; 
+import '../../styles.css';
 import { supabase } from '../../lib/supabase.js';
+
+const role    = Astro.cookies.get('pr_session')?.value || 'empleado';
+const isAdmin = role === 'admin';
 
 // En POS solo cargamos referencias activas; no dependemos de visibilidad en catalogo.
 const { data: referencias, error } = await supabase
@@ -98,8 +101,20 @@ function limpiarNombreReferencia(nombreFamilia, nombreReferencia) {
       }
       /* Ajuste para que la pantalla principal no haga scroll completo, pareciendo una app nativa */
       .layout-height {
-        height: calc(100vh - 5rem); 
+        height: calc(100vh - 5rem);
       }
+      @keyframes badge-pop {
+        0%   { transform: scale(0.4); opacity: 0; }
+        60%  { transform: scale(1.25); opacity: 1; }
+        100% { transform: scale(1); opacity: 1; }
+      }
+      @keyframes badge-bump {
+        0%   { transform: scale(1); }
+        40%  { transform: scale(1.4); }
+        100% { transform: scale(1); }
+      }
+      .cart-badge-appear { animation: badge-pop  0.22s cubic-bezier(.34,1.56,.64,1) forwards; }
+      .cart-badge-bump   { animation: badge-bump 0.18s cubic-bezier(.34,1.56,.64,1) forwards; }
 
       /* ========================================== */
       /* ESTILOS DE IMPRESIÓN (FACTURA)             */
@@ -215,18 +230,24 @@ function limpiarNombreReferencia(nombreFamilia, nombreReferencia) {
             <span class="hidden md:inline">Inventario</span>
           </a>
 
-          <a href="/pos/estadisticas" data-astro-prefetch class="nav-link px-3 md:px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-gray-300 border border-transparent hover:bg-gray-800 hover:text-white whitespace-nowrap">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-            <span class="hidden md:inline">Estadísticas</span>
+          {isAdmin && (
+            <a href="/pos/estadisticas" data-astro-prefetch class="nav-link px-3 md:px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-gray-300 border border-transparent hover:bg-gray-800 hover:text-white whitespace-nowrap">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+              <span class="hidden md:inline">Estadísticas</span>
+            </a>
+          )}
+          <a href="/pos/clientes" data-astro-prefetch class="nav-link px-3 md:px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all text-gray-300 border border-transparent hover:bg-gray-800 hover:text-white whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            <span class="hidden md:inline">Clientes</span>
           </a>
         </nav>
-        
+
         <div class="hidden sm:block ml-2 pl-2 md:ml-4 md:pl-4 border-l border-gray-700 shrink-0">
-           <button class="text-gray-400 hover:text-red-400 transition-colors p-2 rounded-lg hover:bg-gray-800" title="Cerrar Sesión">
-             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-               <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-             </svg>
-           </button>
+          <a href="/pos/logout" class="text-gray-400 hover:text-red-400 transition-colors p-2 rounded-lg hover:bg-gray-800 flex items-center" title="Cerrar Sesión">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+          </a>
         </div>
 
       </div>
@@ -295,9 +316,15 @@ function limpiarNombreReferencia(nombreFamilia, nombreReferencia) {
         <div class="neumorphism p-4 flex-1 overflow-y-auto">
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3" id="listaProductos">
             {referencias?.map(ref => (
-              <div class="producto-card bg-white rounded-xl p-3 border border-gray-200 shadow-sm flex flex-col justify-between cursor-pointer hover:border-orange-400 hover:shadow-md transition-all group relative" 
-                   data-modelo={ref.modelo.toLowerCase()} 
+              <div class="producto-card bg-white rounded-xl p-3 border border-gray-200 shadow-sm flex flex-col justify-between cursor-pointer hover:border-orange-400 hover:shadow-md transition-all group relative"
+                   data-modelo={ref.modelo.toLowerCase()}
                    data-familia={ref.familias?.nombre?.toLowerCase()}>
+
+                <span
+                  id={`cart-badge-${ref.id}`}
+                  class="hidden absolute -top-2.5 -right-2.5 min-w-[22px] h-[22px] px-1.5 bg-orange-500 text-white text-[11px] font-black rounded-full items-center justify-center shadow-lg shadow-orange-500/50 z-10 select-none pointer-events-none"
+                  style="line-height:1;"
+                ></span>
                 
                 <div class="flex gap-3">
                   <div class="w-16 h-16 shrink-0 bg-gray-50 rounded-lg border border-gray-100 p-1 flex items-center justify-center">
@@ -344,33 +371,32 @@ function limpiarNombreReferencia(nombreFamilia, nombreReferencia) {
       </section>
 
       <aside id="seccionCarrito" class="w-full lg:w-[320px] xl:w-[380px] shrink-0 lg:h-full flex flex-col">
-        <div class="neumorphism p-5 flex-1 flex flex-col overflow-hidden">
-          <div class="border-b border-gray-300 pb-3 mb-4 flex justify-between items-end shrink-0">
-            <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+        <div class="neumorphism p-3 flex-1 flex flex-col overflow-hidden">
+          <div class="border-b border-gray-300 pb-1 mb-2 flex justify-between items-center shrink-0">
+            <h2 class="text-sm font-bold text-gray-800 flex items-center gap-1.5">
               <span>📋</span> Resumen del Pedido
             </h2>
             <button id="btnVaciar" class="text-xs text-red-500 hover:text-red-700 font-semibold underline">Vaciar</button>
           </div>
 
-          <div class="mb-4 space-y-1 shrink-0">
-            <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider">Cliente / Taller:</label>
-            <div class="flex flex-col sm:flex-row gap-2">
-              <select id="selectCliente" class="search-input w-full text-sm py-2 bg-white/60 font-bold text-gray-700 outline-none focus:border-orange-500 cursor-pointer">
+          <div class="mb-2 shrink-0">
+            <div class="flex gap-1.5">
+              <select id="selectCliente" class="search-input w-full text-xs py-1.5 bg-white/60 font-bold text-gray-700 outline-none focus:border-orange-500 cursor-pointer">
                 <option value="Cliente Mostrador" data-telefono="N/A" data-descuento="0">CLIENTE MOSTRADOR</option>
                 {clientes.map(cli => (
-                  <option value={cli.nombre} data-telefono={cli.telefono || 'Sin teléfono'} data-descuento={String(cli.descuento_general || 0)}>{cli.nombre.toUpperCase()}</option>
+                  <option value={cli.nombre} data-telefono={cli.telefono || 'Sin teléfono'} data-descuento={String(cli.descuento_general || 0)} data-direccion={cli.direccion || ''}>{cli.nombre.toUpperCase()}</option>
                 ))}
               </select>
               
-              <button id="btnAbrirModalCliente" class="shrink-0 bg-white border-2 border-gray-200 text-orange-500 hover:text-white hover:bg-orange-500 hover:border-orange-500 w-11 h-11 rounded-xl flex items-center justify-center transition-all shadow-sm group" title="Registrar Nuevo Cliente">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <button id="btnAbrirModalCliente" class="shrink-0 bg-white border-2 border-gray-200 text-orange-500 hover:text-white hover:bg-orange-500 hover:border-orange-500 w-8 h-8 rounded-lg flex items-center justify-center transition-all shadow-sm group" title="Registrar Nuevo Cliente">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                 </svg>
               </button>
             </div>
           </div>
 
-          <div class="neumorphism-inset p-2 flex-1 overflow-y-auto mb-4" id="carritoContenedor">
+          <div class="neumorphism-inset p-1.5 flex-1 overflow-y-auto mb-1.5" id="carritoContenedor">
             <div id="carritoVacio" class="h-full flex flex-col items-center justify-center text-gray-400 opacity-70 mt-10">
               <span class="text-4xl mb-2">📥</span>
               <p class="text-sm font-medium">No hay repuestos en el pedido</p>
@@ -378,38 +404,34 @@ function limpiarNombreReferencia(nombreFamilia, nombreReferencia) {
           </div>
 
           <div class="shrink-0">
-            <div class="space-y-2 mb-4 bg-white p-3 rounded-xl border border-gray-200">
-              <div class="flex justify-between text-gray-500 text-sm">
-                <span>Subtotal:</span>
-                <span id="txtSubtotal" class="font-bold text-gray-700">$0</span>
+            <div class="mb-1.5 bg-white px-2 py-1.5 rounded-xl border border-gray-200 flex items-center justify-between gap-2">
+              <div class="text-[10px] text-gray-400 space-y-0.5">
+                <div class="flex gap-1.5"><span>Sub:</span><span id="txtSubtotal" class="font-bold text-gray-600">$0</span></div>
+                <div class="flex gap-1.5"><span>Desc:</span><span id="txtDescuentoGlobalValor" class="font-bold text-red-400">$0</span></div>
               </div>
-              <div class="flex justify-between text-gray-500 text-sm">
-                <span>Descuento Cliente:</span>
-                <span id="txtDescuentoGlobalValor" class="font-bold text-red-500">$0</span>
-              </div>
-              <div class="flex justify-between text-gray-900 text-xl border-t border-gray-100 pt-2 mt-1">
-                <span class="font-black">TOTAL:</span>
-                <span id="txtTotal" class="font-black text-green-600">$0</span>
+              <div class="text-right">
+                <div class="text-[10px] text-gray-400 font-bold uppercase">Total</div>
+                <div id="txtTotal" class="font-black text-green-600 text-lg leading-tight">$0</div>
               </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row gap-3 mb-3">
-              <button id="btnCotizar" class="w-1/2 bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-400 font-bold py-3 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 text-sm group">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <div class="flex gap-1.5 mb-1.5">
+              <button id="btnCotizar" class="flex-1 bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-400 font-bold py-1.5 rounded-lg transition-all shadow-sm flex items-center justify-center gap-1 text-xs group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 Cotizar
               </button>
 
-              <button id="btnGuardar" class="w-1/2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 font-bold py-3 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 text-sm group">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <button id="btnGuardar" class="flex-1 bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 font-bold py-1.5 rounded-lg transition-all shadow-sm flex items-center justify-center gap-1 text-xs group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                 </svg>
                 Guardar
               </button>
             </div>
 
-            <button id="btnGenerarPedido" class="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black py-3.5 rounded-xl text-lg flex justify-center items-center gap-2 shadow-[0_8px_15px_rgba(16,185,129,0.3)] hover:shadow-[0_12px_20px_rgba(16,185,129,0.4)] transition-all border border-green-700 hover:-translate-y-1">
+            <button id="btnGenerarPedido" class="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black py-2 rounded-xl text-sm flex justify-center items-center gap-2 shadow-[0_6px_12px_rgba(16,185,129,0.3)] hover:shadow-[0_10px_18px_rgba(16,185,129,0.4)] transition-all border border-green-700 hover:-translate-y-0.5">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
               </svg>
@@ -897,7 +919,7 @@ function limpiarNombreReferencia(nombreFamilia, nombreReferencia) {
       import { renderFactura, initFacturaModal } from '../../pos/ventas/factura';
       import { generarFacturaPDF }         from '../../pos/ventas/pdf';
       import { initClienteModal }          from '../../pos/ventas/clientes';
-      import { formatoPesos, limpiarMoneda, obtenerNumeroComprobanteDesdeVentaId } from '../../pos/ventas/utils';
+      import { formatoPesos, limpiarMoneda, obtenerNumeroComprobanteDesdeVentaId, formatNumeroFactura } from '../../pos/ventas/utils';
       import type { VentaSnapshot }        from '../../pos/ventas/types';
 
       // ── Refs del DOM ─────────────────────────────────────────────────────────
@@ -1149,10 +1171,10 @@ function limpiarNombreReferencia(nombreFamilia, nombreReferencia) {
       const obtenerClienteActual = () => {
         const clienteSelect = document.getElementById('selectCliente') as HTMLSelectElement;
         const cliente = clienteSelect?.value || 'Cliente Mostrador';
-        const telefono = clienteSelect && clienteSelect.selectedIndex > -1
-          ? clienteSelect.options[clienteSelect.selectedIndex].getAttribute('data-telefono') || 'N/A'
-          : 'N/A';
-        return { clienteSelect, cliente, telefono };
+        const selectedOpt = (clienteSelect && clienteSelect.selectedIndex > -1) ? clienteSelect.options[clienteSelect.selectedIndex] : null;
+        const telefono  = selectedOpt?.getAttribute('data-telefono')  || 'N/A';
+        const direccion = selectedOpt?.getAttribute('data-direccion') || '';
+        return { clienteSelect, cliente, telefono, direccion };
       };
 
       const limpiarVistaVenta = () => {
@@ -1180,7 +1202,9 @@ function limpiarNombreReferencia(nombreFamilia, nombreReferencia) {
 
           const banner = document.getElementById('bannerEdicion');
           const textoBanner = document.getElementById('textoBannerEdicion');
-          const idCorto = factura?.id?.split('-')?.pop()?.substring(6)?.toUpperCase() || 'N/A';
+          const idCorto = factura?.numero_factura != null
+            ? formatNumeroFactura(Number(factura.numero_factura))
+            : factura?.id?.split('-')?.pop()?.substring(6)?.toUpperCase() || 'N/A';
           if (banner && textoBanner) {
             banner.classList.remove('hidden');
             textoBanner.innerText = `Estás modificando la orden #${idCorto} a nombre de ${factura?.cliente_nombre || 'Cliente Mostrador'}.`;
@@ -1335,7 +1359,7 @@ function limpiarNombreReferencia(nombreFamilia, nombreReferencia) {
         }
 
         try {
-          const { clienteSelect, cliente, telefono } = obtenerClienteActual();
+          const { clienteSelect, cliente, telefono, direccion } = obtenerClienteActual();
           const ahora = new Date();
           const recibidoFinal = getRecibidoFinal();
           const fechaPagoInput = document.getElementById('inputFechaPago') as HTMLInputElement | null;
@@ -1364,7 +1388,7 @@ function limpiarNombreReferencia(nombreFamilia, nombreReferencia) {
             snapshot_carrito: carrito,
           };
 
-          let ventaData: { id: string; fecha: string } | null = null;
+          let ventaData: { id: string; fecha: string; numero_factura: number | null } | null = null;
 
           if (facturaGuardada) {
             // Si venimos de Historial, actualizamos la misma venta/cotización.
@@ -1373,27 +1397,37 @@ function limpiarNombreReferencia(nombreFamilia, nombreReferencia) {
               .from('ventas')
               .update(payloadVenta)
               .eq('id', facturaAntigua.id)
-              .select('id, fecha')
+              .select('id, fecha, numero_factura')
               .single();
 
             if (error || !data) {
               throw new Error(error?.message || 'No se pudo actualizar la venta en edición.');
             }
 
-            ventaData = data as { id: string; fecha: string };
+            ventaData = data as { id: string; fecha: string; numero_factura: number | null };
           } else {
-            // Flujo normal: insert de una venta nueva.
+            // Flujo normal: obtener siguiente número y hacer insert.
+            const { data: maxData } = await supabase
+              .from('ventas')
+              .select('numero_factura')
+              .not('numero_factura', 'is', null)
+              .order('numero_factura', { ascending: false })
+              .limit(1)
+              .maybeSingle();
+
+            const nextNumero = (maxData?.numero_factura ?? 0) + 1;
+
             const { data, error } = await supabase
               .from('ventas')
-              .insert([payloadVenta])
-              .select('id, fecha')
+              .insert([{ ...payloadVenta, numero_factura: nextNumero }])
+              .select('id, fecha, numero_factura')
               .single();
 
             if (error || !data) {
               throw new Error(error?.message || 'No se pudo guardar la venta.');
             }
 
-            ventaData = data as { id: string; fecha: string };
+            ventaData = data as { id: string; fecha: string; numero_factura: number | null };
           }
 
           if (!ventaData) {
@@ -1401,7 +1435,9 @@ function limpiarNombreReferencia(nombreFamilia, nombreReferencia) {
           }
 
           const ventaId = ventaData.id;
-          const numeroComprobante = obtenerNumeroComprobanteDesdeVentaId(ventaId);
+          const numeroComprobante = ventaData.numero_factura != null
+            ? formatNumeroFactura(Number(ventaData.numero_factura))
+            : obtenerNumeroComprobanteDesdeVentaId(ventaId);
 
           if (facturaGuardada) {
             const { error: borrarDetallesError } = await supabase
@@ -1438,14 +1474,71 @@ function limpiarNombreReferencia(nombreFamilia, nombreReferencia) {
 
           if (detallesError) throw detallesError;
 
+          // PASO 3: Ajustar stock en 'referencias'
+          if (tipoVenta !== 'cotizacion') {
+            if (facturaGuardada) {
+              // EDICIÓN: calcular delta entre items anteriores y nuevos
+              const facturaAntigua = JSON.parse(facturaGuardada);
+              const rawAntiguos = typeof facturaAntigua.snapshot_carrito === 'string'
+                ? JSON.parse(facturaAntigua.snapshot_carrito || '[]')
+                : (facturaAntigua.snapshot_carrito || []);
+
+              const oldQtyMap: Record<string, number> = {};
+              for (const item of rawAntiguos) {
+                const id = String(item.id || item.referencia_id || '');
+                if (id) oldQtyMap[id] = (oldQtyMap[id] || 0) + Number(item.cantidad || 0);
+              }
+              const newQtyMap: Record<string, number> = {};
+              for (const item of carrito) {
+                newQtyMap[item.id] = (newQtyMap[item.id] || 0) + item.cantidad;
+              }
+
+              const todosIds = [...new Set([...Object.keys(oldQtyMap), ...Object.keys(newQtyMap)])];
+              if (todosIds.length > 0) {
+                const { data: stocks } = await supabase
+                  .from('referencias').select('id, stock_actual').in('id', todosIds);
+                const stockMap: Record<string, number> = Object.fromEntries(
+                  (stocks || []).map(r => [r.id, r.stock_actual])
+                );
+                await Promise.all(
+                  todosIds.map(id => {
+                    const delta = (newQtyMap[id] || 0) - (oldQtyMap[id] || 0);
+                    if (delta === 0) return Promise.resolve();
+                    const nuevoStock = Math.max(0, (stockMap[id] ?? 0) - delta);
+                    return supabase.from('referencias').update({ stock_actual: nuevoStock }).eq('id', id);
+                  })
+                );
+              }
+            } else {
+              // VENTA NUEVA: deducir stock completo del carrito
+              const idsProductos = [...new Set(carrito.map(item => item.id))];
+              const { data: stocksActuales } = await supabase
+                .from('referencias').select('id, stock_actual').in('id', idsProductos);
+              const stockMap: Record<string, number> = Object.fromEntries(
+                (stocksActuales || []).map(r => [r.id, r.stock_actual])
+              );
+              const cantidadesPorProducto = carrito.reduce((acc, item) => {
+                acc[item.id] = (acc[item.id] || 0) + item.cantidad;
+                return acc;
+              }, {} as Record<string, number>);
+              await Promise.all(
+                Object.entries(cantidadesPorProducto).map(([id, cantidad]) => {
+                  const nuevoStock = Math.max(0, (stockMap[id] ?? 0) - cantidad);
+                  return supabase.from('referencias').update({ stock_actual: nuevoStock }).eq('id', id);
+                })
+              );
+            }
+          }
+
           const fechaVenta = ventaData.fecha ? new Date(ventaData.fecha) : ahora;
           const fechaFormateada =
-            fechaVenta.toLocaleDateString('es-CO', { day: '2-digit', month: 'short' }) + ', ' +
-            fechaVenta.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true });
+            fechaVenta.toLocaleDateString('es-CO', { timeZone: 'America/Bogota', day: '2-digit', month: 'short' }) + ', ' +
+            fechaVenta.toLocaleTimeString('es-CO', { timeZone: 'America/Bogota', hour: '2-digit', minute: '2-digit', hour12: true });
 
           ultimaVenta = {
             cliente,
             telefono,
+            direccion: direccion || undefined,
             fecha: fechaFormateada,
             numeroComprobante,
             items: snapshotItems,
@@ -1551,13 +1644,23 @@ function limpiarNombreReferencia(nombreFamilia, nombreReferencia) {
         try {
           const clienteSelect = document.getElementById('selectCliente') as HTMLSelectElement;
           const cliente = clienteSelect ? clienteSelect.value : 'Cliente Mostrador';
-          const telefono = clienteSelect && clienteSelect.selectedIndex > -1 
-            ? clienteSelect.options[clienteSelect.selectedIndex].getAttribute('data-telefono') || 'N/A' 
-            : 'N/A';
+          const _optCot = (clienteSelect && clienteSelect.selectedIndex > -1) ? clienteSelect.options[clienteSelect.selectedIndex] : null;
+          const telefono  = _optCot?.getAttribute('data-telefono')  || 'N/A';
+          const direccionCot = _optCot?.getAttribute('data-direccion') || '';
 
           const subtotalCotizacion = carrito.reduce((sum, item) => sum + ((item.precio * item.cantidad) - (item.descuentoTotal || 0)), 0);
 
           // PASO 1: Guardar la Cotización en Supabase ('ventas')
+          const { data: maxDataCot } = await supabase
+            .from('ventas')
+            .select('numero_factura')
+            .not('numero_factura', 'is', null)
+            .order('numero_factura', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          const nextNumeroCot = (maxDataCot?.numero_factura ?? 0) + 1;
+
           const { data: cotizacionData, error: cotizacionError } = await supabase
             .from('ventas')
             .insert([{
@@ -1565,14 +1668,15 @@ function limpiarNombreReferencia(nombreFamilia, nombreReferencia) {
               cliente_telefono: telefono,
               subtotal: subtotalCotizacion,
               descuento_global: 0,
-              total_neto: subtotalCotizacion, 
+              total_neto: subtotalCotizacion,
               monto_recibido: 0,
               tipo_venta: 'cotizacion',
               metodo_pago: 'N/A',
               estado: 'cotizacion',
-              snapshot_carrito: carrito 
+              snapshot_carrito: carrito,
+              numero_factura: nextNumeroCot
             }])
-            .select('id, fecha')
+            .select('id, fecha, numero_factura')
             .single();
 
           if (cotizacionError) throw cotizacionError;
@@ -1607,8 +1711,11 @@ function limpiarNombreReferencia(nombreFamilia, nombreReferencia) {
           ultimaCotizacion = {
             cliente: cliente,
             telefono: telefono,
+            direccion: direccionCot || undefined,
             fecha: new Date(cotizacionData.fecha).toLocaleDateString('es-CO') + ' (Cotización)',
-            numeroComprobante: obtenerNumeroComprobanteDesdeVentaId(cotizacionData.id),
+            numeroComprobante: cotizacionData.numero_factura != null
+              ? formatNumeroFactura(Number(cotizacionData.numero_factura))
+              : obtenerNumeroComprobanteDesdeVentaId(cotizacionData.id),
             items: JSON.parse(JSON.stringify(carrito)),
             subtotal: subtotalCotizacion,
             descuentoGlobal: 0,
