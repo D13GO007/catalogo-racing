@@ -269,7 +269,7 @@ const fechaHoy = new Date().toLocaleDateString('es-CO', { year: 'numeric', month
                         <div class="w-full md:w-7/12 flex flex-col bg-white">   
                             <div class="bg-[#111111] text-white text-[10px] md:text-xs uppercase font-bold px-4 py-2 flex justify-between items-center shadow-sm z-10">
                                 <span>Ref / Aplicación</span>
-                                <span>Precio Unitario</span>
+                                <span>{item.nombre.toLowerCase().includes('tensor') ? 'Precio Par' : 'Precio Unitario'}</span>
                             </div>
 
                             <div class="flex-1 w-full">

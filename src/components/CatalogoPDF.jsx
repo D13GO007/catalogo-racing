@@ -155,6 +155,7 @@ const CatalogoDocument = ({ productos, fechaHoy }) => (
       {productos.map((grupo, index) => {
         // 🧠 LÓGICA INTELIGENTE: Si son 3 referencias o menos, usa 1 sola columna. Si son 4 o más, usa 2 columnas.
         const isSingleColumn = grupo.referencias.length <= 3;
+        const labelPrecio = grupo.nombre.toLowerCase().includes('tensor') ? 'PRECIO PAR' : 'PRECIO UNITARIO';
 
         return (
           <View key={index} style={styles.productBox} wrap={false}>
@@ -175,17 +176,17 @@ const CatalogoDocument = ({ productos, fechaHoy }) => (
                   {isSingleColumn ? (
                     <View style={styles.fullHead}>
                       <Text style={styles.thModelFull}>REF / APLICACIÓN</Text>
-                      <Text style={styles.thPriceFull}>PRECIO UNITARIO</Text>
+                      <Text style={styles.thPriceFull}>{labelPrecio}</Text>
                     </View>
                   ) : (
                     <>
                       <View style={styles.halfHead}>
                         <Text style={styles.thModelHalf}>REF / APLICACIÓN</Text>
-                        <Text style={styles.thPriceHalf}>PRECIO UNITARIO</Text>
+                        <Text style={styles.thPriceHalf}>{labelPrecio}</Text>
                       </View>
                       <View style={[styles.halfHead, { borderLeft: '1pt solid #333' }]}>
                         <Text style={styles.thModelHalf}>REF / APLICACIÓN</Text>
-                        <Text style={styles.thPriceHalf}>PRECIO UNITARIO</Text>
+                        <Text style={styles.thPriceHalf}>{labelPrecio}</Text>
                       </View>
                     </>
                   )}
