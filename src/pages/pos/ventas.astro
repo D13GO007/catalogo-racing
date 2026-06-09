@@ -910,6 +910,7 @@ function limpiarNombreReferencia(nombreFamilia, nombreReferencia) {
       import {
         carrito, initCarrito, renderCarrito,
         agregarProductoAlCarrito, vaciarCarrito, setDescuentoGlobal, inyectarProductosAlCarrito,
+        actualizarStockBasePostVenta,
       }                                    from '../../pos/ventas/carrito';
       import {
         initCheckout, actualizarCheckout, resetCheckoutUI,
@@ -1554,6 +1555,7 @@ function limpiarNombreReferencia(nombreFamilia, nombreReferencia) {
           successFecha.innerText = fechaFormateada;
           successTotal.innerText = '$' + Math.round(totalNetoVenta).toLocaleString('es-CO');
 
+          actualizarStockBasePostVenta();
           vaciarCarrito();
           if (clienteSelect) clienteSelect.value = 'Cliente Mostrador';
           renderCarrito();

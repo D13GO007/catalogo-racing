@@ -154,6 +154,17 @@ export const vaciarCarrito = () => {
   carrito.splice(0, carrito.length);
 };
 
+export const actualizarStockBasePostVenta = () => {
+  carrito.forEach((item) => {
+    const el = document.getElementById(`stock-visual-${item.id}`);
+    if (el) {
+      const base = parseInt(el.getAttribute('data-stock-base') || '0', 10);
+      const nuevoBase = Math.max(base - item.cantidad, 0);
+      el.setAttribute('data-stock-base', String(nuevoBase));
+    }
+  });
+};
+
 export const abrirModalDescuento = (index: number) => {
   currentEditCartIndex = index;
   const item = carrito[index];
