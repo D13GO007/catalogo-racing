@@ -435,12 +435,12 @@ export async function generarFacturaPDF(
 
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(12.5);
-  pdf.setTextColor(130, 130, 130);
+  pdf.setTextColor(50, 55, 65);
   pdf.text(tituloDocumento, pageWidth - margin, headTop + 7, { align: 'right' });
 
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(10.5);
-  pdf.setTextColor(220, 20, 20);
+  pdf.setTextColor(220, 80, 20);
   pdf.text(numeroTitulo, pageWidth - margin, headTop + 12.5, { align: 'right' });
 
   pdf.setFontSize(8.4);
@@ -557,7 +557,7 @@ export async function generarFacturaPDF(
         minCellWidth: 0,
         overflow: 'linebreak',
         cellPadding: { top: 1.4, right: 0.7, bottom: 1.4, left: 0.7 },
-        textColor: [34, 45, 61],
+        textColor: [20, 20, 20],
         valign: 'middle',
         lineColor: [221, 225, 230],
         lineWidth: 0,
@@ -565,20 +565,19 @@ export async function generarFacturaPDF(
       headStyles: {
         fillColor: [255, 255, 255],
         fontSize: 8,
-        textColor: [105, 115, 128],
+        textColor: [90, 90, 100],
         fontStyle: 'bold',
         lineWidth: 0,
       },
-      bodyStyles: { lineColor: [220, 224, 230], lineWidth: 0 },
-      alternateRowStyles: { fillColor: [255, 255, 255] },
-      // REAJUSTAMOS LOS ANCHOS PARA QUE QUEPAN 6 COLUMNAS
+      bodyStyles: { lineColor: [220, 224, 230], lineWidth: 0, fillColor: [255, 255, 255] },
+      alternateRowStyles: { fillColor: [248, 248, 250] },
       columnStyles: {
-        0: { cellWidth: 18, minCellWidth: 0, halign: 'center', fontStyle: 'bold', textColor: [220, 90, 30] }, // ID
-        1: { cellWidth: 12, minCellWidth: 0, halign: 'center' }, // Cant
-        2: { cellWidth: 72, minCellWidth: 0, halign: 'left', overflow: 'linebreak' }, // Desc
-        3: { cellWidth: 24, minCellWidth: 0, halign: 'right' }, // VU
-        4: { cellWidth: 20, minCellWidth: 0, halign: 'right', textColor: [245, 70, 70] }, // Desc.
-        5: { cellWidth: 22, minCellWidth: 0, halign: 'right', fontStyle: 'bold' }, // Total
+        0: { cellWidth: 18, minCellWidth: 0, halign: 'center', fontStyle: 'bold' },
+        1: { cellWidth: 12, minCellWidth: 0, halign: 'center' },
+        2: { cellWidth: 72, minCellWidth: 0, halign: 'left', overflow: 'linebreak' },
+        3: { cellWidth: 24, minCellWidth: 0, halign: 'right' },
+        4: { cellWidth: 20, minCellWidth: 0, halign: 'right' },
+        5: { cellWidth: 22, minCellWidth: 0, halign: 'right', fontStyle: 'bold' },
       },
       didParseCell: (data: any) => {
         if (data.section === 'head') {
@@ -625,7 +624,7 @@ export async function generarFacturaPDF(
   pdf.text('Subtotal:',               boxX + 4, summaryY + 8);
   pdf.text(formatoPesos(subtotal),    valX,      summaryY + 8, { align: 'right' });
 
-  pdf.setTextColor(245, 70, 70);
+  pdf.setTextColor(70, 70, 80);
   pdf.text('Desc. Global:',           boxX + 4, summaryY + 15);
   pdf.text(`-${formatoPesos(descuentoGlobal)}`,  valX,      summaryY + 15, { align: 'right' });
 
